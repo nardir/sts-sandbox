@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\ApplicationDbContext\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
