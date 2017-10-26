@@ -6,3 +6,15 @@ services:
     build:
       context: ./sts
       dockerfile: Dockerfile
+
+  id-sts:
+    image: id-sts
+    build:
+      context: ./../id-sts
+      dockerfile: Dockerfile
+
+  api:
+    image: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
