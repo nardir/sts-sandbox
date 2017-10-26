@@ -44,6 +44,7 @@ namespace sts
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             //CreateUserTest(services).Wait();
+            ValidateCredentials(services).Wait();
 
             services.AddMvc();
         }
@@ -80,6 +81,20 @@ namespace sts
 
                 var result = await userManager.CreateAsync(user, password);
             }
+        }
+
+        private async Task ValidateCredentials(IServiceCollection services)
+        {
+            UserManager<ApplicationUser> userManager = services.BuildServiceProvider().GetRequiredService<UserManager<ApplicationUser>>();
+            string email = "nardir@axerrio.com";
+            string password = "Vexcherk1";
+
+            var user = await userManager.FindByNameAsync(email);
+            var valid = await userManager.CheckPasswordAsync(user, password);
+            valid = await userManager.CheckPasswordAsync(user, "wrong");
+
+            user = null;
+            valid = await userManager.CheckPasswordAsync(user, password);
         }
     }
 }
