@@ -7,6 +7,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using sts.Data;
+using sts.Extensions;
 
 namespace sts
 {
@@ -14,7 +16,9 @@ namespace sts
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            BuildWebHost(args)
+                .MigrateDbContext<ApplicationDbContext>()
+                .Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
