@@ -44,7 +44,7 @@ namespace sts
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             //CreateUserTest(services).Wait();
-            ValidateCredentials(services).Wait();
+            //ValidateCredentials(services).Wait();
 
             services.AddMvc();
         }
