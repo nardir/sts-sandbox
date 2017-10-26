@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using accounts.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using accounts.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace id_sts
 {
@@ -33,10 +35,15 @@ namespace id_sts
                                          sqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly.GetName().Name);
                                      }));
 
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
+
             services.AddIdentityServer()
                     .AddDeveloperSigningCredential()
                     .AddInMemoryApiResources(Config.GetApiResources())
-                    .AddInMemoryClients(Config.GetClients());
+                    .AddInMemoryClients(Config.GetClients())
+                    .AddAspNetIdentity<ApplicationUser>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
