@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using accounts.Data;
+using id_sts.Extensions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using System;
 
 namespace id_sts
 {
@@ -14,15 +10,34 @@ namespace id_sts
     {
         public static void Main(string[] args)
         {
-            Console.Title = "IdentityServer";
+            BuildWebHost(args)
+                .MigrateDbContext<ApplicationDbContext>((context, services) =>
+                {
+                    //var env = services.GetService<IHostingEnvironment>();
+                    //var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
+                    //var settings = services.GetService<IOptions<AppSettings>>();
 
-            BuildWebHost(args).Run();
+                    //new ApplicationDbContextSeed()
+                    //    .SeedAsync(context, env, logger, settings)
+                    //    .Wait();
+                })
+                .Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://localhost:5000")
                 .UseStartup<Startup>()
                 .Build();
     }
 }
+
+//.MigrateDbContext<ApplicationDbContext>((context, services) =>
+//{
+//    //var env = services.GetService<IHostingEnvironment>();
+//    //var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
+//    //var settings = services.GetService<IOptions<AppSettings>>();
+
+//    //new ApplicationDbContextSeed()
+//    //    .SeedAsync(context, env, logger, settings)
+//    //    .Wait();
+//})
