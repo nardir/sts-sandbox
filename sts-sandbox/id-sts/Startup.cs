@@ -35,7 +35,15 @@ namespace id_sts
                                          sqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly.GetName().Name);
                                      }));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+                    {
+                        options.Password.RequireDigit = false;
+                        options.Password.RequiredLength = 4;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireUppercase = false;
+
+                        options.User.RequireUniqueEmail = true;
+                    })
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
 

@@ -1,7 +1,10 @@
 ﻿using accounts.Data;
+using accounts.Models;
 using id_sts.Extensions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace id_sts
@@ -13,13 +16,9 @@ namespace id_sts
             BuildWebHost(args)
                 .MigrateDbContext<ApplicationDbContext>((context, services) =>
                 {
-                    //var env = services.GetService<IHostingEnvironment>();
-                    //var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
-                    //var settings = services.GetService<IOptions<AppSettings>>();
+                    var userManager = services.GetService<UserManager<ApplicationUser>>();
 
-                    //new ApplicationDbContextSeed()
-                    //    .SeedAsync(context, env, logger, settings)
-                    //    .Wait();
+                    ApplicationUserSeed.SeedAsync(userManager).Wait();
                 })
                 .Run();
         }
@@ -30,14 +29,3 @@ namespace id_sts
                 .Build();
     }
 }
-
-//.MigrateDbContext<ApplicationDbContext>((context, services) =>
-//{
-//    //var env = services.GetService<IHostingEnvironment>();
-//    //var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
-//    //var settings = services.GetService<IOptions<AppSettings>>();
-
-//    //new ApplicationDbContextSeed()
-//    //    .SeedAsync(context, env, logger, settings)
-//    //    .Wait();
-//})
