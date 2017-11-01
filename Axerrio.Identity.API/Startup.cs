@@ -52,7 +52,7 @@ namespace Axerrio.Identity.API
             services.AddTransient<IRedirectService, RedirectService>();
             services.AddTransient<ILoginService, LoginService>();
 
-            services.AddIdentityServer() //options => options.IssuerUri = "null"
+            services.AddIdentityServer(options => options.IssuerUri = "null") //options => options.IssuerUri = "null"
                     .AddDeveloperSigningCredential()
                     .AddInMemoryIdentityResources(Config.GetIdentityResources())
                     .AddInMemoryApiResources(Config.GetApiResources())

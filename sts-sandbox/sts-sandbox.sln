@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.IWebHostExtensions"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.Client.MVC", "Axerrio.Client.MVC\Axerrio.Client.MVC.csproj", "{3A902307-0367-4178-905D-F8AD0A035548}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.HttpClientExtensions", "..\Axerrio.HttpClient\Axerrio.HttpClientExtensions.csproj", "{2B765208-7E4D-4471-B3E5-B43C1BE5545C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.HttpClientExtensions", "..\Axerrio.HttpClient\Axerrio.HttpClientExtensions.csproj", "{2B765208-7E4D-4471-B3E5-B43C1BE5545C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.Client.Xamarin", "..\Axerrio.Client.Xamarin\Axerrio.Client.Xamarin.csproj", "{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +105,10 @@ Global
 		{2B765208-7E4D-4471-B3E5-B43C1BE5545C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B765208-7E4D-4471-B3E5-B43C1BE5545C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B765208-7E4D-4471-B3E5-B43C1BE5545C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +130,7 @@ Global
 		{389A77C8-B6E9-4F81-B860-8B4D058701F3} = {5C871384-D422-4638-8FEC-61C3CC21B3B6}
 		{3A902307-0367-4178-905D-F8AD0A035548} = {5C871384-D422-4638-8FEC-61C3CC21B3B6}
 		{2B765208-7E4D-4471-B3E5-B43C1BE5545C} = {5C871384-D422-4638-8FEC-61C3CC21B3B6}
+		{F7A6C880-6BFA-4350-BAE9-0B1BCED346E9} = {5C871384-D422-4638-8FEC-61C3CC21B3B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}

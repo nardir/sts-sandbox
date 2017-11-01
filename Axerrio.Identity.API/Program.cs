@@ -12,6 +12,9 @@ using Axerrio.Identity.Accounts.Data;
 using Axerrio.Identity.Accounts.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using Axerrio.Identity.API.Certificate;
 
 namespace Axerrio.Identity.API
 {
@@ -31,6 +34,31 @@ namespace Axerrio.Identity.API
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseKestrel(options =>
+                {
+                    options.Listen(IPAddress.Parse("127.0.0.1"), 5000);
+
+                    options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
+                    {
+                        listenOptions.UseHttps(Certificate.Certificate.Get());
+                    });
+
+                    //using (var store = new X509Store(StoreName.My))
+                    //{
+                    //    store.Open(OpenFlags.ReadOnly);
+                    //    var certs = store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", false);
+                    //    if (certs.Count > 0)
+                    //    {
+                    //        var certificate = certs[0];
+
+                    //        // listen for HTTPS
+                    //        options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
+                    //        {
+                    //            listenOptions.UseHttps(certificate);
+                    //        });
+                    //    }
+                    //}
+                })
                 .UseStartup<Startup>()
                 .Build();
     }

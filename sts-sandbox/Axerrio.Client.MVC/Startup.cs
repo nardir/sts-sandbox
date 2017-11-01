@@ -61,7 +61,8 @@ namespace Axerrio.Client.MVC
             .AddOpenIdConnect(options =>
             {
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.Authority = "http://localhost:5000";
+                //options.Authority = "http://localhost:5000";
+                options.Authority = "https://localhost:50000";
                 options.SignedOutRedirectUri = "http://localhost:5002/";
                 options.ClientId = "mvc";
                 options.ClientSecret = "secret";

@@ -105,7 +105,34 @@ namespace Axerrio.Identity.API.Configuration
                         IdentityServerConstants.StandardScopes.OfflineAccess,
                         "api1"
                     },
-                }
+                },
+
+                new Client
+                {
+                    ClientId = "xamarin",
+                    ClientName = "Xamarin",
+                    AllowedGrantTypes = GrantTypes.Implicit,                    
+                    //Used to retrieve the access token on the back channel.
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+                    RedirectUris = { "http://localhost:5000/xamarincallback" },
+                    RequireConsent = false,
+                    RequirePkce = true,
+                    PostLogoutRedirectUris = { "http://localhost:5000/xamarincallback/Account/Redirecting" },
+                    AllowedCorsOrigins = { "http://localhost:5003" },
+                    AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
+                        "api1",
+                    },
+                    //Allow requesting refresh tokens for long lived API access
+                    AllowOfflineAccess = true,
+                    AllowAccessTokensViaBrowser = true
+                },
             };
         }
     }
