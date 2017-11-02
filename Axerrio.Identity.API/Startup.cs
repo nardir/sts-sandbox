@@ -31,8 +31,10 @@ namespace Axerrio.Identity.API
         {
             services.AddMvc();
 
+            var connectionString = Configuration["ConnectionString"];
+
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(Configuration["ConnectionString"],
+             options.UseSqlServer(connectionString,
                                      sqlServerOptionsAction: sqlOptions =>
                                      {
                                          sqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly.GetName().Name);
@@ -52,7 +54,11 @@ namespace Axerrio.Identity.API
 
             services.AddTransient<IRedirectService, RedirectService>();
             services.AddTransient<ILoginService, LoginService>();
+         
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
+
+            //PersistedGrantDbContext
             services.AddIdentityServer(options => options.IssuerUri = "null") //options => options.IssuerUri = "null"
                     //.AddDeveloperSigningCredential()
                     .AddSigningCredential(Certificate.Certificate.Get())
@@ -60,6 +66,14 @@ namespace Axerrio.Identity.API
                     .AddInMemoryApiResources(Config.GetApiResources())
                     .AddInMemoryClients(Config.GetClients())
                     .AddAspNetIdentity<ApplicationUser>()
+                    .AddOperationalStore(options =>
+                    {
+                        options.ConfigureDbContext = builder => builder.UseSqlServer(connectionString,
+                                        sqlServerOptionsAction: sqlOptions =>
+                                        {
+                                            sqlOptions.MigrationsAssembly(migrationsAssembly);
+                                        });
+                    })
                     .Services.AddTransient<IProfileService, ProfileService>();
         }
 

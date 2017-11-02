@@ -73,6 +73,20 @@ namespace Axerrio.Client.MVC
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
                 options.Scope.Add("api1");
+
+                //https://github.com/IdentityServer/IdentityServer4/issues/909
+                //http://www.jerriepelser.com/blog/adding-parameters-to-openid-connect-authorization-url/
+                options.Events = new OpenIdConnectEvents
+                {
+                    OnRedirectToIdentityProvider = context =>
+                    {
+                        context.ProtocolMessage.SetParameter("axerrio", "NL-nl");
+
+                        return Task.CompletedTask;
+
+                        //return Task.FromResult(0);
+                    }
+                };
             });
         }
 

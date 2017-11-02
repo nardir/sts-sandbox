@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Axerrio.Identity.API.Certificate;
+using IdentityServer4.EntityFramework.DbContexts;
 
 namespace Axerrio.Identity.API
 {
@@ -29,6 +30,7 @@ namespace Axerrio.Identity.API
 
                     ApplicationUserSeed.SeedAsync(userManager).Wait();
                 })
+                .MigrateDbContext<PersistedGrantDbContext>()
                 .Run();
         }
 

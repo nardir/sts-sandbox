@@ -53,7 +53,9 @@ namespace Axerrio.Identity.API.Controllers
         public async Task<IActionResult> Login(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-            
+            //http://www.jerriepelser.com/blog/adding-parameters-to-openid-connect-authorization-url/
+            //var axerrio = context.Parameters["axerrio"];
+
             //if (context?.IdP != null)
             //{
             //    // if IdP is passed, then bypass showing the login screen
