@@ -38,26 +38,26 @@ namespace Axerrio.Identity.API
                 {
                     options.Listen(IPAddress.Parse("127.0.0.1"), 5000);
 
-                    options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
-                    {
-                        listenOptions.UseHttps(Certificate.Certificate.Get());
-                    });
-
-                    //using (var store = new X509Store(StoreName.My))
+                    //options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
                     //{
-                    //    store.Open(OpenFlags.ReadOnly);
-                    //    var certs = store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", false);
-                    //    if (certs.Count > 0)
-                    //    {
-                    //        var certificate = certs[0];
+                    //    listenOptions.UseHttps(Certificate.Certificate.Get());
+                    //});
 
-                    //        // listen for HTTPS
-                    //        options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
-                    //        {
-                    //            listenOptions.UseHttps(certificate);
-                    //        });
-                    //    }
-                    //}
+                    using (var store = new X509Store(StoreName.My))
+                    {
+                        store.Open(OpenFlags.ReadOnly);
+                        var certs = store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", false);
+                        if (certs.Count > 0)
+                        {
+                            var certificate = certs[0];
+
+                            // listen for HTTPS
+                            options.Listen(IPAddress.Parse("127.0.0.1"), 50000, listenOptions =>
+                            {
+                                listenOptions.UseHttps(certificate);
+                            });
+                        }
+                    }
                 })
                 .UseStartup<Startup>()
                 .Build();

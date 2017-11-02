@@ -13,6 +13,7 @@ using Axerrio.Identity.Accounts.Models;
 using Microsoft.AspNetCore.Identity;
 using Axerrio.Identity.API.Configuration;
 using Axerrio.Identity.API.Services;
+using IdentityServer4.Services;
 
 namespace Axerrio.Identity.API
 {
@@ -53,11 +54,13 @@ namespace Axerrio.Identity.API
             services.AddTransient<ILoginService, LoginService>();
 
             services.AddIdentityServer(options => options.IssuerUri = "null") //options => options.IssuerUri = "null"
-                    .AddDeveloperSigningCredential()
+                    //.AddDeveloperSigningCredential()
+                    .AddSigningCredential(Certificate.Certificate.Get())
                     .AddInMemoryIdentityResources(Config.GetIdentityResources())
                     .AddInMemoryApiResources(Config.GetApiResources())
                     .AddInMemoryClients(Config.GetClients())
-                    .AddAspNetIdentity<ApplicationUser>();
+                    .AddAspNetIdentity<ApplicationUser>()
+                    .Services.AddTransient<IProfileService, ProfileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
