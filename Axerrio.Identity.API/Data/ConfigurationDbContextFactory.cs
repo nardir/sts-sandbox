@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace Axerrio.Identity.API.Data
 {
-    public class PersistedGrantDbContextFactory : IDesignTimeDbContextFactory<PersistedGrantDbContext>
+    public class ConfigurationDbContextFactory : IDesignTimeDbContextFactory<ConfigurationDbContext>
     {
-        public PersistedGrantDbContext CreateDbContext(string[] args)
+        public ConfigurationDbContext CreateDbContext(string[] args)
         {
-            var options = new DbContextOptionsBuilder<PersistedGrantDbContext>()
+            var options = new DbContextOptionsBuilder<ConfigurationDbContext>()
                 .UseSqlServer(@"Data Source=(localdb)\ProjectsV13;Initial Catalog=Axerrio_Accounts;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
                                 sqlOptions =>
                                 {
-                                    sqlOptions.MigrationsAssembly(typeof(PersistedGrantDbContextFactory).GetTypeInfo().Assembly.GetName().Name);
+                                    sqlOptions.MigrationsAssembly(typeof(ConfigurationDbContextFactory).GetTypeInfo().Assembly.GetName().Name);
                                 }).Options;
 
-            return new PersistedGrantDbContext(options, new OperationalStoreOptions());
+            return new ConfigurationDbContext(options, new ConfigurationStoreOptions());
         }
     }
 }

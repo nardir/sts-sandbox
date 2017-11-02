@@ -62,10 +62,18 @@ namespace Axerrio.Identity.API
             services.AddIdentityServer(options => options.IssuerUri = "null") //options => options.IssuerUri = "null"
                     //.AddDeveloperSigningCredential()
                     .AddSigningCredential(Certificate.Certificate.Get())
-                    .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                    .AddInMemoryApiResources(Config.GetApiResources())
-                    .AddInMemoryClients(Config.GetClients())
+                    //.AddInMemoryIdentityResources(Config.GetIdentityResources())
+                    //.AddInMemoryApiResources(Config.GetApiResources())
+                    //.AddInMemoryClients(Config.GetClients())
                     .AddAspNetIdentity<ApplicationUser>()
+                    .AddConfigurationStore(options =>
+                    {
+                        options.ConfigureDbContext = builder => builder.UseSqlServer(connectionString,
+                                        sqlServerOptionsAction: sqlOptions =>
+                                        {
+                                            sqlOptions.MigrationsAssembly(migrationsAssembly);
+                                        });
+                    })
                     .AddOperationalStore(options =>
                     {
                         options.ConfigureDbContext = builder => builder.UseSqlServer(connectionString,
