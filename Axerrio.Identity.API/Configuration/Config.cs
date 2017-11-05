@@ -23,7 +23,8 @@ namespace Axerrio.Identity.API.Configuration
         {
             return new List<ApiResource>
             {
-                new ApiResource("api1", "My API")
+                new ApiResource("api1", "api1")
+                , new ApiResource("api2", "api2")
             };
         }
 
@@ -42,7 +43,7 @@ namespace Axerrio.Identity.API.Configuration
                         new Secret("secret".Sha256())
                     },
 
-                    AllowedScopes = { "api1" }
+                    AllowedScopes = { "api1", "api2" }
                 },
 
                 new Client
@@ -55,7 +56,7 @@ namespace Axerrio.Identity.API.Configuration
                         new Secret("secret".Sha256())
                     },
 
-                    AllowedScopes = { "api1" }
+                    AllowedScopes = { "api1", "api2" }
                 },
 
                 //new Client
@@ -103,7 +104,8 @@ namespace Axerrio.Identity.API.Configuration
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OfflineAccess,
-                        "api1"
+                        "api1",
+                        "api2"
                     },
                 },
 

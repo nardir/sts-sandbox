@@ -32,6 +32,7 @@ namespace Axerrio.Client.MVC
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IHttpClient, StandardHttpClient>();
             services.AddTransient<IApi1Service, Api1Service>();
+            services.AddTransient<IApi2Service, Api2Service>();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -73,6 +74,7 @@ namespace Axerrio.Client.MVC
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
                 options.Scope.Add("api1");
+                options.Scope.Add("api2");
 
                 //https://github.com/IdentityServer/IdentityServer4/issues/909
                 //http://www.jerriepelser.com/blog/adding-parameters-to-openid-connect-authorization-url/

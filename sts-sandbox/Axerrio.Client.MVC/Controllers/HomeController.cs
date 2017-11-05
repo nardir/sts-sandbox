@@ -16,10 +16,12 @@ namespace Axerrio.Client.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly IApi1Service _api1Service;
+        private readonly IApi2Service _api2Service;
 
-        public HomeController(IApi1Service api1Service)
+        public HomeController(IApi1Service api1Service, IApi2Service api2Service)
         {
             _api1Service = api1Service;
+            _api2Service = api2Service;
         }
         public IActionResult Index()
         {
@@ -27,12 +29,21 @@ namespace Axerrio.Client.MVC.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Identity()
+        public async Task<IActionResult> Api1()
         {
             var identity = await _api1Service.GetIdentityAsync();
 
             return View("Index");
         }
+
+        [Authorize]
+        public async Task<IActionResult> Api2()
+        {
+            var values = await _api2Service.GetValuesAsync();
+
+            return View("Index");
+        }
+
 
         [Authorize]
         public IActionResult Secure()

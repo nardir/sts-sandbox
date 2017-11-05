@@ -19,7 +19,7 @@ namespace Axerrio.Identity.API.Data
                 {
                     await context.Clients.AddAsync(client.ToEntity());
                 }
-            }
+             }
             //await context.SaveChangesAsync();
 
             foreach (var resource in Config.GetIdentityResources())
