@@ -83,7 +83,9 @@ namespace Axerrio.Client.MVC
                     OnRedirectToIdentityProvider = context =>
                     {
                         context.ProtocolMessage.SetParameter("axerrio", "NL-nl");
-
+                        context.ProtocolMessage.AcrValues = "tenant:axerrio";
+                        context.ProtocolMessage.UiLocales = "nl-NL";
+                        
                         return Task.CompletedTask;
 
                         //return Task.FromResult(0);

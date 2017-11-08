@@ -1,4 +1,5 @@
 ﻿using Axerrio.Identity.Accounts.Models;
+using Axerrio.Identity.API.Extensions;
 using Axerrio.Identity.API.Models;
 using Axerrio.Identity.API.Services;
 using IdentityModel;
@@ -53,6 +54,7 @@ namespace Axerrio.Identity.API.Controllers
         public async Task<IActionResult> Login(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+            
             //http://www.jerriepelser.com/blog/adding-parameters-to-openid-connect-authorization-url/
             //var axerrio = context.Parameters["axerrio"];
 
@@ -92,6 +94,7 @@ namespace Axerrio.Identity.API.Controllers
                     };
 
                     await _loginService.SignInAsync(user, props);
+                    //await HttpContext.SignInAsync(user.ClaimsPrincipal(), props);
 
                     // make sure the returnUrl is still valid, and if yes - redirect back to authorize endpoint
                     if (_interaction.IsValidReturnUrl(model.ReturnUrl))
