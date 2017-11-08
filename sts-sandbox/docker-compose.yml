@@ -18,3 +18,15 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+
+  axerrio.identity.api:
+    image: axerrio.identity.api
+    build:
+      context: ./../Axerrio.Identity.API
+      dockerfile: Dockerfile
+
+  axerrio.client.mvc:
+    image: axerrio.client.mvc
+    build:
+      context: ./Axerrio.Client.MVC
+      dockerfile: Dockerfile
