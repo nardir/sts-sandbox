@@ -40,7 +40,7 @@ namespace Axerrio.Identity.API
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            WebHost.CreateDefaultBuilder(args) //https://andrewlock.net/exploring-program-and-startup-in-asp-net-core-2-preview1-2/
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Parse("127.0.0.1"), 5000);

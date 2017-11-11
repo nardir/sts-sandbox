@@ -23,7 +23,7 @@
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="Email" class="control-label form-label"></label>
-                        <input asp-for="Email" class="form-control form-input form-input-center" />
+                        <input asp-for="Email" class="form-control form-input form-input-center" />@Model.Email
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -44,6 +44,9 @@
                     </div>
                     <p>
                         <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" class="text">Register as a new user?</a>
+                    </p>
+                    <p>
+                        <a asp-action="ForgotPassword" asp-route-returnurl="@ViewData["ReturnUrl"]" class="text">Forgot Password</a>
                     </p>
                 </form>
             </section>

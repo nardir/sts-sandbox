@@ -54,7 +54,9 @@ namespace Axerrio.Identity.API
 
             services.AddTransient<IRedirectService, RedirectService>();
             services.AddTransient<ILoginService, LoginService>();
-         
+            //services.AddTransient<IMessageService, FileMessageService>(); //SendGridMessageService
+            services.AddTransient<IMessageService, SendGridMessageService>();
+
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
 
@@ -81,6 +83,7 @@ namespace Axerrio.Identity.API
                                         {
                                             sqlOptions.MigrationsAssembly(migrationsAssembly);
                                         });
+                        //options.DefaultSchema = "ops";
                     })
                     .Services.AddTransient<IProfileService, ProfileService>();
         }
