@@ -52,9 +52,12 @@ namespace Axerrio.Identity.API
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
 
+            //string SendGridApiKey = Configuration["SendGridApiKey"];
+            services.Configure<SendGridMessageOptions>(Configuration);
+
             services.AddTransient<IRedirectService, RedirectService>();
             services.AddTransient<ILoginService, LoginService>();
-            //services.AddTransient<IMessageService, FileMessageService>(); //SendGridMessageService
+            //services.AddTransient<IMessageService, FileMessageService>();
             services.AddTransient<IMessageService, SendGridMessageService>();
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;

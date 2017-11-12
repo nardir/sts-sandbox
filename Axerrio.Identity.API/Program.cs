@@ -39,6 +39,9 @@ namespace Axerrio.Identity.API
                 .Run();
         }
 
+        //stssandboxkv : B8Ow71m+dCL1APjMHjwFypdCuHr1B0pd6ULQhzEu8f0=
+        //sts-sandbox-kv : qfdPnh5tuR7DMgVM9jrDGVaYbAip0ognZDGy4Zw711M=
+
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args) //https://andrewlock.net/exploring-program-and-startup-in-asp-net-core-2-preview1-2/
                 .UseKestrel(options =>
@@ -66,7 +69,24 @@ namespace Axerrio.Identity.API
                         }
                     }
                 })
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    #region snippet1
+                    config.SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("azurekeyvault.json", optional: false)
+                        .AddEnvironmentVariables();
+
+                    var builtConfig = config.Build();
+
+                    config.AddAzureKeyVault(
+                        $"https://{builtConfig["Vault"]}.vault.azure.net/",
+                        builtConfig["ClientId"],
+                        builtConfig["ClientSecret"]);
+                    #endregion
+                })
                 .UseStartup<Startup>()
                 .Build();
+
+        //SendGridApiKey
     }
 }
