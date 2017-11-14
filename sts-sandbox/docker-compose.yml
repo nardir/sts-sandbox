@@ -30,3 +30,9 @@ services:
     build:
       context: ./Axerrio.Client.MVC
       dockerfile: Dockerfile
+
+  axerrio.ddd.ordering:
+    image: axerrio.ddd.ordering
+    build:
+      context: ./Axerrio.DDD.Ordering
+      dockerfile: Dockerfile
