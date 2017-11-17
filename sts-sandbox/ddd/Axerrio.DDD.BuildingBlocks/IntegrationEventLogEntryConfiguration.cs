@@ -10,7 +10,7 @@ namespace Axerrio.DDD.BuildingBlocks
     {
         public void Configure(EntityTypeBuilder<IntegrationEventLogEntry> builder)
         {
-            builder.ToTable("IntegrationEventLog");
+            builder.ToTable("IntegrationEventLog"); //schema
 
             builder.HasKey(e => e.EventId);
 

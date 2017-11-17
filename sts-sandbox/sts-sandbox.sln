@@ -51,7 +51,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.BuildingBlocks"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Ordering", "Axerrio.DDD.Ordering\Axerrio.DDD.Ordering.csproj", "{2F678ED0-E3E9-46DC-BDA1-6AF373FB492A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.DDD.Guard.Test", "..\Axerrio.DDD.Guard.Test\Axerrio.DDD.Guard.Test.csproj", "{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Guard.Test", "..\Axerrio.DDD.Guard.Test\Axerrio.DDD.Guard.Test.csproj", "{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.AppInsights.Test", "..\Axerrio.AppInsights.Test\Axerrio.AppInsights.Test.csproj", "{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,6 +137,10 @@ Global
 		{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,6 +168,7 @@ Global
 		{609BAEFE-0833-4182-B276-C65D58128EA9} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{2F678ED0-E3E9-46DC-BDA1-6AF373FB492A} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{33E527A3-3D7D-4772-AAF0-70C9AEBB24FA} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
+		{F8AF2E02-ACFB-49AC-8BB7-02496F04678B} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}

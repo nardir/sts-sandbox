@@ -16,6 +16,8 @@ namespace Axerrio.DDD.BuildingBlocks
             Content = JsonConvert.SerializeObject(@event);
             State = EventStateEnum.NotPublished;
             TimesSent = 0;
+
+            //Retries ??
         }
         public Guid EventId { get; private set; }
         public string EventTypeName { get; private set; }
@@ -23,5 +25,7 @@ namespace Axerrio.DDD.BuildingBlocks
         public int TimesSent { get; set; }
         public DateTime CreationTime { get; private set; }
         public string Content { get; private set; }
+
+        //Id int EF Shadow properties
     }
 }

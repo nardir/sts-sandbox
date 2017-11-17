@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Axerrio.DDD.BuildingBlocks
 {
-    public class IntegrationEvent: IAggregateRoot
+    public abstract class IntegrationEvent: IAggregateRoot
     {
         public IntegrationEvent()
         {

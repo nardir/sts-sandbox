@@ -36,3 +36,9 @@ services:
     build:
       context: ./Axerrio.DDD.Ordering
       dockerfile: Dockerfile
+
+  axerrio.appinsights.test:
+    image: axerrio.appinsights.test
+    build:
+      context: ./../Axerrio.AppInsights.Test
+      dockerfile: Dockerfile

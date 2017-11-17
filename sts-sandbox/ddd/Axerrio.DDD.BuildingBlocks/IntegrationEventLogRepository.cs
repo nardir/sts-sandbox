@@ -19,6 +19,8 @@ namespace Axerrio.DDD.BuildingBlocks
 
         public void Add(IntegrationEvent @event)
         {
+            //Guard
+
             _context.Add(new IntegrationEventLogEntry(@event));
         }
     }
