@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Axerrio.DDD.Ordering.Services;
 using Axerrio.DDD.Ordering.Model;
+using Newtonsoft.Json;
 
 namespace Axerrio.DDD.Ordering.Controllers
 {
@@ -22,9 +23,15 @@ namespace Axerrio.DDD.Ordering.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            var paymentMethod = new PaymentMethod(3, "alias3", "cardnumber3", "securitynumber3", "cardholder3", DateTime.Now.AddYears(1));
+            //var paymentMethod = new PaymentMethod(3, "alias3", "cardnumber3", "securitynumber3", "cardholder3", DateTime.Now.AddYears(1));
 
-            await _paymentService.CreatePaymentMethodAsync(paymentMethod);
+            //await _paymentService.CreatePaymentMethodAsync(paymentMethod);
+
+            var order = new Order("Nardi Rens", OrderStatus.Submitted);
+            var status = order.OrderStatus;
+            var json = JsonConvert.SerializeObject(order);
+            var order2 = JsonConvert.DeserializeObject<Order>(json);
+            var status2 = order2.OrderStatus;
 
             return new string[] { "value1", "value2" };
         }

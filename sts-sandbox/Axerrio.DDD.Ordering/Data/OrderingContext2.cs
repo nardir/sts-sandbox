@@ -11,10 +11,11 @@ namespace Axerrio.DDD.Ordering.Data
     public class OrderingContext2: IntegrationEventLogContext
     {
         public DbSet<PaymentMethod> Paymentmethods { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderStatus> OrderStatus { get; set; }
 
         public OrderingContext2(DbContextOptions<OrderingContext2> options): base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,6 +23,8 @@ namespace Axerrio.DDD.Ordering.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new PaymentMethodEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderStatusEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
         }
     }
 }

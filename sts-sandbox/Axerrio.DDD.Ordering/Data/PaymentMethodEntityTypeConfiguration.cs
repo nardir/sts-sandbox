@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Ordering.Data
 {
-    public class PaymentMethodEntityTypeConfiguration : IEntityTypeConfiguration<PaymentMethod>
+    class PaymentMethodEntityTypeConfiguration : IEntityTypeConfiguration<PaymentMethod>
     {
         public void Configure(EntityTypeBuilder<PaymentMethod> paymentConfiguration)
         {
