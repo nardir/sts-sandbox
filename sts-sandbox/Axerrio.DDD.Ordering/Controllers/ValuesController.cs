@@ -27,11 +27,15 @@ namespace Axerrio.DDD.Ordering.Controllers
 
             //await _paymentService.CreatePaymentMethodAsync(paymentMethod);
 
-            var order = new Order("Nardi Rens", OrderStatus.Submitted);
+            //var order = new Order("Nardi Rens", OrderStatus.Submitted);
+            var order = new Order("Nardi Rens", OrderStatus.Submitted, 100);
             var status = order.OrderStatus;
             var json = JsonConvert.SerializeObject(order);
             var order2 = JsonConvert.DeserializeObject<Order>(json);
             var status2 = order2.OrderStatus;
+
+            var sameStatus = (order.OrderStatus == order2.OrderStatus);
+            var sameOrder = (order == order2);
 
             return new string[] { "value1", "value2" };
         }
