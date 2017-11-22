@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="BuildingBlocks\ClientRequestService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
   </ItemGroup>
 

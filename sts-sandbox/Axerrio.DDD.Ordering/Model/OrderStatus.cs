@@ -22,7 +22,7 @@ namespace Axerrio.DDD.Ordering.Model
 
         protected OrderStatus() { }
 
-        public OrderStatus(int id, string name)
+        protected OrderStatus(int id, string name)
             : base(id, name)
         {
         }

@@ -1,4 +1,5 @@
 ﻿using Axerrio.DDD.BuildingBlocks;
+using Axerrio.DDD.Ordering.Model.DomainEvents;
 using MediatR;
 using Newtonsoft.Json;
 using System;
@@ -8,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Ordering.Model
 {
-    public class Order: Entity<int, INotification>
+    //public class Order: Entity<int, INotification>
+    public class Order : IntEntity
     {
         public override int Identity
         {
@@ -59,6 +61,8 @@ namespace Axerrio.DDD.Ordering.Model
         {
             BuyerName = buyerName;
             OrderStatusId = orderStatus.Id;
+
+            AddDomainEvent(new OrderStartedDomainEvent(this));
         }
 
         public Order(string buyerName, OrderStatus orderStatus, int identity)

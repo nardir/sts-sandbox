@@ -13,4 +13,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\sts-sandbox\Axerrio.DDD.Ordering\Axerrio.DDD.Ordering.csproj" />
+    <ProjectReference Include="..\sts-sandbox\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
+  </ItemGroup>
+
 </Project>

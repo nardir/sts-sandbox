@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using EnsureThat;
+using Axerrio.DDD.Ordering.Controllers;
 
 namespace Axerrio.DDD.Guard.Test
 {
@@ -26,6 +27,16 @@ namespace Axerrio.DDD.Guard.Test
             var ex = Assert.Throws<ArgumentNullException>(() => {
                 var o2 = EnsureArg.IsNotNull(o, nameof(o));
                     });
+        }
+
+        [Fact]
+        public void ValuesController_NotAuthenticated_ThrowsException()
+        {
+            //https://hudosvibe.net/post/mock-user-identity-in-asp.net-mvc-core-controller-tests
+
+            //Arrange
+            var controller = new ValuesController(null);
+            controller.
         }
     }
 }

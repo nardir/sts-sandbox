@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Axerrio.DDD.Ordering.Data
 {
@@ -24,5 +25,19 @@ namespace Axerrio.DDD.Ordering.Data
 
             modelBuilder.ApplyConfiguration(new PaymentMethodEntityTypeConfiguration());
         }
+
+        #region IUnitOfWork
+
+        public Task DispatchDomainEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DispatchDomainEventsAndSaveChangesAsync(bool saveChanges = true, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion IUnitOfWork
     }
 }

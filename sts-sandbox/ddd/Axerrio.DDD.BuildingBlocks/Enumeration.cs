@@ -24,9 +24,10 @@ namespace Axerrio.DDD.BuildingBlocks
             Name = name;
         }
 
-        protected override IEnumerable<object> GetAtomicValues()
+        protected override IEnumerable<object> GetMemberValues()
         {
             yield return Id;
+            yield return Name;
         }
 
         public override string ToString()

@@ -6,7 +6,13 @@ using System.Text;
 
 namespace Axerrio.DDD.BuildingBlocks
 {
-    public abstract class Entity<TIdentity, TDomainEvent>
+    public interface IDomainEventsEntity<TDomainEvent>
+    {
+        ReadOnlyCollection<TDomainEvent> DomainEvents { get; }
+        void ClearDomainEvents();
+    }
+
+    public abstract class Entity<TIdentity, TDomainEvent>: IDomainEventsEntity<TDomainEvent>
     {
         public Entity()
         {
@@ -52,7 +58,7 @@ namespace Axerrio.DDD.BuildingBlocks
 
         #region DomainEvents
 
-        private List<TDomainEvent> _domainEvents;
+        private readonly List<TDomainEvent> _domainEvents;
         [JsonIgnore]
         public ReadOnlyCollection<TDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 

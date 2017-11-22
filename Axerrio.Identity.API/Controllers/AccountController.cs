@@ -273,6 +273,8 @@ namespace Axerrio.Identity.API.Controllers
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
+                //var result = await _userManager.CreateAsync(user);
+
                 if (result.Errors.Count() > 0)
                 {
                     AddErrors(result);

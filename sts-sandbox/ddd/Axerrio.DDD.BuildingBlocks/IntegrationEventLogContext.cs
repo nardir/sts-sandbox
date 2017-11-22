@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Axerrio.DDD.BuildingBlocks
 {
-    public class IntegrationEventLogContext: DbContext, IUnitOfWork
+    public class IntegrationEventLogContext: DbContext
     {
         protected IntegrationEventLogContext(DbContextOptions options) : base(options)
         {

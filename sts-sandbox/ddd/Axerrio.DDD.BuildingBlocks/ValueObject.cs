@@ -10,7 +10,7 @@ namespace Axerrio.DDD.BuildingBlocks
     {
         protected static bool EqualOperator(ValueObject<T> left, ValueObject<T> right)
         {
-            if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null))
+            if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null)) //https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/xor-operator
             {
                 return false;
             }
@@ -32,7 +32,7 @@ namespace Axerrio.DDD.BuildingBlocks
             return NotEqualOperator(left, right);
         }
 
-        protected abstract IEnumerable<object> GetAtomicValues();
+        protected abstract IEnumerable<object> GetMemberValues();
 
         public override bool Equals(object obj)
         {
@@ -51,8 +51,8 @@ namespace Axerrio.DDD.BuildingBlocks
                 return false;
             }
 
-            IEnumerator<object> thisValues = GetAtomicValues().GetEnumerator();
-            IEnumerator<object> otherValues = other.GetAtomicValues().GetEnumerator();
+            IEnumerator<object> thisValues = GetMemberValues().GetEnumerator();
+            IEnumerator<object> otherValues = other.GetMemberValues().GetEnumerator();
             while (thisValues.MoveNext() && otherValues.MoveNext())
             {
                 if (ReferenceEquals(thisValues.Current, null) ^ ReferenceEquals(otherValues.Current, null))
@@ -69,7 +69,7 @@ namespace Axerrio.DDD.BuildingBlocks
 
         public override int GetHashCode()
         {
-            return GetAtomicValues()
+            return GetMemberValues()
              .Select(x => x != null ? x.GetHashCode() : 0)
              .Aggregate((x, y) => x ^ y);
         }
