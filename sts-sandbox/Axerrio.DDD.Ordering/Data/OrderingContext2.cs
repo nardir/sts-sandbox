@@ -37,14 +37,19 @@ namespace Axerrio.DDD.Ordering.Data
 
         #region IUnitOfWork
 
-        public Task DispatchDomainEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return _mediator.DispatchDomainEventsAsync(this);
-        }
+        //protected Task DispatchDomainEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        //{
+        //    return _mediator.DispatchDomainEventsAsync(this);
+        //}
 
-        public Task<bool> DispatchDomainEventsAndSaveChangesAsync(bool saveChanges = true, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DispatchDomainEventsAndSaveChangesAsync(bool saveChanges = true, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            await _mediator.DispatchDomainEventsAsync(this);
+
+            if (saveChanges)
+                await SaveChangesAsync();
+
+            return true;
         }
 
         #endregion IUnitOfWork

@@ -35,7 +35,7 @@ namespace Axerrio.DDD.Ordering.Services
 
             _integrationEventLogRepository.Add(@event);
 
-            return _paymentRepository.UnitOfWork.SaveChangesAsync();
+            return _paymentRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();
         }
     }
 }

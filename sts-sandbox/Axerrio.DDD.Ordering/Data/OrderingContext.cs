@@ -28,11 +28,6 @@ namespace Axerrio.DDD.Ordering.Data
 
         #region IUnitOfWork
 
-        public Task DispatchDomainEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<bool> DispatchDomainEventsAndSaveChangesAsync(bool saveChanges = true, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();

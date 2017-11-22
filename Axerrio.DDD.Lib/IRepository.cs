@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Axerrio.DDD.BuildingBlocks
 {
-    public interface IAggregateRoot<T>
-        where T: Entity<>
+    public interface IRepository<T> where T : IAggregateRoot, IEntity
     {
+        IUnitOfWork UnitOfWork { get; }
     }
 }

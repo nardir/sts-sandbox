@@ -59,7 +59,7 @@ namespace Axerrio.Identity.API.Controllers
         public async Task<IActionResult> Login(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-
+            
             //if (string.IsNullOrWhiteSpace(context.LoginHint) && context != null)
             //{
             //    context.LoginHint = loginHint;
