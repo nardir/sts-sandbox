@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Axerrio.DDD.BuildingBlocks
 {
-    public interface IAggregateRoot<T>
-        where T: Entity<>
+    public interface IAggregateRoot//<T>    JJ: Commented out, because of build error
+     //   where T: Entity
     {
     }
 }
