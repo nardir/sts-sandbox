@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Axerrio.DDD.Versioning.Controllers;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace Axerrio.DDD.Versioning
 {
@@ -41,8 +42,9 @@ namespace Axerrio.DDD.Versioning
             {
                 o.ReportApiVersions = true;
                 o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
                 o.DefaultApiVersion = new ApiVersion(3, 0);
-
+                
                 o.Conventions.Controller<ValuesController>().HasApiVersion(new ApiVersion(2, 0));
                 o.Conventions.Controller<ValuesController>().HasApiVersion(new ApiVersion(3, 0));
 
