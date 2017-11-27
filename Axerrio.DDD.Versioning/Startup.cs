@@ -35,12 +35,13 @@ namespace Axerrio.DDD.Versioning
 
             //https://www.codeproject.com/Articles/1204149/Versioning-ASP-NET-Core-Web-API
 
-            
+            //https://github.com/Microsoft/aspnet-api-versioning/wiki/New-Services-Quick-Start
+
             services.AddApiVersioning(o =>
             {
                 o.ReportApiVersions = true;
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(2, 0);
+                o.DefaultApiVersion = new ApiVersion(3, 0);
 
                 o.Conventions.Controller<ValuesController>().HasApiVersion(new ApiVersion(2, 0));
                 o.Conventions.Controller<ValuesController>().HasApiVersion(new ApiVersion(3, 0));

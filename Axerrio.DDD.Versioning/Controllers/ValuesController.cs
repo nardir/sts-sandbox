@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Axerrio.DDD.Versioning.Controllers
 {
-    //[Route("api/[controller]")]
+    [Route("api/[controller]")]
     //[ApiVersion("2.0")]
     //[ApiVersion("3.0")]
     [Route("api/v{version:apiVersion}/values")]
