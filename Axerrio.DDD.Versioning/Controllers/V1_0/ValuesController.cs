@@ -4,18 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Axerrio.DDD.Versioning.Controllers
+namespace Axerrio.DDD.Versioning.Controllers.V1_0
 {
     //[ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/values")]
-    public class ValuesV1Controller : Controller
+    //[Route("api/v{version:apiVersion}/values")]
+    [Route("api/values")]
+    public class ValuesController : Controller
     {
         // GET api/values
+        //[HttpGet]
+        //public IEnumerable<string> Get()
+        //{
+        //    return new string[] { "value1", "value2" };
+        //}
+
         [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        public string Get() => HttpContext.GetRequestedApiVersion().ToString();
 
         // GET api/values/5
         [HttpGet("{id}")]

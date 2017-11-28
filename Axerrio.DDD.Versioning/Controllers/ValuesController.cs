@@ -9,7 +9,7 @@ namespace Axerrio.DDD.Versioning.Controllers
     [Route("api/[controller]")]
     //[ApiVersion("2.0")]
     //[ApiVersion("3.0")]
-    [Route("api/v{version:apiVersion}/values")]
+    //[Route("api/v{version:apiVersion}/values")]
     public class ValuesController : Controller
     {
         // GET api/values
