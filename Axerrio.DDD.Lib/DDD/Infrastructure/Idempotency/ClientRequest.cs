@@ -1,10 +1,7 @@
-﻿using EnsureThat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using EnsureThat;
 
-namespace Axerrio.DDD.Ordering.BuildingBlocks
+namespace Axerrio.BuildingBlocks
 {
     class ClientRequest
     {

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Commands\" />
+    <Folder Include="Application\DomainEventHandlers\" />
+    <Folder Include="Application\Models\" />
+    <Folder Include="Domain\AggregatesModel\" />
+    <Folder Include="Domain\Events\" />
+    <Folder Include="Domain\Exceptions\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Axerrio.IWebHostsExtensions" Version="2.0.0" />
+    <PackageReference Include="MediatR" Version="3.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj" />
+  </ItemGroup>
+
+</Project>

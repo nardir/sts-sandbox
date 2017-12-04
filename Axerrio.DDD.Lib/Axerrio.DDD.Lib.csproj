@@ -2,14 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RuntimeFrameworkVersion>2.0.3</RuntimeFrameworkVersion>
+    <AssemblyName>Axerrio.DDD.Lib</AssemblyName>
+    <RootNamespace>Axerrio.BuildingBlocks</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Ensure.That" Version="7.1.0" />
     <PackageReference Include="MediatR" Version="3.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />    
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
   </ItemGroup>
 
 </Project>
