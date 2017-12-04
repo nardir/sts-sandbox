@@ -17,6 +17,7 @@ namespace Axerrio.DDD.Messaging
 
         //Ideas:
         //- Create Default Axerrio API/Microservices Project template(s) based on Building Blocks.
+        //- Create Class templates based on Building Blcoks (DomainEvent etc.)
 
 
         public static void Main(string[] args)

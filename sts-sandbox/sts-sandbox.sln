@@ -57,7 +57,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.AppInsights.Test", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Lib", "..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj", "{50E1B8ED-FC42-454D-8727-4872ADAE6744}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD", "..\Axerrio.DDD.JJ\Axerrio.DDD.csproj", "{FEAC737D-C338-4B4A-A839-D9058ADBFA81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Menu", "..\Axerrio.DDD.JJ\Axerrio.DDD.Menu.csproj", "{FEAC737D-C338-4B4A-A839-D9058ADBFA81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
