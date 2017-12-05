@@ -40,7 +40,7 @@ namespace Axerrio.BuildingBlocks
             return mediator.Send(request, cancellationToken);
         }
 
-        public static Task SendCommandAsync<TResponse>(this IMediator mediator, ICommand<TResponse> command, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task<TResponse> SendCommandAsync<TResponse>(this IMediator mediator, ICommand<TResponse> command, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRequest<TResponse> request = command;
 

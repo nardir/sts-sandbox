@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Swashbuckle.AspNetCore.Swagger;
 using Axerrio.BuildingBlocks;
 using MediatR;
 using Axerrio.DDD.Menu.Infrastructure;
@@ -29,7 +29,7 @@ namespace Axerrio.DDD.Messaging
         {
             services.AddMvc();
 
-            services.AddDbContext<ClientRequestContext>(options =>
+            services.AddDbContext<MenuContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
@@ -55,7 +55,20 @@ namespace Axerrio.DDD.Messaging
 
             //IMediator zaken.
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
-            
+
+
+            services.AddSwaggerGen(options =>
+            {
+                options.DescribeAllEnumsAsStrings();
+                options.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info
+                {
+                    Title = "Menu HTTP API",
+                    Version = "v1",
+                    Description = "The Menu Service HTTP API",
+                    TermsOfService = "Terms Of Service"
+                });
+            });
+
 
         }
 

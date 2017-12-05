@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Axerrio.IWebHostsExtensions;
 using Axerrio.BuildingBlocks;
+using Axerrio.DDD.Menu.Infrastructure;
 
 namespace Axerrio.DDD.Messaging
 {
@@ -24,6 +25,7 @@ namespace Axerrio.DDD.Messaging
         {
             BuildWebHost(args)
                 .MigrateDbContext<ClientRequestContext>()
+                .MigrateDbContext<MenuContext>()
                 .Run();
         }
 
