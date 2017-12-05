@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Axerrio.BuildingBlocks;
 using MediatR;
 using Axerrio.DDD.Menu.Infrastructure;
+using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
+using Axerrio.DDD.Menu.Infrastructure.Repositories;
 
 namespace Axerrio.DDD.Messaging
 {
@@ -47,7 +49,13 @@ namespace Axerrio.DDD.Messaging
                     });
             });
 
- //           services.AddMediatR(typeof().GetTypeInfo().Assembly);
+            services.AddScoped<IMenuRepository, MenuRepository>();
+            services.AddTransient<IClientRequestService, ClientRequestService>();
+
+
+            //IMediator zaken.
+            //services.AddMediatR(typeof().GetTypeInfo().Assembly);
+            
 
         }
 

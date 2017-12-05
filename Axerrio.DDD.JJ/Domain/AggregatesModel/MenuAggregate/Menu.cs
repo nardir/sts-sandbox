@@ -15,9 +15,10 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
             //Create default things
         }
 
-        public Menu(MenuStatus menuStatus)
+        public Menu(MenuStatus menuStatus, string description)
         {
             MenuStatusId = menuStatus.Id;
+            Description = description;
         }
 
         public override int Identity
@@ -36,8 +37,17 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
         [JsonProperty]
         protected int MenuStatusId { get; set; }
 
+        [JsonProperty]
+        protected string Description { get; set; }
+
         [JsonIgnore]
-        public MenuStatus MenuStatus => MenuStatus.Parse(MenuStatusId);
-    
+ //       public MenuStatus MenuStatus => MenuStatus.Parse(MenuStatusId);
+        public MenuStatus MenuStatus {
+            get {
+                return MenuStatus.Parse(MenuStatusId);
+            }
+            private set { }
+        }
+
     }
 }

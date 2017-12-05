@@ -1,4 +1,4 @@
-﻿namespace Axerrio.BuildingBlocks.Command
+﻿namespace Axerrio.BuildingBlocks
 {
     public abstract class Command<TCommand>: ValueObject<TCommand>, ICommand
         where TCommand: Command<TCommand>

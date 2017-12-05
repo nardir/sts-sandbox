@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using EnsureThat;
 using MediatR;
-using Axerrio.BuildingBlocks.Command;
+using Axerrio.BuildingBlocks;
 
 namespace Axerrio.BuildingBlocks
 {

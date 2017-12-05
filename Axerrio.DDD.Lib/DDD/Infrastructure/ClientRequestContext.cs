@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BuildingBlocks
 {
-    public class ClientRequestContext: DbContext
+    public class ClientRequestContext: DbContext 
     {
+        public const string DEFAULT_SCHEMA = "ddd";
+
         public ClientRequestContext(DbContextOptions<ClientRequestContext> options): base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new ClientRequestEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientRequestEntityTypeConfiguration(DEFAULT_SCHEMA));
         }
     }
 }
