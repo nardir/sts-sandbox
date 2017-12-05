@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Axerrio.BuildingBlocks;
 using MediatR;
+using Axerrio.DDD.Menu.Infrastructure;
 
 namespace Axerrio.DDD.Messaging
 {
@@ -31,7 +32,17 @@ namespace Axerrio.DDD.Messaging
                 options.UseSqlServer(Configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
                     {
-                        sqlOptions.MigrationsAssembly(typeof(ClientRequestContext).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.MigrationsAssembly(typeof(MenuContext).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                    });
+            });
+
+            services.AddDbContext<ClientRequestContext>(options =>
+            {
+                options.UseSqlServer(Configuration["ConnectionString"],
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(ClientRequestContext).GetTypeInfo().Assembly.GetName().Name);                        
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
             });

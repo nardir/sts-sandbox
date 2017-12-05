@@ -7,5 +7,6 @@ namespace Axerrio.DDD.BuildingBlocks
     public interface IAggregateRoot//<T>    JJ: Commented out, because of build error
      //   where T: Entity
     {
+        //Dit zou ik anders doen!
     }
 }

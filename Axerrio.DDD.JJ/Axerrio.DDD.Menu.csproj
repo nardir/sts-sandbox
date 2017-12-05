@@ -8,11 +8,10 @@
     <Folder Include="Application\Commands\" />
     <Folder Include="Application\DomainEventHandlers\" />
     <Folder Include="Application\Models\" />
-    <Folder Include="Domain\AggregatesModel\" />
+    <Folder Include="Domain\AggregatesModel\ArtistAggregate\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Domain\Exceptions\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Infrastructure\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -26,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
   </ItemGroup>
 
