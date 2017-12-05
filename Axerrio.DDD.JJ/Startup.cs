@@ -54,7 +54,7 @@ namespace Axerrio.DDD.Messaging
 
 
             //IMediator zaken.
-            //services.AddMediatR(typeof().GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             
 
         }

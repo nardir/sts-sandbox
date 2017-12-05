@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Axerrio.BuildingBlocks
 {
-    public interface IEntityDomainEvents
+    public interface IDomainEventsEntity
     {
         ReadOnlyCollection<DomainEvent> DomainEvents { get; }
         void ClearDomainEvents();

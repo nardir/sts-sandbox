@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Axerrio.BuildingBlocks
 {
-    public abstract class Entity<TIdentity>: IEntity, IEntityDomainEvent
+    public abstract class Entity<TIdentity>: IEntity, IDomainEventsEntity
     {
         public Entity()
         {
@@ -70,9 +70,5 @@ namespace Axerrio.BuildingBlocks
         }
 
         #endregion 
-    }
-
-    internal interface IEntityDomainEvent
-    {
     }
 }

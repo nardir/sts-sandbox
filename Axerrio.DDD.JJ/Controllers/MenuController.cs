@@ -28,8 +28,9 @@ namespace Axerrio.DDD.Menu.Controllers
  //           bool commandResult = false;
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand>(submitMenuCommand, guid);
-                await _mediator.Send(requestSubmitMenu);
+                var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
+                //await _mediator.Send(requestSubmitMenu);
+                await _mediator.SendCommandAsync(requestSubmitMenu);
             }
 
             return (IActionResult)Ok();
