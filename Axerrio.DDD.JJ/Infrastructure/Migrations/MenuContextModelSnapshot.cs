@@ -24,7 +24,8 @@ namespace Axerrio.DDD.Menu.Migrations
                 {
                     b.Property<int>("Identity")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("MenuId");
+                        .HasColumnName("MenuId")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .IsRequired()

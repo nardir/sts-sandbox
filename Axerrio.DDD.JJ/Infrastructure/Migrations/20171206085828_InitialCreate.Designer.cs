@@ -11,7 +11,7 @@ using System;
 namespace Axerrio.DDD.Menu.Migrations
 {
     [DbContext(typeof(MenuContext))]
-    [Migration("20171205125021_InitialCreate")]
+    [Migration("20171206085828_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,8 @@ namespace Axerrio.DDD.Menu.Migrations
                 {
                     b.Property<int>("Identity")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("MenuId");
+                        .HasColumnName("MenuId")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .IsRequired()
