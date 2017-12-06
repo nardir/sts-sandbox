@@ -5,10 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\DomainEventHandlers\" />
     <Folder Include="Application\Models\" />
     <Folder Include="Domain\AggregatesModel\ArtistAggregate\" />
-    <Folder Include="Domain\Events\" />
     <Folder Include="Domain\Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\" />

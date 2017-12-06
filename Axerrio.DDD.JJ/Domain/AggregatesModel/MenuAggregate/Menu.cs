@@ -1,4 +1,5 @@
 ﻿using Axerrio.BuildingBlocks;
+using Axerrio.DDD.Menu.Domain.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
             //Create default things
         }
 
-        public Menu(MenuStatus menuStatus, string description)
+        public Menu(MenuStatus menuStatus, string description) : this()
         {
             MenuStatusId = menuStatus.Id;
             Description = description;
+
+            AddDomainEvent(new MenuCreatedDomainEvent(this));
         }
 
         public override int Identity
