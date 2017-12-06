@@ -11,7 +11,7 @@ using System;
 namespace Axerrio.DDD.Menu.Migrations
 {
     [DbContext(typeof(MenuContext))]
-    [Migration("20171206085828_InitialCreate")]
+    [Migration("20171206091659_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

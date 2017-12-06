@@ -16,7 +16,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
         public static MenuStatus Approved = new MenuStatus(5, nameof(Approved).ToLowerInvariant());           
         public static MenuStatus Cancelled = new MenuStatus(6, nameof(Cancelled).ToLowerInvariant());
         public static MenuStatus Send = new MenuStatus(7, nameof(Send).ToLowerInvariant());
-
+             
         static MenuStatus()
         {
             Items.AddRange(new[] { Created, PickedUp, AwaitingApproval, Approved, ChangesRequested, Cancelled, Send });

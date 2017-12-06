@@ -43,8 +43,8 @@ namespace Axerrio.DDD.Menu.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new MenuEntityTypeConfiguration(DEFAULT_SCHEMA));
             modelBuilder.ApplyConfiguration(new MenuStatusEntityTypeConfiguration(DEFAULT_SCHEMA));
+            modelBuilder.ApplyConfiguration(new MenuEntityTypeConfiguration(DEFAULT_SCHEMA));            
         }        
     }
 
