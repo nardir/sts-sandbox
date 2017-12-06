@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace Axerrio.BuildingBlocks
 {
-    public class ClientRequestContextDesignFactory : IDesignTimeDbContextFactory<ClientRequestContext>
+    public class ClientRequestContextFactory : IDesignTimeDbContextFactory<ClientRequestContext>
     {
         public ClientRequestContext CreateDbContext(string[] args)
         {

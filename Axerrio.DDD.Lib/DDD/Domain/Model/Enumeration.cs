@@ -69,7 +69,7 @@ namespace Axerrio.BuildingBlocks
         {
             //https://msdn.microsoft.com/en-us/library/essfb559(v=vs.110).aspx
 
-            item = Items.FirstOrDefault(i => i.Id == value);
+            item =_items.FirstOrDefault(i => i.Id == value);
 
             if (item == null)
                 return false;

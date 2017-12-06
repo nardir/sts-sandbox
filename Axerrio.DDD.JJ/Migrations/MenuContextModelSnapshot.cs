@@ -18,6 +18,7 @@ namespace Axerrio.DDD.Menu.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
+                .HasAnnotation("Relational:Sequence:dbo.MenuId", "'MenuId', 'dbo', '1', '5', '', '', 'Int32', 'False'")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate.Menu", b =>
@@ -25,17 +26,21 @@ namespace Axerrio.DDD.Menu.Migrations
                     b.Property<int>("Identity")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("MenuId")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasAnnotation("SqlServer:HiLoSequenceName", "MenuId")
+                        .HasAnnotation("SqlServer:HiLoSequenceSchema", "dbo")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.SequenceHiLo);
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255);
 
+                    b.Property<int>("Id");
+
                     b.Property<int>("MenuStatusId");
 
                     b.HasKey("Identity");
 
-                    b.HasIndex("MenuStatusId");
+                    b.HasIndex("Id");
 
                     b.ToTable("Menus","dbo");
                 });
@@ -44,11 +49,15 @@ namespace Axerrio.DDD.Menu.Migrations
                 {
                     b.Property<int>("Id");
 
+                    b.Property<int?>("MenuStatusId");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MenuStatusId");
 
                     b.ToTable("MenuStatus","dbo");
                 });
@@ -57,8 +66,15 @@ namespace Axerrio.DDD.Menu.Migrations
                 {
                     b.HasOne("Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate.MenuStatus", "MenuStatus")
                         .WithMany()
-                        .HasForeignKey("MenuStatusId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate.MenuStatus", b =>
+                {
+                    b.HasOne("Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate.MenuStatus")
+                        .WithMany("Items")
+                        .HasForeignKey("MenuStatusId");
                 });
 #pragma warning restore 612, 618
         }

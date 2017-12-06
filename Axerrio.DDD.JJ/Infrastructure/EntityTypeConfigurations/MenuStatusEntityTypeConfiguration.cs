@@ -24,10 +24,10 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
 
             menuStatusConfiguration.HasKey(s => s.Id);
 
-            menuStatusConfiguration.Property(s => s.Id)                
+            menuStatusConfiguration.Property(s => s.Id) 
                 .ValueGeneratedNever()
                 .IsRequired();
-
+            
             menuStatusConfiguration.Property(s => s.Name)
                 .HasMaxLength(200)
                 .IsRequired();
