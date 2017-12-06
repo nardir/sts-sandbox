@@ -38,6 +38,7 @@ namespace Axerrio.DDD.Menu.Infrastructure
 
         public MenuContext(DbContextOptions<MenuContext> options, IMediator mediator): base(options)
         {
+            
             _mediator = EnsureArg.IsNotNull(mediator, nameof(mediator));
         }
 
