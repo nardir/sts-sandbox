@@ -12,7 +12,7 @@ using MediatR;
 namespace Axerrio.DDD.Menu.Application.Commands
 {   
 
-    public class SubmitMenuCommandHandler : ICommandHandler<SubmitMenuCommand>
+    public class SubmitMenuCommandHandler : ICommandHandler<SubmitMenuCommand,bool>
     {
         private readonly IMenuRepository _menuRepository;
 
@@ -21,14 +21,16 @@ namespace Axerrio.DDD.Menu.Application.Commands
             _menuRepository = EnsureArg.IsNotNull(menuRepository);
         }
 
-        public async Task Handle(SubmitMenuCommand message)
+        public async Task<bool> Handle(SubmitMenuCommand message)
         {
             //todo: menu props erbij!
             var menu = new MenuAggr.Menu(MenuStatus.Created, message.Description);
             _menuRepository.Add(menu);
 
             if(message.Initiating)
-                await _menuRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();       
+                return await _menuRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();
+
+            return true;
         }
         
     }

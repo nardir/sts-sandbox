@@ -25,15 +25,23 @@ namespace Axerrio.DDD.Menu.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitMenu([FromBody]SubmitMenuCommand submitMenuCommand, [FromHeader(Name = "x-requestid")] string requestId)
         {
-            bool commandResult = false;
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+            try
             {
-                var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
+                bool commandResult = false;
+                if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+                {
+                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
                
-                commandResult = await _mediator.SendCommandAsync(requestSubmitMenu);
-            }
+                    commandResult = await _mediator.SendCommandAsync(requestSubmitMenu);
+                }
 
-            return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
+                return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
+            }
+            catch(Exception ex)
+            {
+
+                return (IActionResult)BadRequest(ex);
+            }
         }
 
 

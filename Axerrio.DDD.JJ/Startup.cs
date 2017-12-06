@@ -55,11 +55,11 @@ namespace Axerrio.DDD.Messaging
 
             //IMediator zaken.
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
-
+ //           services.AddMediatR(typeof(MenuContext).GetTypeInfo().Assembly);
 
             services.AddSwaggerGen(options =>
             {
-                options.DescribeAllEnumsAsStrings();
+  //              options.DescribeAllEnumsAsStrings();
                 options.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info
                 {
                     Title = "Menu HTTP API",
@@ -68,6 +68,10 @@ namespace Axerrio.DDD.Messaging
                     TermsOfService = "Terms Of Service"
                 });
             });
+
+
+            //https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio
+
 
 
         }
@@ -79,6 +83,13 @@ namespace Axerrio.DDD.Messaging
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger()
+               .UseSwaggerUI(c =>
+               {
+                   c.SwaggerEndpoint($"/swagger/v1/swagger.json", "My Menu API V1");
+                  
+               });
 
             app.UseMvc();
         }

@@ -1,8 +1,11 @@
-﻿namespace Axerrio.BuildingBlocks
+﻿using Newtonsoft.Json;
+
+namespace Axerrio.BuildingBlocks
 {
     public abstract class Command<TCommand>: ValueObject<TCommand>, ICommand
         where TCommand: Command<TCommand>
     {
+        [JsonIgnore]
         public bool Initiating { get; private set; } = true;
 
         protected Command()
