@@ -19,7 +19,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
 
         static MenuStatus()
         {
-            Items.AddRange(new[] { Created, PickedUp, AwaitingApproval, Approved, ChangesRequested, Cancelled, Send });
+            _items.AddRange(new[] { Created, PickedUp, AwaitingApproval, Approved, ChangesRequested, Cancelled, Send });
         }
 
         protected MenuStatus() { }

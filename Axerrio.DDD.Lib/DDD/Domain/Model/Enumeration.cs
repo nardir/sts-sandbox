@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Axerrio.BuildingBlocks
@@ -7,7 +8,7 @@ namespace Axerrio.BuildingBlocks
     public abstract class Enumeration<T>: ValueObject<T>, IComparable
         where T : Enumeration<T>
     {
-        protected readonly static List<T> Items = new List<T>();
+        protected readonly static List<T> _items = new List<T>();
 
         public string Name { get; private set; }
         public int Id { get; private set; }
@@ -43,6 +44,8 @@ namespace Axerrio.BuildingBlocks
 
             return Id.CompareTo(other.Id);
         }
+
+        public ReadOnlyCollection<T> Items => _items.AsReadOnly();
 
         //public static explicit operator int(Enumeration<T> value)
         //{

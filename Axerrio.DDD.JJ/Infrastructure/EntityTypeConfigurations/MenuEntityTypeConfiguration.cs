@@ -26,8 +26,8 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
             menuConfiguration.Ignore(o => o.DomainEvents);
 
             menuConfiguration.Property(o => o.Identity)
- //               .ForSqlServerUseSequenceHiLo("MenuSeq")
-                .UseSqlServerIdentityColumn()
+                .ForSqlServerUseSequenceHiLo("MenuSeq")
+   //             .UseSqlServerIdentityColumn()
                 .HasColumnName("MenuId")
                 .IsRequired();
 
