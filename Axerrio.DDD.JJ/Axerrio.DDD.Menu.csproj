@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Application\Models\" />
-    <Folder Include="Domain\AggregatesModel\ArtistAggregate\" />
     <Folder Include="Domain\Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\" />
@@ -30,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.BBLib.csproj" />
+    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj" />
     <ProjectReference Include="..\sts-sandbox\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
   </ItemGroup>
 

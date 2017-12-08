@@ -23,14 +23,14 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
         {
             menuConfiguration.ToTable("Menus", _schema);
 
-            menuConfiguration.Ignore(o => o.DomainEvents);
+            menuConfiguration.Ignore(m => m.DomainEvents);
 
-            menuConfiguration.Property(o => o.Identity)
+            menuConfiguration.Property(m  => m.Identity)
                 .HasColumnName("MenuId")
                 .ForSqlServerUseSequenceHiLo("MenuId", _schema) 
                 .IsRequired();
 
-            menuConfiguration.HasKey(o => o.Identity);                       
+            menuConfiguration.HasKey(m => m.Identity);                       
 
             menuConfiguration.Property<int>("MenuStatusId")
                 .IsRequired();
@@ -39,9 +39,17 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
                 .HasMaxLength(255)
                 .IsRequired();
 
-            menuConfiguration.HasOne(o => o.MenuStatus)
+            menuConfiguration.OwnsOne(m => m.RequestInfo)
+                .ToTable("RequestInfo");     //
+
+            menuConfiguration.HasOne(m => m.ArtistPickedUp)
                 .WithMany()
-                .HasForeignKey("Id")
+                .HasForeignKey("ArtistId")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            menuConfiguration.HasOne(m => m.MenuStatus)
+                .WithMany()
+                .HasForeignKey("MenuStatusId")
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

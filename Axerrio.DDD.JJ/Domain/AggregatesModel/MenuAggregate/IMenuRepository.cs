@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 
 namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
 {

@@ -14,7 +14,7 @@ using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 
 namespace Axerrio.DDD.Menu.Infrastructure
 {
-    public class MenuContext : DbContextUnitOfWork //: DbContext, IUnitOfWork
+    public class MenuContext : DbContextUnitOfWork 
     {
         public const string DEFAULT_SCHEMA = "dbo";
 
@@ -31,8 +31,12 @@ namespace Axerrio.DDD.Menu.Infrastructure
             modelBuilder.HasSequence<int>("MenuId", DEFAULT_SCHEMA)
                         .IncrementsBy(5);
 
+            modelBuilder.HasSequence<int>("ArtistId", DEFAULT_SCHEMA)
+                       .IncrementsBy(5);
+
             modelBuilder.ApplyConfiguration(new MenuStatusEntityTypeConfiguration(DEFAULT_SCHEMA));
-            modelBuilder.ApplyConfiguration(new MenuEntityTypeConfiguration(DEFAULT_SCHEMA));            
+            modelBuilder.ApplyConfiguration(new MenuEntityTypeConfiguration(DEFAULT_SCHEMA));
+            modelBuilder.ApplyConfiguration(new ArtistEntityTypeConfiguration(DEFAULT_SCHEMA));
         }        
     }
 

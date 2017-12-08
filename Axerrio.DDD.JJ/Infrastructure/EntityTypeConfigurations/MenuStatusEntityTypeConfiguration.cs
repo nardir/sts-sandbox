@@ -25,6 +25,7 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
             menuStatusConfiguration.HasKey(s => s.Id);
 
             menuStatusConfiguration.Property(s => s.Id) 
+                .HasColumnName("MenuStatusId")
                 .ValueGeneratedNever()
                 .IsRequired();
             

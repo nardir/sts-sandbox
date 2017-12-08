@@ -24,7 +24,7 @@ namespace Axerrio.DDD.Menu.Application.Commands
         public async Task<bool> Handle(SubmitMenuCommand message)
         {
             //todo: menu props erbij!
-            var menu = new MenuAggr.Menu(MenuStatus.Created, message.Description);
+            var menu = new MenuAggr.Menu(MenuStatus.Created, message.Description, new RequestInfo(message.RequesterName, DateTime.UtcNow));
             _menuRepository.Add(menu);
 
             if(message.Initiating)

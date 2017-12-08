@@ -28,18 +28,23 @@ namespace Axerrio.DDD.Menu.Controllers
             try
             {
                 bool commandResult = false;
+
+                //Todo: Parsing + Identifiedcommand in Extension Method?
                 if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
                 {
-                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
-               
+                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid); 
+                    //Todo: Test, Exception indien geen corresponderende handler gevonden ...
+                    //--> Iedere Command een test?
+
                     commandResult = await _mediator.SendCommandAsync(requestSubmitMenu);
                 }
 
                 return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
+                
             }
             catch(Exception ex)
             {
-
+                //TODO: Algemene catch ofzo?
                 return (IActionResult)BadRequest(ex);
             }
         }

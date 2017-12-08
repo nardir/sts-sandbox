@@ -19,7 +19,10 @@ namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
 
         public Task Handle(MenuCreatedDomainEvent notification)
         {
-            return null;
+            return Task.Run(() => {
+                //Todo:
+                //Task handle? doen ze shop wel await??
+            });
         }
     }
 }
