@@ -8,6 +8,7 @@ using MediatR;
 using EnsureThat;
 using Axerrio.DDD.Menu.Application.Commands;
 using Axerrio.BuildingBlocks;
+using Microsoft.Extensions.Logging;
 
 namespace Axerrio.DDD.Menu.Controllers
 {    
@@ -15,10 +16,12 @@ namespace Axerrio.DDD.Menu.Controllers
     public class MenuController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<MenuController> _logger;
 
-        public MenuController(IMediator mediator)
+        public MenuController(IMediator mediator, ILogger<MenuController> logger)
         {
             _mediator = EnsureArg.IsNotNull(mediator);
+            _logger = EnsureArg.IsNotNull(logger);
         }
 
         [Route("submit")]
@@ -27,6 +30,8 @@ namespace Axerrio.DDD.Menu.Controllers
         {
             try
             {
+                _logger.LogInformation("Testje! SubmitMenu.");
+
                 bool commandResult = false;
 
                 //Todo: Parsing + Identifiedcommand in Extension Method?

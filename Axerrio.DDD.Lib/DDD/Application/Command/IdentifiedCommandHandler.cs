@@ -51,14 +51,12 @@ namespace Axerrio.BuildingBlocks
         protected async Task Handle<TCommand>(Guid id, IRequest message) where TCommand: ICommand
         {
             await _clientRequestService.CreateClientRequestForCommandAsync<TCommand>(id);
-
             await _mediator.Send(message);
         }
 
         protected async Task<TResponse> Handle<TCommand, TResponse>(Guid id, IRequest<TResponse> message) where TCommand : ICommand
         {
             await _clientRequestService.CreateClientRequestForCommandAsync<TCommand>(id);
-
             return await _mediator.Send(message);
         }
     }

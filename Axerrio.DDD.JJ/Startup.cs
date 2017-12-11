@@ -12,6 +12,7 @@ using MediatR;
 using Axerrio.DDD.Menu.Infrastructure;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Infrastructure.Repositories;
+using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 
 namespace Axerrio.DDD.Messaging
 {
@@ -49,7 +50,10 @@ namespace Axerrio.DDD.Messaging
                     });
             });
 
+            //Todo: to seperate builders
             services.AddScoped<IMenuRepository, MenuRepository>();
+            services.AddScoped<IArtistRepository, ArtistRepository>();
+
             services.AddTransient<IClientRequestService, ClientRequestService>();
 
 

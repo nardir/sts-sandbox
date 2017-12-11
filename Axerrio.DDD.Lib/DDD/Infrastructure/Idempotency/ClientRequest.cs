@@ -18,5 +18,10 @@ namespace Axerrio.BuildingBlocks
             
             Time = time;
         }
+
+        public override string ToString()
+        {
+            return $"ClientRequest, ID[{Id}], Name[{Name}], Time[{Time}]";
+        }
     }
 }

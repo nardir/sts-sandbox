@@ -43,5 +43,10 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate
         protected string LastName { get; set; }
         [JsonProperty]
         protected string EmailAddress { get; set; }
+
+        public string GetEmailAddress()
+        {
+            return EmailAddress;
+        }
     }
 }

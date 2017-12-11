@@ -31,8 +31,12 @@ namespace Axerrio.DDD.Menu.Infrastructure.Repositories
                 //                  .Collection(i => i.MenuItems).LoadAsync();
                 await _context.Entry(menu)
                     .Reference(i => i.MenuStatus).LoadAsync();
-                //               await _context.Entry(menu)
-                //                   .Reference(i => i.Address).LoadAsync();
+
+                await _context.Entry(menu)
+                    .Reference(i => i.RequestInfo).LoadAsync();
+
+                await _context.Entry(menu)
+                    .Reference(i => i.ArtistPickedUp).LoadAsync();
             }
 
             return menu;

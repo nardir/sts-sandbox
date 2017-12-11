@@ -19,6 +19,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="2.4.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
   </ItemGroup>
 
@@ -30,7 +34,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj" />
+    <ProjectReference Include="..\Axerrio.DDD.Menu.Domain\Axerrio.DDD.Menu.Domain.csproj" />
     <ProjectReference Include="..\sts-sandbox\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\sts-sandbox\src\Axerrio.DDD.Menu.Infrastructure\Axerrio.DDD.Menu.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
