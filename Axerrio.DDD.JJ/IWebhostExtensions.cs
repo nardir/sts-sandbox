@@ -1,6 +1,4 @@
 ﻿using Axerrio.BuildingBlocks;
-using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
-using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +30,8 @@ namespace Axerrio.BuildingBlocks
                     logger.LogInformation($"Migrating database associated with context {typeof(TContext).Name}");
 
                     context.Database.Migrate();
-
-                    //Get the DBSets of type IEnumeration
-                    //Todo: extensionmethod on context.
                     
+                    //Todo: extensionmethod on context: migrateEnumerations                    
                     var enumerationProperties = context.GetType().GetProperties()
                         .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
                         .Where(p => typeof(IEnumeration).IsAssignableFrom(p.PropertyType.GetGenericArguments().First()));
@@ -63,10 +59,8 @@ namespace Axerrio.BuildingBlocks
                         {
                             var id = item.Id;
                             var name = item.Name;                            
-                            //name: .ToLowerInvariant() -->  Waarom?
-
-                            //Todo: async in extensionmethod
-                            DbSet<MenuStatus> set = context.Set<MenuStatus>();
+                            //Opmerking: name .ToLowerInvariant() -->  Waarom?
+                                                        
                             var existingItem = dbSet.Find(id);
                             if(existingItem == null)
                                 dbSet.Add(item);
