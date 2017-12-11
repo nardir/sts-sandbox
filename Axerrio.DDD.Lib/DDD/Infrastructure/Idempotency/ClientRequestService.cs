@@ -20,7 +20,7 @@ namespace Axerrio.BuildingBlocks
             if (await ExistAsync(id))
             {
                 var domainException = new DomainException($"Request with {id} already exists");
-                _logger.LogError(domainException.ToString());
+                _logger.LogError(domainException, $"Request with {id} already exists");
 
                 throw domainException;
             }

@@ -49,7 +49,7 @@ namespace Axerrio.DDD.Menu.Controllers
             }
             catch(Exception ex)
             {
-                //TODO: Algemene catch ofzo?
+                //TODO: Algemene Handler. Lib?
                 return (IActionResult)BadRequest(ex);
             }
         }

@@ -24,10 +24,15 @@ namespace Axerrio.DDD.Menu.Infrastructure.Repositories
             _context = EnsureArg.IsNotNull(context);
         }
 
-        public async Task<List<Artist>> GetAllAsync()
-        {
-            var artists = _context.Artist;
+        public async Task<List<Artist>> GetActiveArtistsAsync()
+        {           
+            var artists = _context.Artist.Where(a => a.Active);
             return await artists.ToListAsync();
+        }
+
+        public void Add(Artist artist)
+        {
+            _context.Artist.Add(artist);
         }
     }
 }

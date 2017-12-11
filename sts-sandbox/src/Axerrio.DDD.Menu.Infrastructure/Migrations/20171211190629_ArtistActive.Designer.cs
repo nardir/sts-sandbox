@@ -11,9 +11,10 @@ using System;
 namespace Axerrio.DDD.Menu.Migrations
 {
     [DbContext(typeof(MenuContext))]
-    partial class MenuContextModelSnapshot : ModelSnapshot
+    [Migration("20171211190629_ArtistActive")]
+    partial class ArtistActive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,6 +31,10 @@ namespace Axerrio.DDD.Menu.Migrations
                         .HasAnnotation("SqlServer:HiLoSequenceName", "ArtistId")
                         .HasAnnotation("SqlServer:HiLoSequenceSchema", "dbo")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.SequenceHiLo);
+
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()

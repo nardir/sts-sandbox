@@ -15,11 +15,12 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate
             //Create default things
         }
 
-        protected Artist(string firstName, string lastName, string emailAddress) : this()
+        public Artist(string firstName, string lastName, string emailAddress) : this()
         {
             FirstName = firstName;
             LastName = lastName;
             EmailAddress = emailAddress;
+            Active = false;
 
             AddDomainEvent(new ArtistCreatedDomainEvent(this));
         }
@@ -43,6 +44,8 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate
         protected string LastName { get; set; }
         [JsonProperty]
         protected string EmailAddress { get; set; }
+        [JsonProperty]
+        public bool Active { get; set; }
 
         public string GetEmailAddress()
         {

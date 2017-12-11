@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Menu.Application.Commands
 {
+    
     public class SubmitMenuCommand : Command<SubmitMenuCommand, bool>
     {
         [DataMember]

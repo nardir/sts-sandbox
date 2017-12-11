@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,13 +7,13 @@ using System.Linq;
 
 namespace Axerrio.BuildingBlocks
 {
-    public abstract class Enumeration<T>: ValueObject<T>, IComparable
+    public abstract class Enumeration<T>: ValueObject<T>, IEnumeration
         where T : Enumeration<T>
     {
         [NotMapped]
         protected readonly static List<T> _items = new List<T>();
 
-        public string Name { get; private set; }
+        public string Name { get; set; } //private set;
         public int Id { get; private set; }
 
         protected Enumeration()
@@ -49,6 +50,7 @@ namespace Axerrio.BuildingBlocks
 
         [NotMapped]
         public ReadOnlyCollection<T> Items => _items.AsReadOnly();
+        
 
         //public static explicit operator int(Enumeration<T> value)
         //{

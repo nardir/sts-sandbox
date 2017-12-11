@@ -8,6 +8,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate
 {
     public  interface IArtistRepository : IRepository<Artist>
     {
-        Task<List<Artist>> GetAllAsync();
+        void Add(Artist artist);
+        Task<List<Artist>> GetActiveArtistsAsync();
     }
 }

@@ -26,7 +26,7 @@ namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
         {
             //Create Command?
             
-            var artists = await _artistRepository.GetAllAsync();
+            var artists = await _artistRepository.GetActiveArtistsAsync();
 
             string emailTo = "";
             artists.ForEach(artist => emailTo += artist.GetEmailAddress() + ";");

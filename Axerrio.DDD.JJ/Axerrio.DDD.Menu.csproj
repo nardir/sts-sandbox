@@ -8,11 +8,11 @@
     <Folder Include="Application\Models\" />
     <Folder Include="Domain\Exceptions\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Infrastructure\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Axerrio.IWebHostsExtensions" Version="2.0.0" />
     <PackageReference Include="MediatR" Version="3.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />

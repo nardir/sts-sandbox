@@ -14,7 +14,7 @@ using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Infrastructure.Repositories;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 
-namespace Axerrio.DDD.Messaging
+namespace Axerrio.DDD.Menu
 {
     public class Startup
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-using Axerrio.IWebHostsExtensions;
+using Axerrio.DDD.Menu;
 using Axerrio.BuildingBlocks;
 using Axerrio.DDD.Menu.Infrastructure;
 using Serilog;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
 
-namespace Axerrio.DDD.Messaging
+namespace Axerrio.DDD.Menu
 {
     public class Program
     {
@@ -59,6 +59,7 @@ namespace Axerrio.DDD.Messaging
                 Log.CloseAndFlush();
             }
         }
+        
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

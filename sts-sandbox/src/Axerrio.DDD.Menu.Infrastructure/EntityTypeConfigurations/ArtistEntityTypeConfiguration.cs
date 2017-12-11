@@ -44,6 +44,10 @@ namespace Axerrio.DDD.Menu.Infrastructure.EntityTypeConfigurations
                 .HasMaxLength(255)
                 .IsRequired();
 
+            artistConfiguration.Property<bool>("Active")
+               .HasDefaultValue(false)
+               .IsRequired();
+
         }
     }
     

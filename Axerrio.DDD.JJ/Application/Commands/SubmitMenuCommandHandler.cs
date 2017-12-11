@@ -11,7 +11,8 @@ using MediatR;
 
 namespace Axerrio.DDD.Menu.Application.Commands
 {   
-
+    //TODO: Template classfile for CommandHandler (Install with Nuget --> in package?)
+    //Command/Handler toevoegen, meteen 2 files mogelijk?
     public class SubmitMenuCommandHandler : ICommandHandler<SubmitMenuCommand,bool>
     {
         private readonly IMenuRepository _menuRepository;
@@ -22,8 +23,7 @@ namespace Axerrio.DDD.Menu.Application.Commands
         }
 
         public async Task<bool> Handle(SubmitMenuCommand message)
-        {
-            //todo: menu props erbij!
+        {           
             var menu = new MenuAggr.Menu(MenuStatus.Created, message.Description, new RequestInfo(message.RequesterName, DateTime.UtcNow));
             _menuRepository.Add(menu);
 
@@ -31,19 +31,18 @@ namespace Axerrio.DDD.Menu.Application.Commands
                 return await _menuRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();
 
             return true;
-        }
-        
+        }        
     }
 
-    public class SubmitMenuIdentifiedCommandHandler: IdentifiedCommandHandler<SubmitMenuCommand, bool>
-    {
-        public SubmitMenuIdentifiedCommandHandler(IMediator mediator, IClientRequestService clientRequestService) : base(mediator, clientRequestService)
-        {
-        }
+    //public class SubmitMenuIdentifiedCommandHandler: IdentifiedCommandHandler<SubmitMenuCommand, bool>
+    //{
+    //    public SubmitMenuIdentifiedCommandHandler(IMediator mediator, IClientRequestService clientRequestService) : base(mediator, clientRequestService)
+    //    {
+    //    }
 
-        protected override bool CreateResultForDuplicateRequest()
-        {
-            return true;
-        }
-    }
+    //    protected override bool CreateResultForDuplicateRequest()
+    //    {
+    //        return true;
+    //    }
+    //}
 }
