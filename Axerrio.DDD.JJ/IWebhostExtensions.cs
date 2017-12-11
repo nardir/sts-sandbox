@@ -30,7 +30,9 @@ namespace Axerrio.BuildingBlocks
                     logger.LogInformation($"Migrating database associated with context {typeof(TContext).Name}");
 
                     context.Database.Migrate();
-                    
+
+                    logger.LogInformation($"Migrating database enumeration sets associated with context {typeof(TContext).Name}");
+
                     //Todo: extensionmethod on context: migrateEnumerations                    
                     var enumerationProperties = context.GetType().GetProperties()
                         .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
@@ -62,13 +64,18 @@ namespace Axerrio.BuildingBlocks
                             //Opmerking: name .ToLowerInvariant() -->  Waarom?
                                                         
                             var existingItem = dbSet.Find(id);
-                            if(existingItem == null)
+                            if (existingItem == null)
+                            {
                                 dbSet.Add(item);
-                            else
+                                logger.LogInformation($"Added enumeration value: bla bla goede info {item.Name}");
+                            }
+                            else if(existingItem.Name != name)
                             {
                                 //Opmerking: public string Name { get; private set; } --> private weggehaald hiervoor.
                                 existingItem.Name = name;
                                 dbSet.Update(existingItem);
+
+                                logger.LogInformation($"Updated enumeration value: bla bla goede info {existingItem.Name}");
                             }
                         }
 
