@@ -31,7 +31,7 @@ namespace Axerrio.BuildingBlocks
 
                     context.Database.Migrate();
                     
-                    //Opmerking: scope meegeven, logger meegeven, nieuwe scope starten? 
+                    //Opmerking: scope meegeven of logger meegeven
                     context.MigrateEnumerations(logger);
 
                     seeder(context, services);
@@ -53,11 +53,11 @@ namespace Axerrio.BuildingBlocks
             return webHost;
         }
 
+        //Todo: extensionmethod zit in verkeerde class nu.
         private static void MigrateEnumerations<TContext>(this TContext context, ILogger<TContext> logger) where TContext : DbContext
         {
             logger.LogInformation($"Migrating database enumeration sets associated with context {typeof(TContext).Name}");
-
-            //Todo: extensionmethod zit in verkeerde class nu.                
+                          
             var enumerationProperties = context.GetType().GetProperties()
                 .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
                 .Where(p => typeof(IEnumeration).IsAssignableFrom(p.PropertyType.GetGenericArguments().First()));
@@ -101,14 +101,14 @@ namespace Axerrio.BuildingBlocks
                         existingItem.Name = name;
                         dbSet.Update(existingItem);
 
-                        logger.LogInformation($"Updated enumeration value for type {dbSetGenericPropertyType.Name}. Id{item.Id}, Name:'{existingName}' updated to '{item.Name}'");
+                        logger.LogInformation($"Updated enumeration value for type {dbSetGenericPropertyType.Name}. Id:{item.Id}, Name:'{existingName}' updated to '{item.Name}'");
                     }
 
                     existingIds.Add(id);
                 }
 
-                var databaseItems = dbSet.All(); //ForEach & if needed, due too: Cannot use a lambda expression as an argument to a dynamically dispatched operation
-                foreach (dynamic item in databaseItems)
+                //ForEach & if needed, due too: Cannot use a lambda expression as an argument to a dynamically dispatched operation
+                foreach (dynamic item in dbSet)
                 {
                     if (!existingIds.Contains(item.Id))
                     {
