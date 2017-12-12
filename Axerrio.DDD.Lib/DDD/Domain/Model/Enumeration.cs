@@ -15,7 +15,7 @@ namespace Axerrio.BuildingBlocks
 
         public string Name { get; set; } //private set;
         public int Id { get; private set; }
-
+        
         protected Enumeration()
         {
         }
@@ -49,7 +49,7 @@ namespace Axerrio.BuildingBlocks
         }
 
         [NotMapped]
-        public ReadOnlyCollection<T> Items => _items.AsReadOnly();
+        public static ReadOnlyCollection<T> Items => _items.AsReadOnly();
         
 
         //public static explicit operator int(Enumeration<T> value)

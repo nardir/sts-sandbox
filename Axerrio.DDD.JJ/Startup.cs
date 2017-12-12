@@ -30,7 +30,8 @@ namespace Axerrio.DDD.Menu
         {
             services.AddMvc();
 
-            services.AddDbContext<MenuContext>(options =>
+
+           services.AddDbContext<MenuContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
@@ -73,10 +74,8 @@ namespace Axerrio.DDD.Menu
                 });
             });
 
-
-            //https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio
-
-
+            
+            //https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio           
 
         }
 
