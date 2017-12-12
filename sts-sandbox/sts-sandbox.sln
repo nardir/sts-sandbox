@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Guard.Test", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.AppInsights.Test", "..\Axerrio.AppInsights.Test\Axerrio.AppInsights.Test.csproj", "{F8AF2E02-ACFB-49AC-8BB7-02496F04678B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.LibBB", "..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj", "{50E1B8ED-FC42-454D-8727-4872ADAE6744}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Lib", "..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj", "{50E1B8ED-FC42-454D-8727-4872ADAE6744}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Menu", "..\Axerrio.DDD.JJ\Axerrio.DDD.Menu.csproj", "{FEAC737D-C338-4B4A-A839-D9058ADBFA81}"
 EndProject

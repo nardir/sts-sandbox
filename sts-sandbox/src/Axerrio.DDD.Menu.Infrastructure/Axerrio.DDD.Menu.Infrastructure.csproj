@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj" />
+    <ProjectReference Include="..\..\..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj" />
     <ProjectReference Include="..\..\..\Axerrio.DDD.Menu.Domain\Axerrio.DDD.Menu.Domain.csproj" />
   </ItemGroup>
 

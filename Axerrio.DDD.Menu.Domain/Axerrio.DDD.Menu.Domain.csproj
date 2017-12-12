@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj" />
+    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj" />
   </ItemGroup>
 
 </Project>

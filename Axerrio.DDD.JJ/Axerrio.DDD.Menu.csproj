@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.LibBB.csproj" />
+    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj" />
     <ProjectReference Include="..\Axerrio.DDD.Menu.Domain\Axerrio.DDD.Menu.Domain.csproj" />
     <ProjectReference Include="..\sts-sandbox\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
     <ProjectReference Include="..\sts-sandbox\src\Axerrio.DDD.Menu.Infrastructure\Axerrio.DDD.Menu.Infrastructure.csproj" />
