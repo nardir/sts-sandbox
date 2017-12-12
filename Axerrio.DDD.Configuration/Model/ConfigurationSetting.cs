@@ -23,10 +23,19 @@ namespace Axerrio.DDD.Configuration.Model
         {
         }
 
-        public ConfigurationSetting(ConfigurationSection section, string key)
+        protected ConfigurationSetting(ConfigurationSection section, string key)
         {
             Section = section;
             Key = key;
+        }
+
+        public static ConfigurationSetting Create<T>(ConfigurationSection section, string key, T value)
+        {
+            var setting = new ConfigurationSetting(section, key);
+
+            setting.SetValue(value);
+
+            return setting;
         }
 
         public virtual T GetValue<T>()
@@ -41,6 +50,11 @@ namespace Axerrio.DDD.Configuration.Model
                 _value = JsonConvert.DeserializeObject(JsonValue, type);
             }
             return _value;
+        }
+
+        public virtual void SetValue<T>(T value)
+        {
+            SetValue(value, typeof(T));
         }
 
         public virtual void SetValue(object value, Type type)

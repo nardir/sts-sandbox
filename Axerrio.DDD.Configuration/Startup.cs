@@ -20,14 +20,18 @@ namespace Axerrio.DDD.Configuration
         {
             Configuration = configuration;
 
-            var setting1 = new ConfigurationSetting(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring");
-            setting1.SetValue("test", typeof(string));
+            //var setting1 = new ConfigurationSetting(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring");
+            //setting1.SetValue("test", typeof(string));
+            //setting1.SetValue("test");
+            var setting1 = ConfigurationSetting.Create(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring", "test");
             var value1 = setting1.GetValue<string>();
 
-            
 
-            var setting2 = new ConfigurationSetting(new Model.ConfigurationSection("Setting"), "setting1");
-            setting2.SetValue(setting1, setting1.GetType());
+
+            //var setting2 = new ConfigurationSetting(new Model.ConfigurationSection("Setting"), "setting1");
+            //setting2.SetValue(setting1, setting1.GetType());
+            //setting2.SetValue(setting1);
+            var setting2 = ConfigurationSetting.Create(new Model.ConfigurationSection("Setting"), "setting1", setting1);
             var value2 = setting2.GetValue(setting1.GetType());
 
         }
