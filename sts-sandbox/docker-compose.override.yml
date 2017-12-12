@@ -42,3 +42,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
+
+  axerrio.ddd.configuration:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+

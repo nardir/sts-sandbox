@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4FA288D4-0038-4B47-A325-C00E6E4A57BB}"
 EndProject
@@ -69,7 +69,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.QueueTest", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Versioning", "..\Axerrio.DDD.Versioning\Axerrio.DDD.Versioning.csproj", "{A5BFF9D0-50AD-4128-936A-BE4083F0C620}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.DDD.Logging", "..\Axerrio.DDD.Logging\Axerrio.DDD.Logging.csproj", "{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Logging", "..\Axerrio.DDD.Logging\Axerrio.DDD.Logging.csproj", "{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.DDD.Configuration", "..\Axerrio.DDD.Configuration\Axerrio.DDD.Configuration.csproj", "{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,10 @@ Global
 		{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -221,6 +227,7 @@ Global
 		{154AD041-A3DB-462A-8241-A259D25B6AB0} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{A5BFF9D0-50AD-4128-936A-BE4083F0C620} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
+		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}
