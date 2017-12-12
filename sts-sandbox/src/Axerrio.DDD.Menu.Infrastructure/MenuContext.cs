@@ -25,7 +25,8 @@ namespace Axerrio.DDD.Menu.Infrastructure
         public MenuContext(DbContextOptions<MenuContext> options) : base (options) { }
 
         public MenuContext(DbContextOptions<MenuContext> options, IMediator mediator): base(options, mediator)
-        {            
+        {
+   //         MenuStatus.AsNoTracking();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

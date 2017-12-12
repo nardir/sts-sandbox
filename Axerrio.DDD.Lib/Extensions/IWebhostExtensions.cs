@@ -73,8 +73,8 @@ namespace Axerrio.BuildingBlocks
                 var enumerationItems = (IEnumerable)dbSetGenericType.BaseType.GetProperty("Items", BindingFlags.Static | BindingFlags.Public) //Get the static, public Property Items
                         .GetValue(null);   //GetValue null: static class, so no instantiated object to get the value from. 
 
-                var dbSet = context.GetSetWithItemsInChangeTracker(dbSetGenericType);
-                
+                var dbSet = context.GetSetWithItemsInChangeTracker(dbSetGenericType);                
+
                 List<int> existingIds = new List<int>();
                 foreach (dynamic item in enumerationItems)
                 {
@@ -85,8 +85,9 @@ namespace Axerrio.BuildingBlocks
                         logger.LogInformation($"Added enumeration value for type {dbSetGenericType.Name}. Id:{item.Id}, Name:'{item.Name}'");
                     }
                     else if (existingItem.Name != item.Name)
-                    {  
-                        dbSet.Update(item);
+                    {
+                        context.Entry(existingItem).CurrentValues.SetValues(item);
+                        dbSet.Update(existingItem);
                         logger.LogInformation($"Updated enumeration value for type {dbSetGenericType.Name}. Id:{item.Id}, Name:'{existingItem.Name}' updated to '{item.Name}'");
                     }
 
@@ -94,7 +95,7 @@ namespace Axerrio.BuildingBlocks
                 }
 
                 //ForEach & if needed, due too: Cannot use a lambda expression as an argument to a dynamically dispatched operation
-                foreach (dynamic item in enumerationItems)
+                foreach (dynamic item in dbSet)
                 {
                     if (!existingIds.Contains(item.Id))
                     {
@@ -121,84 +122,15 @@ namespace Axerrio.BuildingBlocks
                                         o.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
                                         o.PropertyType.GenericTypeArguments.Contains(dbSetGenericType))
                                     .FirstOrDefault();
-            
-            dynamic dbSet = model.GetValue(context);
-            
+
+            dynamic dbSet = model.GetValue(context);           
+
             //Get all items of the dbSet in the change tracker with one db SELECT action, so we have all enumerations in memory.
             foreach (dynamic record in dbSet) { break; }
 
             return dbSet;
         }
-
-        //private static void MigrateEnumerations<TContext>(this TContext context, ILogger<TContext> logger) where TContext : DbContext
-        //{
-        //    logger.LogInformation($"Migrating database enumeration sets associated with context {typeof(TContext).Name}");
-
-        //    var enumerationProperties = context.GetType().GetProperties()
-        //        .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
-        //        .Where(p => typeof(IEnumeration).IsAssignableFrom(p.PropertyType.GetGenericArguments().First()));
-
-        //    foreach (var enumerationProperty in enumerationProperties)
-        //    {
-        //        var dbSetGenericPropertyType = enumerationProperty.PropertyType.GetGenericArguments().First();
-
-        //        //Creating instance of type without default constructor in C# using reflection: https://stackoverflow.com/questions/390578/creating-instance-of-type-without-default-constructor-in-c-sharp-using-reflectio
-        //        dynamic enumeration = FormatterServices.GetUninitializedObject(dbSetGenericPropertyType);
-        //        var enumerationItems = (IEnumerable)enumeration.Items;
-
-        //        //Get instance of specific DbSet: https://stackoverflow.com/questions/33940507/find-a-generic-dbset-in-a-dbcontext-dynamically
-        //        var model = context.GetType()
-        //                .GetRuntimeProperties()
-        //                .Where(o =>
-        //                    o.PropertyType.IsGenericType &&
-        //                    o.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
-        //                    o.PropertyType.GenericTypeArguments.Contains(dbSetGenericPropertyType))
-        //                .FirstOrDefault();
-
-        //        dynamic dbSet = model.GetValue(context);
-
-        //        List<int> existingIds = new List<int>();
-        //        foreach (dynamic item in enumerationItems)
-        //        {
-        //            int id = item.Id;
-        //            var name = item.Name;
-        //            //Opmerking: name .ToLowerInvariant() -->  Waarom?
-
-        //            var existingItem = dbSet.Find(id);
-        //            if (existingItem == null)
-        //            {
-        //                dbSet.Add(item);
-        //                logger.LogInformation($"Added enumeration value for type {dbSetGenericPropertyType.Name}. Id:{item.Id}, Name:'{item.Name}'");
-        //            }
-        //            else if (existingItem.Name != name)
-        //            {
-        //                var existingName = existingItem.Name;
-        //                //Opmerking: public string Name { get; private set; } --> private weggehaald hiervoor.
-        //                existingItem.Name = name;
-        //                dbSet.Update(existingItem);
-
-        //                logger.LogInformation($"Updated enumeration value for type {dbSetGenericPropertyType.Name}. Id:{item.Id}, Name:'{existingName}' updated to '{item.Name}'");
-        //            }
-
-        //            existingIds.Add(id);
-        //        }
-
-        //        //ForEach & if needed, due too: Cannot use a lambda expression as an argument to a dynamically dispatched operation
-        //        foreach (dynamic item in dbSet)
-        //        {
-        //            if (!existingIds.Contains(item.Id))
-        //            {
-        //                dbSet.Remove(item);
-
-        //                logger.LogInformation($"Deleted enumeration value for type {dbSetGenericPropertyType.Name}. Id:{item.Id}, Name:'{item.Name}'");
-        //            }
-        //        }
-
-        //        context.SaveChanges();
-        //    }
-
-        //    logger.LogInformation($"Migrated database enumeration sets associated with context {typeof(TContext).Name}");
-        //}
+        
 
         public static IWebHost MigrateDbContext<TContext>(this IWebHost webHost) where TContext : DbContext
         {
