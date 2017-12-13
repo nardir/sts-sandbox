@@ -1,6 +1,7 @@
 ﻿using Axerrio.BuildingBlocks;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using EnsureThat;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -30,5 +31,12 @@ namespace Axerrio.DDD.Menu.Application.Commands
             await _artistRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync(message.Initiating, cancellationToken);           
         }
         
+    }
+
+    public class AddArtistIdentifiedCommandHandler : IdentifiedCommandHandler<AddArtistCommand>
+    {
+        public AddArtistIdentifiedCommandHandler(IMediator mediator, IClientRequestService clientRequestService) : base(mediator, clientRequestService)
+        {
+        }        
     }
 }

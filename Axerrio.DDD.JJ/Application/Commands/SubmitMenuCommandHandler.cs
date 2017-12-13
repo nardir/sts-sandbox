@@ -32,15 +32,15 @@ namespace Axerrio.DDD.Menu.Application.Commands
         }        
     }
 
-    //public class SubmitMenuIdentifiedCommandHandler: IdentifiedCommandHandler<SubmitMenuCommand, bool>
-    //{
-    //    public SubmitMenuIdentifiedCommandHandler(IMediator mediator, IClientRequestService clientRequestService) : base(mediator, clientRequestService)
-    //    {
-    //    }
+    public class SubmitMenuIdentifiedCommandHandler : IdentifiedCommandHandler<SubmitMenuCommand, bool>
+    {
+        public SubmitMenuIdentifiedCommandHandler(IMediator mediator, IClientRequestService clientRequestService) : base(mediator, clientRequestService)
+        {
+        }
 
-    //    protected override bool CreateResultForDuplicateRequest()
-    //    {
-    //        return true;
-    //    }
-    //}
+        protected override bool CreateResultForDuplicateRequest()
+        {
+            return true;
+        }
+    }
 }

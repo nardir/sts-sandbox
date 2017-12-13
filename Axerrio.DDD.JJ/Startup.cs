@@ -60,7 +60,6 @@ namespace Axerrio.DDD.Menu
 
             //IMediator zaken.
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
- //           services.AddMediatR(typeof(MenuContext).GetTypeInfo().Assembly);
 
             services.AddSwaggerGen(options =>
             {

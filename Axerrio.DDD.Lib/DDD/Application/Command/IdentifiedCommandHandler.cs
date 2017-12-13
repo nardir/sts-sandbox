@@ -23,7 +23,7 @@ namespace Axerrio.BuildingBlocks
         {
             await _clientRequestService.CreateClientRequestForCommandAsync<TCommand>(message.Id, cancellationToken);
 
-            await _mediator.Send(message);
+            await _mediator.Send(message.Command);
         }
     }
 
@@ -48,7 +48,7 @@ namespace Axerrio.BuildingBlocks
         {
             await _clientRequestService.CreateClientRequestForCommandAsync<TCommand, TResponse>(message.Id, cancellationToken);
 
-            return await _mediator.Send(message);
+            return await _mediator.Send(message.Command);
         }
     }    
 }
