@@ -52,8 +52,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
         [JsonProperty]
         public Artist ArtistPickedUp { get; set; }       
 
-        [JsonIgnore]
-        [NotMapped]
+        [JsonIgnore]       
         public MenuStatus MenuStatus
         {
             get
