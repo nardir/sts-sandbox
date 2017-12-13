@@ -4,6 +4,7 @@ using Axerrio.DDD.Menu.Domain.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,6 +53,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
         public Artist ArtistPickedUp { get; set; }       
 
         [JsonIgnore]
+        [NotMapped]
         public MenuStatus MenuStatus
         {
             get

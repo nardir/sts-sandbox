@@ -26,17 +26,9 @@ namespace Axerrio.DDD.Menu.Infrastructure.Repositories
         {
             var menu = await _context.Menu.FindAsync(menuId);
             if (menu != null)
-            {
-                //              await _context.Entry(menu)
-                //                  .Collection(i => i.MenuItems).LoadAsync();
-                await _context.Entry(menu)
-                    .Reference(i => i.MenuStatus).LoadAsync();
-
+            {      
                 await _context.Entry(menu)
                     .Reference(i => i.RequestInfo).LoadAsync();
-
-                await _context.Entry(menu)
-                    .Reference(i => i.ArtistPickedUp).LoadAsync();
             }
 
             return menu;
