@@ -20,13 +20,26 @@ namespace Axerrio.DDD.Configuration
 
         private JsonTextReader _reader;
 
-        public static IDictionary<string, string> Parse(Stream input)
-            => new JsonConfigurationParser().ParseStream(input);
+        public static IDictionary<string, string> Parse(string key, Stream input)
+            => new JsonConfigurationParser().ParseStream(key, input);
 
-        public static IDictionary<string, string> Parse(string input, string section = null, string key = null)
-            => new JsonConfigurationParser().ParseString(input, section, key);
+        public static IDictionary<string, string> Parse(string key, string input)
+            => new JsonConfigurationParser().ParseString(key, input);
 
-        private IDictionary<string, string> ParseStream(Stream input)
+        public static IDictionary<string, string> Parse<T>(string key, T input)
+            => new JsonConfigurationParser().ParseObject(key, input);
+
+        private IDictionary<string, string> ParseObject<T>(string key, T input)
+        {
+            var jsonConfig = JObject.FromObject(input);
+
+            if (string.IsNullOrWhiteSpace(key))
+                key = nameof(T);
+
+            return Parse(key, jsonConfig);
+        }
+
+        private IDictionary<string, string> ParseStream(string key, Stream input)
         {
             //_data.Clear();
             _reader = new JsonTextReader(new StreamReader(input));
@@ -38,41 +51,32 @@ namespace Axerrio.DDD.Configuration
 
             //return _data;
 
-            return Parse(jsonConfig);
+            return Parse(key, jsonConfig);
         }
 
-        private IDictionary<string, string> ParseString(string input, string section = null, string key = null)
+        private IDictionary<string, string> ParseString(string key, string input)
         {
             var jsonConfig = JObject.Parse(input);
 
-            return Parse(jsonConfig, section, key);
+            return Parse(key, jsonConfig);
         }
 
-        private IDictionary<string, string> Parse(JObject jObject, string section = null, string key = null)
+        private IDictionary<string, string> Parse(string key, JObject jObject)
         {
             _data.Clear();
 
-            if (!string.IsNullOrWhiteSpace(section))
-                EnterContext(section);
-
-            if (!string.IsNullOrWhiteSpace(key))
+             if (!string.IsNullOrWhiteSpace(key))
                 EnterContext(key);
 
-            VisitJObject(jObject, section, key);
+            VisitJObject(jObject);
 
             return _data;
         }
 
-        private void VisitJObject(JObject jObject, string section = null, string key = null)
+        private void VisitJObject(JObject jObject)
         {
             foreach (var property in jObject.Properties())
             {
-                //if (!string.IsNullOrWhiteSpace(section))
-                //    EnterContext(section);
-
-                //if (!string.IsNullOrWhiteSpace(key))
-                //    EnterContext(key);
-
                 EnterContext(property.Name);
                 VisitProperty(property);
                 ExitContext();

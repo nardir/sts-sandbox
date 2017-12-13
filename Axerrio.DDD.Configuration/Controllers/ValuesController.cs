@@ -2,13 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Axerrio.DDD.Configuration.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Axerrio.DDD.Configuration.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        //public ValuesController(IOptions<DbContextOptions<ConfigurationContext>> optionsAccessor)
+        public ValuesController(IOptions<TestOptions> optionsAccessor)
+        {
+            var options = optionsAccessor.Value;
+        }
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()

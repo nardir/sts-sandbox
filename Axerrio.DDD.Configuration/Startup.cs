@@ -17,6 +17,7 @@ namespace Axerrio.DDD.Configuration
 {
     //https://github.com/thinkabouthub/Configuration.EntityFramework/wiki
     //https://msdn.microsoft.com/en-us/magazine/mt814420
+    //https://github.com/aspnet/Configuration/tree/dev/src/Config.Json
 
     public class Startup
     {
@@ -25,7 +26,7 @@ namespace Axerrio.DDD.Configuration
             Configuration = configuration;
 
 
-            //var data = Configuration.AsEnumerable();
+            var data = Configuration.AsEnumerable();
             //var data2 = Configuration.GetChildren();
             //var env1 = Configuration.GetValue<string>("ENVIRONMENT");
             //var env2 = Configuration.GetValue<string>("NR_TEST");
@@ -44,23 +45,26 @@ namespace Axerrio.DDD.Configuration
             var setting2 = ConfigurationSetting.Create(new Model.ConfigurationSection("Setting"), "setting1", setting1);
             var value2 = setting2.GetValue(setting1.GetType());
 
-            var options = new DbContextOptionsBuilder<ConfigurationContext>()
-                .UseInMemoryDatabase("Config")
-                .Options;
+            //var options = new DbContextOptionsBuilder<ConfigurationContext>()
+            //    .UseInMemoryDatabase("Config")
+            //    .Options;
 
-            var input = JsonConvert.SerializeObject(options);
-            var data = JsonConfigurationParser.Parse(input, "ConfigContext", "Options");
-
+            //var input = JsonConvert.SerializeObject(options);
+            //var data = JsonConfigurationParser.Parse(input, "ConfigContext", "Options");
         }
 
         public IConfiguration Configuration { get; }
+        public IConfigurationBuilder Builder { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
 
-            
+            //services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
+            //var optionsConfig = Configuration.GetSection("Test:Options");
+            var optionsConfig = Configuration.GetSection(nameof(TestOptions));
+            services.Configure<TestOptions>(optionsConfig);
 
             services.AddMvc();
         }
