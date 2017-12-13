@@ -27,6 +27,7 @@ namespace Axerrio.DDD.Configuration
             var value1 = setting1.GetValue<string>();
 
 
+            
 
             //var setting2 = new ConfigurationSetting(new Model.ConfigurationSection("Setting"), "setting1");
             //setting2.SetValue(setting1, setting1.GetType());

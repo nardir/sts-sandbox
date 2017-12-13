@@ -58,7 +58,7 @@ namespace Axerrio.DDD.Configuration
 
                 foreach(var setting in settings)
                 {
-                    if (this.IsJsonObjectOrArray(setting.JsonValue))
+                    if (IsJsonObjectOrArray(setting.JsonValue))
                     {
                         var data = JsonConvert.DeserializeObject(setting.JsonValue);
                         var container = (JContainer)data;
@@ -66,7 +66,7 @@ namespace Axerrio.DDD.Configuration
                     }
                     else
                     {
-                        this.AddSetting(setting.Key, setting.JsonValue);
+                        AddSetting(setting.Key, setting.JsonValue);
                     }
                 }
             }
