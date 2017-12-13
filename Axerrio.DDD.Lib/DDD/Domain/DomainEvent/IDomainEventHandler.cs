@@ -2,7 +2,7 @@
 
 namespace Axerrio.BuildingBlocks
 {
-    public interface IDomainEventHandler<TDomainEvent>: IAsyncNotificationHandler<TDomainEvent>
+    public interface IDomainEventHandler<TDomainEvent>: INotificationHandler<TDomainEvent>
         where TDomainEvent : DomainEvent
     {
     }

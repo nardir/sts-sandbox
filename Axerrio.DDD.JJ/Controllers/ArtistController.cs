@@ -31,7 +31,7 @@ namespace Axerrio.DDD.Menu.Controllers
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
                 var requestAddArtist = new IdentifiedCommand<AddArtistCommand>(addArtistCommand, guid);  
-                await _mediator.SendCommandAsync(requestAddArtist);
+                await _mediator.Send(requestAddArtist);
 
                 commandResult = true;
             }

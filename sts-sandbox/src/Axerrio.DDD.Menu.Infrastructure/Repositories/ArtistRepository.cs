@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Menu.Infrastructure.Repositories
@@ -24,10 +25,10 @@ namespace Axerrio.DDD.Menu.Infrastructure.Repositories
             _context = EnsureArg.IsNotNull(context);
         }
 
-        public async Task<List<Artist>> GetActiveArtistsAsync()
+        public async Task<List<Artist>> GetActiveArtistsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {           
             var artists = _context.Artist.Where(a => a.Active);
-            return await artists.ToListAsync();
+            return await artists.ToListAsync(cancellationToken);
         }
 
         public void Add(Artist artist)

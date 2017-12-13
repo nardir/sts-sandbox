@@ -71,7 +71,7 @@ namespace Axerrio.BuildingBlocks
                 RuntimeHelpers.RunClassConstructor(dbSetGenericType.TypeHandle);
 
                 var enumerationItems = (IEnumerable)dbSetGenericType.BaseType.GetProperty("Items", BindingFlags.Static | BindingFlags.Public) //Get the static, public Property Items
-                        .GetValue(null);   //GetValue null: static class, so no instantiated object to get the value from. 
+                        .GetValue(null);   //GetValue null: static class, so no instantiated object to get the value from. Is ignored at static class.
 
                 var dbSet = context.GetSetWithItemsInChangeTracker(dbSetGenericType);                
 
@@ -123,7 +123,7 @@ namespace Axerrio.BuildingBlocks
                                         o.PropertyType.GenericTypeArguments.Contains(dbSetGenericType))
                                     .FirstOrDefault();
 
-            dynamic dbSet = model.GetValue(context);           
+            dynamic dbSet = model.GetValue(context);       
 
             //Get all items of the dbSet in the change tracker with one db SELECT action, so we have all enumerations in memory.
             foreach (dynamic record in dbSet) { break; }

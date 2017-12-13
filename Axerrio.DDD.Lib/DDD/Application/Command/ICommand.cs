@@ -6,7 +6,7 @@ namespace Axerrio.BuildingBlocks
     {
     }
 
-    public interface ICommand<TResponse>: ICommand, IRequest<TResponse>
+    public interface ICommand<TResponse>: IRequest<TResponse>
     {
     }
 }

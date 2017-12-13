@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using MediatR;
+using System.Threading;
 
 namespace Axerrio.DDD.Menu.Application.Commands
 {   
     //TODO: Template classfile for CommandHandler (Install with Nuget --> in package?)
     //Command/Handler toevoegen, meteen 2 files mogelijk?
-    public class SubmitMenuCommandHandler : ICommandHandler<SubmitMenuCommand,bool>
+    public class SubmitMenuCommandHandler : CommandHandler<SubmitMenuCommand,bool>
     {
         private readonly IMenuRepository _menuRepository;
 
@@ -22,15 +23,12 @@ namespace Axerrio.DDD.Menu.Application.Commands
             _menuRepository = EnsureArg.IsNotNull(menuRepository);
         }
 
-        public async Task<bool> Handle(SubmitMenuCommand message)
-        {           
+        public override async Task<bool> Handle(SubmitMenuCommand message, CancellationToken cancellationToken = default(CancellationToken))
+        {         
             var menu = new MenuAggr.Menu(MenuStatus.Created, message.Description, new RequestInfo(message.RequesterName, DateTime.UtcNow));
-            _menuRepository.Add(menu);
-
-            if(message.Initiating)
-                return await _menuRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();
-
-            return true;
+            _menuRepository.Add(menu); // async on repo!?
+            
+            return await _menuRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync(message.Initiating, cancellationToken);            
         }        
     }
 

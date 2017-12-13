@@ -8,10 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
 {
-    public class NotifyArtistsWhenMenuCreated : IDomainEventHandler<MenuCreatedDomainEvent>
+    public class NotifyArtistsWhenMenuCreated : DomainEventHandler<MenuCreatedDomainEvent>
     {
         private readonly IArtistRepository _artistRepository;
         private readonly ILogger<NotifyArtistsWhenMenuCreated> _logger;
@@ -22,11 +23,11 @@ namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
             _logger = EnsureArg.IsNotNull(logger);
         }
 
-        public async Task Handle(MenuCreatedDomainEvent notification)
+        public override async Task Handle(MenuCreatedDomainEvent notification, CancellationToken cancellationToken = default(CancellationToken))
         {
             //Create Command?
             
-            var artists = await _artistRepository.GetActiveArtistsAsync();
+            var artists = await _artistRepository.GetActiveArtistsAsync(cancellationToken);
 
             string emailTo = "";
             artists.ForEach(artist => emailTo += artist.GetEmailAddress() + ";");
@@ -36,5 +37,6 @@ namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
             _logger.LogDebug("Email Send to: " + emailTo);
             
         }
+        
     }
 }

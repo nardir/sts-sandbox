@@ -1,5 +1,6 @@
 ﻿using Axerrio.DDD.BuildingBlocks;
 using MediatR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Axerrio.DDD.Ordering.BuildingBlocks
     public abstract class Command<TCommand, TResult>: ValueObject<TCommand>, ICommand, IRequest<TResult>
         where TCommand : Command<TCommand, TResult>
     {
+        [JsonIgnore]
         public bool Initiating { get; private set; } = true;
 
         protected Command() {}

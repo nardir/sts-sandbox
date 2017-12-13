@@ -33,15 +33,16 @@ namespace Axerrio.DDD.Menu.Controllers
                 _logger.LogInformation("Testje! SubmitMenu.");
 
                 bool commandResult = false;
-
+                
                 //Todo: Parsing + Identifiedcommand in Extension Method?
                 if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
                 {
-                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid); 
+                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
                     //Todo: Test, Exception indien geen corresponderende handler gevonden ...
                     //--> Iedere Command een test?
 
-                    commandResult = await _mediator.SendCommandAsync(requestSubmitMenu);
+                    //Insert Canccelationtoken?
+                    commandResult = await _mediator.Send(requestSubmitMenu);                   
                 }
 
                 return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();

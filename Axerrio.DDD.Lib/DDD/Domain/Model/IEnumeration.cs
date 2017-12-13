@@ -8,5 +8,7 @@ namespace Axerrio.BuildingBlocks
 {
     public interface IEnumeration: IComparable
     {
+        int Id { get;  }
+        string Name { get; }
     }
 }

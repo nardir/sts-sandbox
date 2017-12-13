@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EnsureThat;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace Axerrio.BuildingBlocks
 {
@@ -15,23 +16,30 @@ namespace Axerrio.BuildingBlocks
             _context = EnsureArg.IsNotNull(context, nameof(context));
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
-        public async Task CreateClientRequestForCommandAsync<TCommand>(Guid id) where TCommand : ICommand
+
+        private async Task CreateClientRequestForCommandAsync(Guid id, Type commandType, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (await ExistAsync(id))
-            {
-                var domainException = new DomainException($"Request with {id} already exists");
-                _logger.LogError(domainException, $"Request with {id} already exists");
+                throw new DomainException($"Request with {id} already exists");
+        
 
-                throw domainException;
-            }
+            var request = new ClientRequest(id, commandType.Name, DateTime.UtcNow);
 
-            var request = new ClientRequest(id, typeof(TCommand).Name, DateTime.UtcNow);
+            await _context.AddAsync(request, cancellationToken);
 
-            _context.Add(request);
+            await _context.SaveChangesAsync(cancellationToken);
 
-            await _context.SaveChangesAsync();
+            _logger.LogDebug($"{request.ToString()}"); //todo: better info!
+        }
 
-            _logger.LogDebug($"{request.ToString()}");
+        public Task CreateClientRequestForCommandAsync<TCommand, TResponse>(Guid id, CancellationToken cancellationToken = default(CancellationToken)) where TCommand : ICommand<TResponse>
+        {
+            return CreateClientRequestForCommandAsync(id, typeof(TCommand), cancellationToken);
+        }
+ 
+        public Task CreateClientRequestForCommandAsync<TCommand>(Guid id, CancellationToken cancellationToken = default(CancellationToken)) where TCommand : ICommand
+        {
+            return CreateClientRequestForCommandAsync(id, typeof(TCommand), cancellationToken);
         }
 
         public async Task<bool> ExistAsync(Guid id)

@@ -2,12 +2,12 @@
 
 namespace Axerrio.BuildingBlocks
 {
-    public interface ICommandHandler<TCommand> : IAsyncRequestHandler<TCommand>
+    public interface ICommandHandler<TCommand> : IRequestHandler<TCommand>
         where TCommand : ICommand
     {
     }
 
-    public interface ICommandHandler<TCommand, TResponse> : IAsyncRequestHandler<TCommand, TResponse>
+    public interface ICommandHandler<TCommand, TResponse> : IRequestHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>
     {
     }

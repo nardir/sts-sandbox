@@ -5,11 +5,12 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Menu.Application.Commands
 {
-    public class AddArtistCommandHandler : ICommandHandler<AddArtistCommand>
+    public class AddArtistCommandHandler : CommandHandler<AddArtistCommand>
     {
         private readonly IArtistRepository _artistRepository;
         private readonly ILogger<AddArtistCommandHandler> _logger;
@@ -20,16 +21,14 @@ namespace Axerrio.DDD.Menu.Application.Commands
             _logger = EnsureArg.IsNotNull(logger);
         }
 
-        public async Task Handle(AddArtistCommand message)
+        public override async Task Handle(AddArtistCommand message, CancellationToken cancellationToken = default(CancellationToken))
         {
             //todo: menu props erbij!
             var artist = new Artist(message.FirstName, message.LastName, message.EmailAddress);
             _artistRepository.Add(artist);
 
-            if (message.Initiating)
-                await _artistRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync();
-
-           
+            await _artistRepository.UnitOfWork.DispatchDomainEventsAndSaveChangesAsync(message.Initiating, cancellationToken);           
         }
+        
     }
 }
