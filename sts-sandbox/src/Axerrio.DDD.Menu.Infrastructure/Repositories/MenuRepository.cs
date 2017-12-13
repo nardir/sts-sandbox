@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
@@ -34,14 +35,18 @@ namespace Axerrio.DDD.Menu.Infrastructure.Repositories
             return menu;
         }
 
-        public void Add(MenuAggr.Menu menu)
+        public MenuAggr.Menu Add(MenuAggr.Menu menu)
         {
-            _context.Menu.Add(menu);
+            _context.Entry(menu.MenuStatus).State = EntityState.Unchanged;
+
+            return _context.Menu.Add(menu).Entity;
         }
 
         public void Update(MenuAggr.Menu menu)
-        {
+        {            
             _context.Entry(menu).State = EntityState.Modified;
         }
+
+        
     }
 }

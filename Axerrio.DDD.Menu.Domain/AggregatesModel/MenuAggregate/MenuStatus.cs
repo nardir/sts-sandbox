@@ -8,7 +8,7 @@ namespace Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate
 {
     public class MenuStatus : Enumeration<MenuStatus>
     {
-        public static MenuStatus Created = new MenuStatus(1, nameof(Created).ToLowerInvariant());   
+        public static MenuStatus Created = new MenuStatus(1, nameof(Created));   
         public static MenuStatus PickedUp = new MenuStatus(2, nameof(PickedUp));
 //        public static MenuStatus Submitted = new MenuStatus(3, nameof(Submitted));
         public static MenuStatus AwaitingApproval = new MenuStatus(3, nameof(AwaitingApproval));

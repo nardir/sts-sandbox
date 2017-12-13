@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 
 namespace Axerrio.DDD.Menu.Application.Commands
 {
     
-    public class SubmitMenuCommand : Command<SubmitMenuCommand, bool>
+    public class SubmitMenuCommand : Command<SubmitMenuCommand, MenuAggr.Menu>
     {
         [DataMember]
         public string Description { get; set; }

@@ -9,6 +9,7 @@ using EnsureThat;
 using Axerrio.DDD.Menu.Application.Commands;
 using Axerrio.BuildingBlocks;
 using Microsoft.Extensions.Logging;
+using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 
 namespace Axerrio.DDD.Menu.Controllers
 {    
@@ -30,23 +31,21 @@ namespace Axerrio.DDD.Menu.Controllers
         {
             try
             {
-                _logger.LogInformation("Testje! SubmitMenu.");
-
-                bool commandResult = false;
+                _logger.LogInformation("Testje! SubmitMenu.");                
                 
                 //Todo: Parsing + Identifiedcommand in Extension Method?
                 if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
                 {
-                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, bool>(submitMenuCommand, guid);
+                    var requestSubmitMenu = new IdentifiedCommand<SubmitMenuCommand, MenuAggr.Menu>(submitMenuCommand, guid);
                     //Todo: Test, Exception indien geen corresponderende handler gevonden ...
                     //--> Iedere Command een test?
 
                     //Insert Canccelationtoken?
-                    commandResult = await _mediator.Send(requestSubmitMenu);                   
+                    var menu = await _mediator.Send(requestSubmitMenu);       
+                    return menu == default(MenuAggr.Menu) ? (IActionResult)Ok(menu) : (IActionResult)BadRequest();
                 }
 
-                return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
-                
+                return (IActionResult)BadRequest();
             }
             catch(Exception ex)
             {
