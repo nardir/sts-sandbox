@@ -1,4 +1,5 @@
-﻿using Axerrio.DDD.Configuration.Model;
+﻿using Axerrio.DDD.Configuration.Config.EFJson;
+using Axerrio.DDD.Configuration.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Axerrio.DDD.Configuration.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.ApplyConfiguration(new JsonEFConfigurationValueEntityTypeConfiguration());
         }
     }
 }

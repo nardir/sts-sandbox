@@ -13,7 +13,7 @@ namespace Axerrio.DDD.Configuration.Controllers
     public class ValuesController : Controller
     {
         //public ValuesController(IOptions<DbContextOptions<ConfigurationContext>> optionsAccessor)
-        public ValuesController(IOptions<TestOptions> optionsAccessor)
+        public ValuesController(IOptionsSnapshot<TestOptions> optionsAccessor)
         {
             var options = optionsAccessor.Value;
         }

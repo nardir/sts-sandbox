@@ -18,6 +18,8 @@ namespace Axerrio.DDD.Configuration
     //https://github.com/thinkabouthub/Configuration.EntityFramework/wiki
     //https://msdn.microsoft.com/en-us/magazine/mt814420
     //https://github.com/aspnet/Configuration/tree/dev/src/Config.Json
+    //https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
+    //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options#reload-configuration-data-with-ioptionssnapshot
 
     public class Startup
     {
