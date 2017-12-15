@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Axerrio.DDD.Configuration.Config.EFJson;
 using Axerrio.DDD.Configuration.Infrastructure;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,19 @@ namespace Axerrio.DDD.Configuration
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, builder) => 
                 {
+                    var config = builder.Build();
+
+                    //var ctxoptions = new DbContextOptionsBuilder<JsonEFConfigurationContext>()
+                    //    .UseSqlServer("")
+                    //    .Options;
+
+                    //using (var ctx = new JsonEFConfigurationContext(ctxoptions))
+                    //{
+                    //    ctx.Database.Migrate();
+                    //}
+
+
+
                     //var options = new DbContextOptionsBuilder<ConfigurationContext>()
                     //    .UseInMemoryDatabase("Config")
                     //    .Options;
