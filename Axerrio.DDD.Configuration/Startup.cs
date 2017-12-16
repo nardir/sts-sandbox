@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Axerrio.DDD.Configuration.Infrastructure;
 using Axerrio.DDD.Configuration.Model;
+using Axerrio.DDD.Configuration.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -28,24 +29,24 @@ namespace Axerrio.DDD.Configuration
             Configuration = configuration;
 
 
-            var data = Configuration.AsEnumerable();
-            //var data2 = Configuration.GetChildren();
-            //var env1 = Configuration.GetValue<string>("ENVIRONMENT");
-            //var env2 = Configuration.GetValue<string>("NR_TEST");
-            //var logging = Configuration.GetSection("Logging");
-            //var loggingValues = logging.AsEnumerable();
+            //var data = Configuration.AsEnumerable();
+            ////var data2 = Configuration.GetChildren();
+            ////var env1 = Configuration.GetValue<string>("ENVIRONMENT");
+            ////var env2 = Configuration.GetValue<string>("NR_TEST");
+            ////var logging = Configuration.GetSection("Logging");
+            ////var loggingValues = logging.AsEnumerable();
 
-            //var setting1 = new ConfigurationSetting(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring");
-            //setting1.SetValue("test", typeof(string));
-            //setting1.SetValue("test");
-            var setting1 = ConfigurationSetting.Create(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring", "test");
-            var value1 = setting1.GetValue<string>();
+            ////var setting1 = new ConfigurationSetting(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring");
+            ////setting1.SetValue("test", typeof(string));
+            ////setting1.SetValue("test");
+            //var setting1 = ConfigurationSetting.Create(new Model.ConfigurationSection("ConnectionStrings"), "connectionstring", "test");
+            //var value1 = setting1.GetValue<string>();
 
-            //var setting2 = new ConfigurationSetting(new Model.ConfigurationSection("Setting"), "setting1");
-            //setting2.SetValue(setting1, setting1.GetType());
-            //setting2.SetValue(setting1);
-            var setting2 = ConfigurationSetting.Create(new Model.ConfigurationSection("Setting"), "setting1", setting1);
-            var value2 = setting2.GetValue(setting1.GetType());
+            ////var setting2 = new ConfigurationSetting(new Model.ConfigurationSection("Setting"), "setting1");
+            ////setting2.SetValue(setting1, setting1.GetType());
+            ////setting2.SetValue(setting1);
+            //var setting2 = ConfigurationSetting.Create(new Model.ConfigurationSection("Setting"), "setting1", setting1);
+            //var value2 = setting2.GetValue(setting1.GetType());
 
             //var options = new DbContextOptionsBuilder<ConfigurationContext>()
             //    .UseInMemoryDatabase("Config")
@@ -61,12 +62,29 @@ namespace Axerrio.DDD.Configuration
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<SettingDbContext>(options => 
+            {
+                options.UseInMemoryDatabase("Settings");
+            });
+
+            services.AddTransient<ISettingService, EFSettingService>();
+
             services.AddOptions();
 
-            //services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
-            //var optionsConfig = Configuration.GetSection("Test:Options");
-            var optionsConfig = Configuration.GetSection(nameof(TestOptions));
-            services.Configure<TestOptions>(optionsConfig);
+            ////services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
+            ////var optionsConfig = Configuration.GetSection("Test:Options");
+            //var optionsConfig = Configuration.GetSection(nameof(TestOptions));
+            //services.Configure<TestOptions>(optionsConfig);
+
+            //var data = optionsConfig.AsEnumerable();
+
+            //var options1 = optionsConfig.Get<TestOptions>();
+            //TestOptions options2 = new TestOptions();
+            //optionsConfig.Bind(options2);
+
+            //var provider = services.BuildServiceProvider();
+            //var optionsAccessor = provider.GetService<IOptionsSnapshot<TestOptions>>();
+            //var options3 = optionsAccessor.Value;
 
             services.AddMvc();
         }
