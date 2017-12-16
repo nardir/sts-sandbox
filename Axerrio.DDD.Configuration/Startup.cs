@@ -73,18 +73,18 @@ namespace Axerrio.DDD.Configuration
 
             ////services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
             ////var optionsConfig = Configuration.GetSection("Test:Options");
-            //var optionsConfig = Configuration.GetSection(nameof(TestOptions));
-            //services.Configure<TestOptions>(optionsConfig);
+            var optionsConfig = Configuration.GetSection(nameof(TestOptions));
+            services.Configure<TestOptions>(optionsConfig);
 
-            //var data = optionsConfig.AsEnumerable();
+            var data = optionsConfig.AsEnumerable();
 
-            //var options1 = optionsConfig.Get<TestOptions>();
-            //TestOptions options2 = new TestOptions();
-            //optionsConfig.Bind(options2);
+            var options1 = optionsConfig.Get<TestOptions>();
+            TestOptions options2 = new TestOptions();
+            optionsConfig.Bind(options2);
 
-            //var provider = services.BuildServiceProvider();
-            //var optionsAccessor = provider.GetService<IOptionsSnapshot<TestOptions>>();
-            //var options3 = optionsAccessor.Value;
+            var provider = services.BuildServiceProvider();
+            var optionsAccessor = provider.GetService<IOptionsSnapshot<TestOptions>>();
+            var options3 = optionsAccessor.Value;
 
             services.AddMvc();
         }

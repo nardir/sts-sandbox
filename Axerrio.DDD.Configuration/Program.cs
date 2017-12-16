@@ -57,11 +57,31 @@ namespace Axerrio.DDD.Configuration
                     //var data = JsonConfigurationParser.Parse(nameof(TestOptions), options);
 
                     //builder.AddInMemoryCollection(data);
+                    var options = new DbContextOptionsBuilder<SettingDbContext>()
+                        .UseInMemoryDatabase("Settings Config")
+                        .Options;
 
-                    builder.AddEntityFrameworkSettings<SettingDbContext>(options => 
+                    var ctx = new SettingDbContext(options);
+
+                    var testOptions = new TestOptions()
                     {
-                        options.UseInMemoryDatabase("Settings Config");
-                    });
+                        Id = 100,
+                        Description = "NR Test Options",
+                        Names = new string[] { "aap", "noot", "mies" }
+                    };
+
+                    var logger = new LoggerFactory().CreateLogger<EFSettingService>();
+
+                    var settingService = new EFSettingService(ctx, logger);
+
+                    var setting = settingService.UpdateOrAddAsync(nameof(TestOptions), testOptions).Result;
+
+                    builder.AddEntityFrameworkSettings(ctx);
+
+                    //builder.AddEntityFrameworkSettings<SettingDbContext>(options => 
+                    //{
+                    //    options.UseInMemoryDatabase("Settings Config");
+                    //});
                 })
                 .UseStartup<Startup>()
                 .Build();
