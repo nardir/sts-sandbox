@@ -37,7 +37,7 @@ namespace Axerrio.DDD.Configuration.Settings
             _seeder = seeder;
         }
 
-        public override async void Load()
+        public override void Load()
         {
             try
             {
@@ -71,7 +71,8 @@ namespace Axerrio.DDD.Configuration.Settings
 
                     var service = (TSettingService)Activator.CreateInstance(typeof(TSettingService), Context, logger);
 
-                    await _seeder(service);
+                    //await _seeder(service);
+                    _seeder(service).Wait();
                 }
 
                 var settings = Context.Settings.AsNoTracking().ToList();

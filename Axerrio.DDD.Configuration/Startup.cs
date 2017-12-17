@@ -19,6 +19,7 @@ namespace Axerrio.DDD.Configuration
     //https://github.com/aspnet/Configuration/tree/dev/src/Config.Json
     //https://msdn.microsoft.com/en-us/magazine/mt632279.aspx
     //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options#reload-configuration-data-with-ioptionssnapshot
+    //https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options.ConfigurationExtensions/OptionsConfigurationServiceCollectionExtensions.cs
 
     public class Startup
     {
@@ -75,7 +76,20 @@ namespace Axerrio.DDD.Configuration
             ////services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
             ////var optionsConfig = Configuration.GetSection("Test:Options");
             var optionsConfig = Configuration.GetSection(nameof(TestOptions));
-            services.Configure<TestOptions>(optionsConfig);
+            //services.Configure<TestOptions>(testOptions => 
+            //{
+            //    testOptions.Id = 999;
+            //    testOptions.Description = "Default description";
+            //    testOptions.Names = new string[] { };
+            //});
+            //services.Configure<TestOptions>(optionsConfig);
+
+            services.Configure<TestOptions>(Configuration, testOptions =>
+            {
+                testOptions.Id = 999;
+                testOptions.Description = "Default description";
+                testOptions.Names = new string[] { };
+            });
 
             var data = optionsConfig.AsEnumerable();
 
@@ -87,7 +101,7 @@ namespace Axerrio.DDD.Configuration
             var optionsAccessor = provider.GetService<IOptionsSnapshot<TestOptions>>();
             var options3 = optionsAccessor.Value;
 
-            services.AddSingleton<IConfigurationRoot>((IConfigurationRoot)Configuration);
+            services.AddSingleton<IConfigurationRoot>((IConfigurationRoot)Configuration); //Nodig voor Reload
 
             services.AddMvc();
         }
