@@ -9,25 +9,35 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Configuration.Settings
 {
-    public class EFSettingConfigurationProvider<TContext>: ConfigurationProvider
+    public class EFSettingConfigurationProvider<TContext, TSettingService>: ConfigurationProvider
         where TContext : DbContext, ISettingDbContext, new()
-    {        
-        protected readonly ILogger<EFSettingConfigurationProvider<TContext>> _logger = new LoggerFactory().CreateLogger<EFSettingConfigurationProvider<TContext>>();
-        protected readonly Action<DbContextOptionsBuilder<TContext>> OptionsAction;
+        where TSettingService : ISettingService
+    {
+        //private bool _migrated = false;
+
+        protected readonly ILogger<EFSettingConfigurationProvider<TContext, TSettingService>> _logger = new LoggerFactory().CreateLogger<EFSettingConfigurationProvider<TContext, TSettingService>>();
+        protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
+        protected readonly Func<ISettingService, Task> _seeder;
+
         protected TContext Context { get; set; }
         protected bool IsContextOwner { get; set; } = false;
 
-        public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction)
+        public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction
+            , Func<ISettingService, Task> seeder = null)
         {
-            OptionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            _optionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            _seeder = seeder;
         }
 
-        public EFSettingConfigurationProvider(TContext context)
+        public EFSettingConfigurationProvider(TContext context
+            , Func<ISettingService, Task> seeder = null)
         {
             Context = context;
+
+            _seeder = seeder;
         }
 
-        public override void Load()
+        public override async void Load()
         {
             try
             {
@@ -35,11 +45,11 @@ namespace Axerrio.DDD.Configuration.Settings
 
                 if (Context == null)
                 {
-                    if (OptionsAction != null)
+                    if (_optionsAction != null)
                     {
                         var builder = new DbContextOptionsBuilder<TContext>();
 
-                        OptionsAction(builder);
+                        _optionsAction(builder);
 
                         Context = (TContext)Activator.CreateInstance(typeof(TContext), builder.Options);
                     }
@@ -49,8 +59,20 @@ namespace Axerrio.DDD.Configuration.Settings
                     IsContextOwner = true;
                 }
 
-                if (Context.Database.IsSqlServer())
-                    Context.Database.Migrate();
+                //if (!_migrated && Context.Database.IsSqlServer())
+                //{
+                //    Context.Database.Migrate();
+                //    _migrated = true;
+                //}
+
+                if (_seeder != null)
+                {
+                    var logger = new LoggerFactory().CreateLogger<TSettingService>();
+
+                    var service = (TSettingService)Activator.CreateInstance(typeof(TSettingService), Context, logger);
+
+                    await _seeder(service);
+                }
 
                 var settings = Context.Settings.AsNoTracking().ToList();
 

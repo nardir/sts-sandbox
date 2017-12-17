@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-//using Axerrio.DDD.Configuration.Config.EFJson;
-using Axerrio.DDD.Configuration.Infrastructure;
 using Axerrio.DDD.Configuration.Settings;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -28,60 +26,48 @@ namespace Axerrio.DDD.Configuration
                 {
                     var config = builder.Build();
 
-                    //var ctxoptions = new DbContextOptionsBuilder<JsonEFConfigurationContext>()
-                    //    .UseSqlServer("")
+                    //var data = config.AsEnumerable();
+
+                    var connectionString = config["ConnectionString"];
+
+                    //var options = new DbContextOptionsBuilder<SettingDbContext>()
+                    //    .UseInMemoryDatabase("Settings Config")
                     //    .Options;
 
-                    //using (var ctx = new JsonEFConfigurationContext(ctxoptions))
-                    //{
-                    //    if (ctx.Database.IsSqlServer())
-                    //        ctx.Database.Migrate();
-                    //}
+                    //var ctx = new SettingDbContext(options);
 
-
-
-                    //var options = new DbContextOptionsBuilder<ConfigurationContext>()
-                    //    .UseInMemoryDatabase("Config")
-                    //    .Options;
-
-                    //var options = new TestOptions()
+                    //var testOptions = new TestOptions()
                     //{
                     //    Id = 100,
                     //    Description = "NR Test Options",
                     //    Names = new string[] { "aap", "noot", "mies" }
                     //};
 
-                    //var input = JsonConvert.SerializeObject(options);
-                    //var data = JsonConfigurationParser.Parse(nameof(TestOptions), input);
+                    //var logger = new LoggerFactory().CreateLogger<EFSettingService>();
 
-                    //var data = JsonConfigurationParser.Parse(nameof(TestOptions), options);
+                    //var settingService = new EFSettingService(ctx, logger);
 
-                    //builder.AddInMemoryCollection(data);
-                    var options = new DbContextOptionsBuilder<SettingDbContext>()
-                        .UseInMemoryDatabase("Settings Config")
-                        .Options;
+                    //var setting = settingService.UpdateOrAddAsync(nameof(TestOptions), testOptions).Result;
 
-                    var ctx = new SettingDbContext(options);
-
-                    var testOptions = new TestOptions()
+                    Func<ISettingService, Task> seeder = service => 
                     {
-                        Id = 100,
-                        Description = "NR Test Options",
-                        Names = new string[] { "aap", "noot", "mies" }
+                        var testOptions = new TestOptions()
+                        {
+                            Id = 100,
+                            Description = "NR Test Options",
+                            Names = new string[] { "aap", "noot", "mies" }
+                        };
+
+                        return service.AddAsync(nameof(TestOptions), testOptions);
                     };
 
-                    var logger = new LoggerFactory().CreateLogger<EFSettingService>();
+                    builder.AddEntityFrameworkSettings<SettingDbContext, EFSettingService>(options =>
+                    {
+                        //options.UseInMemoryDatabase("Settings Config");
+                        options.UseSqlServer(connectionString);
+                    }
+                    , seeder);
 
-                    var settingService = new EFSettingService(ctx, logger);
-
-                    var setting = settingService.UpdateOrAddAsync(nameof(TestOptions), testOptions).Result;
-
-                    builder.AddEntityFrameworkSettings(ctx);
-
-                    //builder.AddEntityFrameworkSettings<SettingDbContext>(options => 
-                    //{
-                    //    options.UseInMemoryDatabase("Settings Config");
-                    //});
                 })
                 .UseStartup<Startup>()
                 .Build();

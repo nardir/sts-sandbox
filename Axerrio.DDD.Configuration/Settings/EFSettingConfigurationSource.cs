@@ -9,34 +9,38 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Configuration.Settings
 {
-    public class EFSettingConfigurationSource<TContext> : IConfigurationSource
+    public class EFSettingConfigurationSource<TContext, TSettingService> : IConfigurationSource
         where TContext : DbContext, ISettingDbContext, new()
+        where TSettingService : ISettingService
     {
         private TContext _context;
 
-        protected Action<DbContextOptionsBuilder<TContext>> OptionsAction { get; set; }
+        protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
+        protected readonly Func<ISettingService, Task> _seeder;
 
-        public EFSettingConfigurationSource(Action<DbContextOptionsBuilder<TContext>> optionsAction)
+        public EFSettingConfigurationSource(Action<DbContextOptionsBuilder<TContext>> optionsAction, Func<ISettingService, Task> seeder = null)
         {
-            OptionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            _optionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            _seeder = seeder;
         }
 
-        public EFSettingConfigurationSource(TContext context)
+        public EFSettingConfigurationSource(TContext context, Func<ISettingService, Task> seeder = null)
         {
             _context = context;
+            _seeder = seeder;
         }
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            EFSettingConfigurationProvider<TContext> provider;
+            EFSettingConfigurationProvider<TContext, TSettingService> provider;
 
             if (_context == null)
-                if (OptionsAction == null)
-                    provider = new EFSettingConfigurationProvider<TContext>(context: null);
+                if (_optionsAction == null)
+                    provider = new EFSettingConfigurationProvider<TContext, TSettingService>(context: null, seeder: _seeder);
                 else
-                    provider = new EFSettingConfigurationProvider<TContext>(OptionsAction);
+                    provider = new EFSettingConfigurationProvider<TContext, TSettingService>(_optionsAction, _seeder);
             else
-                provider = new EFSettingConfigurationProvider<TContext>(_context);
+                provider = new EFSettingConfigurationProvider<TContext, TSettingService>(_context, _seeder);
 
             return provider;
         }

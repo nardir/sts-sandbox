@@ -14,7 +14,7 @@ namespace Axerrio.DDD.Configuration.Settings
         private readonly SettingDbContext _context;
         private readonly ILogger<EFSettingService> _logger;
 
-        public EFSettingService()
+        protected EFSettingService()
         {
         }
 
@@ -22,6 +22,21 @@ namespace Axerrio.DDD.Configuration.Settings
         {
             _context = EnsureArg.IsNotNull(context, nameof(context));
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+        }
+
+        public async Task<Setting> AddAsync<T>(string key, T value)
+        {
+            var setting = await FindByKeyAsync(key);
+
+            if (setting != null)
+                return null;
+
+            setting = Setting.Create(key, value);
+
+            await _context.Settings.AddAsync(setting);
+            await _context.SaveChangesAsync();
+
+            return setting;
         }
 
         public Task<Setting> FindByKeyAsync(string key)
@@ -35,7 +50,7 @@ namespace Axerrio.DDD.Configuration.Settings
 
             if (setting != null)
             {
-                _context.Remove(setting);
+                _context.Settings.Remove(setting);
                 await _context.SaveChangesAsync();
             }
         }
@@ -49,7 +64,7 @@ namespace Axerrio.DDD.Configuration.Settings
             else
                 setting.SetValue(value);
 
-            _context.Update(setting);
+            _context.Settings.Update(setting);
 
             await _context.SaveChangesAsync();
 

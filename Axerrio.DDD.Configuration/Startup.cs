@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Axerrio.DDD.Configuration.Infrastructure;
-using Axerrio.DDD.Configuration.Model;
 using Axerrio.DDD.Configuration.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -62,9 +60,12 @@ namespace Axerrio.DDD.Configuration
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration["ConnectionString"];
+
             services.AddDbContext<SettingDbContext>(options => 
             {
-                options.UseInMemoryDatabase("Settings");
+                //options.UseInMemoryDatabase("Settings");
+                options.UseSqlServer(connectionString);
             });
 
             services.AddTransient<ISettingService, EFSettingService>();
@@ -85,6 +86,8 @@ namespace Axerrio.DDD.Configuration
             var provider = services.BuildServiceProvider();
             var optionsAccessor = provider.GetService<IOptionsSnapshot<TestOptions>>();
             var options3 = optionsAccessor.Value;
+
+            services.AddSingleton<IConfigurationRoot>((IConfigurationRoot)Configuration);
 
             services.AddMvc();
         }

@@ -7,6 +7,7 @@ namespace Axerrio.DDD.Configuration.Settings
 {
     public interface ISettingService
     {
+        Task<Setting> AddAsync<T>(string key, T value);
         Task<Setting> UpdateOrAddAsync<T>(string key, T value);
         Task RemoveAsync(string key);
         Task<Setting> FindByKeyAsync(string key);
