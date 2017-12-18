@@ -13,32 +13,28 @@ namespace Axerrio.DDD.Configuration.Settings
         where TContext : DbContext, ISettingDbContext, new()
         where TSettingService : ISettingService
     {
-        protected readonly ILogger<EFSettingConfigurationProvider<TContext, TSettingService>> _logger = new LoggerFactory().CreateLogger<EFSettingConfigurationProvider<TContext, TSettingService>>();
+        protected readonly ILogger<EFSettingConfigurationProvider<TContext, TSettingService>> _logger;
         protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
-        protected readonly Func<ISettingService, Task> _seeder;
         protected readonly ILoggerFactory _loggerFactory;
 
         protected TContext Context { get; set; }
         protected bool IsContextOwner { get; set; } = false;
 
-        public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction
-            , ILoggerFactory loggerFactory
-            , Func<ISettingService, Task> seeder = null)
+        protected EFSettingConfigurationProvider(ILoggerFactory loggerFactory)
         {
-            _optionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
             _loggerFactory = EnsureArg.IsNotNull(loggerFactory, nameof(LoggerFactory));
 
-            _seeder = seeder;
+            _logger = _loggerFactory.CreateLogger<EFSettingConfigurationProvider<TContext, TSettingService>>();
         }
 
-        public EFSettingConfigurationProvider(TContext context
-            , ILoggerFactory loggerFactory
-            , Func<ISettingService, Task> seeder = null)
+        public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction, ILoggerFactory loggerFactory): this(loggerFactory)
+        {
+            _optionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+        }
+
+        public EFSettingConfigurationProvider(TContext context, ILoggerFactory loggerFactory): this(loggerFactory)
         {
             Context = context;
-            _loggerFactory = EnsureArg.IsNotNull(loggerFactory, nameof(LoggerFactory));
-
-            _seeder = seeder;
         }
 
         public override void Load()
@@ -61,16 +57,6 @@ namespace Axerrio.DDD.Configuration.Settings
                         Context = new TContext();
 
                     IsContextOwner = true;
-                }
-
-                if (_seeder != null)
-                {
-                    var logger = new LoggerFactory().CreateLogger<TSettingService>();
-
-                    var service = (TSettingService)Activator.CreateInstance(typeof(TSettingService), Context, logger);
-
-                    //await _seeder(service);
-                    _seeder(service).Wait();
                 }
 
                 var settings = Context.Settings.AsNoTracking().ToList();

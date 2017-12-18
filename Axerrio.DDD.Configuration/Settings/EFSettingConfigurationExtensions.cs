@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Axerrio.DDD.Configuration.Settings
         public static IConfigurationBuilder AddEntityFrameworkSettings<TContext, TSettingService>(this IConfigurationBuilder builder
                 , Action<DbContextOptionsBuilder<TContext>> optionsAction
                 , ILoggerFactory loggerFactory
-                , Func<ISettingService, Task> seeder = null) 
+                , Func<ISettingService, ILogger, Task> seeder = null) 
             where TContext : DbContext, ISettingDbContext, new()
             where TSettingService : ISettingService
         {
@@ -26,9 +27,10 @@ namespace Axerrio.DDD.Configuration.Settings
             using (var context = (TContext)Activator.CreateInstance(typeof(TContext), optionsbuilder.Options))
             {
                 Migrate(context, loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions)));
+                Seed<TContext, TSettingService>(context, seeder, loggerFactory);
             }
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, loggerFactory, seeder));
+            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, loggerFactory));
 
             return builder;
         }
@@ -36,7 +38,7 @@ namespace Axerrio.DDD.Configuration.Settings
         public static IConfigurationBuilder AddEntityFrameworkSettings<TContext, TSettingService>(this IConfigurationBuilder builder
                 , TContext context
                 , ILoggerFactory loggerFactory
-                , Func<ISettingService, Task> seeder = null)
+                , Func<ISettingService, ILogger, Task> seeder = null)
             where TContext : DbContext, ISettingDbContext, new()
             where TSettingService : ISettingService
         {
@@ -44,10 +46,27 @@ namespace Axerrio.DDD.Configuration.Settings
             EnsureArg.IsNotNull(loggerFactory, nameof(loggerFactory));
 
             Migrate(context, loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions)));
+            Seed<TContext, TSettingService>(context, seeder, loggerFactory);
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, loggerFactory, seeder));
+            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, loggerFactory));
 
             return builder;
+        }
+
+        private static void Seed<TContext, TSettingService>(TContext context, Func<ISettingService, ILogger, Task> seeder, ILoggerFactory loggerFactory)
+            where TContext : DbContext, ISettingDbContext, new()
+            where TSettingService : ISettingService
+        {
+            var logger = loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions));
+
+            if (seeder != null)
+            {
+                var service = (TSettingService)Activator.CreateInstance(typeof(TSettingService), context, loggerFactory.CreateLogger<TSettingService>());
+
+                seeder(service, logger).Wait();
+            }
+            else
+                logger.LogDebug($"No settings to seed, no setting seeder supplied");
         }
 
         private static void Migrate<TContext>(TContext context, ILogger logger)
@@ -55,9 +74,13 @@ namespace Axerrio.DDD.Configuration.Settings
         {
             if (context.Database.IsSqlServer())
             {
-                logger.LogDebug($"");
+                var builder = new SqlConnectionStringBuilder(context.Database.GetDbConnection().ConnectionString);
+
+                logger.LogDebug($"Migrating setting database objects for database {builder.DataSource} {builder.InitialCatalog}");
 
                 context.Database.Migrate();
+
+                logger.LogDebug($"Migrated setting database objects for database {builder.DataSource} {builder.InitialCatalog}");
             }
         }
     }

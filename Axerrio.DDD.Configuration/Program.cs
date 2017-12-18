@@ -49,7 +49,7 @@ namespace Axerrio.DDD.Configuration
 
                     //var setting = settingService.UpdateOrAddAsync(nameof(TestOptions), testOptions).Result;
 
-                    Func<ISettingService, Task> seeder = service => 
+                    Func<ISettingService, ILogger, Task> seeder = (service, logger) => 
                     {
                         var testOptions = new TestOptions()
                         {

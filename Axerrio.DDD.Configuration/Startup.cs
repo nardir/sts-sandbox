@@ -76,6 +76,9 @@ namespace Axerrio.DDD.Configuration
             ////services.Configure<DbContextOptions<ConfigurationContext>>(Configuration.GetSection("ConfigContext:Options"));
             ////var optionsConfig = Configuration.GetSection("Test:Options");
             var optionsConfig = Configuration.GetSection(nameof(TestOptions));
+
+            var options4 = Configuration.GetValue<TestOptions>(nameof(TestOptions), new TestOptions { Description = "Default", Id = 1000 });
+
             //services.Configure<TestOptions>(testOptions => 
             //{
             //    testOptions.Id = 999;
