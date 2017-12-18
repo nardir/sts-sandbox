@@ -13,26 +13,30 @@ namespace Axerrio.DDD.Configuration.Settings
         where TContext : DbContext, ISettingDbContext, new()
         where TSettingService : ISettingService
     {
-        //private bool _migrated = false;
-
         protected readonly ILogger<EFSettingConfigurationProvider<TContext, TSettingService>> _logger = new LoggerFactory().CreateLogger<EFSettingConfigurationProvider<TContext, TSettingService>>();
         protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
         protected readonly Func<ISettingService, Task> _seeder;
+        protected readonly ILoggerFactory _loggerFactory;
 
         protected TContext Context { get; set; }
         protected bool IsContextOwner { get; set; } = false;
 
         public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction
+            , ILoggerFactory loggerFactory
             , Func<ISettingService, Task> seeder = null)
         {
             _optionsAction = EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            _loggerFactory = EnsureArg.IsNotNull(loggerFactory, nameof(LoggerFactory));
+
             _seeder = seeder;
         }
 
         public EFSettingConfigurationProvider(TContext context
+            , ILoggerFactory loggerFactory
             , Func<ISettingService, Task> seeder = null)
         {
             Context = context;
+            _loggerFactory = EnsureArg.IsNotNull(loggerFactory, nameof(LoggerFactory));
 
             _seeder = seeder;
         }
@@ -58,12 +62,6 @@ namespace Axerrio.DDD.Configuration.Settings
 
                     IsContextOwner = true;
                 }
-
-                //if (!_migrated && Context.Database.IsSqlServer())
-                //{
-                //    Context.Database.Migrate();
-                //    _migrated = true;
-                //}
 
                 if (_seeder != null)
                 {

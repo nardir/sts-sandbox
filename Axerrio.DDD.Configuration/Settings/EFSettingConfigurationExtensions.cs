@@ -1,6 +1,7 @@
 ﻿using EnsureThat;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Axerrio.DDD.Configuration.Settings
     { 
         public static IConfigurationBuilder AddEntityFrameworkSettings<TContext, TSettingService>(this IConfigurationBuilder builder
                 , Action<DbContextOptionsBuilder<TContext>> optionsAction
+                , ILoggerFactory loggerFactory
                 , Func<ISettingService, Task> seeder = null) 
             where TContext : DbContext, ISettingDbContext, new()
             where TSettingService : ISettingService
@@ -25,13 +27,14 @@ namespace Axerrio.DDD.Configuration.Settings
                 Migrate(context);
             }
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, seeder));
+            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, loggerFactory, seeder));
 
             return builder;
         }
 
         public static IConfigurationBuilder AddEntityFrameworkSettings<TContext, TSettingService>(this IConfigurationBuilder builder
                 , TContext context
+                , ILoggerFactory loggerFactory
                 , Func<ISettingService, Task> seeder = null)
             where TContext : DbContext, ISettingDbContext, new()
             where TSettingService : ISettingService
@@ -40,7 +43,7 @@ namespace Axerrio.DDD.Configuration.Settings
 
             Migrate(context);
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, seeder));
+            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, loggerFactory, seeder));
 
             return builder;
         }

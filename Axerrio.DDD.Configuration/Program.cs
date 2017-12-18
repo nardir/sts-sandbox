@@ -66,6 +66,7 @@ namespace Axerrio.DDD.Configuration
                         //options.UseInMemoryDatabase("Settings Config");
                         options.UseSqlServer(connectionString);
                     }
+                    , new LoggerFactory()
                     , seeder);
 
                 })
