@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Axerrio.BuildingBlocks
 {
-    //TODO: Move to nuget package
+    //TODO: Move to nuget package 
 
     public class ValidatorBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
