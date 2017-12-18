@@ -19,12 +19,13 @@ namespace Axerrio.DDD.Configuration.Settings
             where TSettingService : ISettingService
         {
             EnsureArg.IsNotNull(optionsAction, nameof(optionsAction));
+            EnsureArg.IsNotNull(loggerFactory, nameof(loggerFactory));
 
             var optionsbuilder = new DbContextOptionsBuilder<TContext>();
             optionsAction(optionsbuilder);
             using (var context = (TContext)Activator.CreateInstance(typeof(TContext), optionsbuilder.Options))
             {
-                Migrate(context);
+                Migrate(context, loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions)));
             }
 
             builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, loggerFactory, seeder));
@@ -40,19 +41,22 @@ namespace Axerrio.DDD.Configuration.Settings
             where TSettingService : ISettingService
         {
             EnsureArg.IsNotNull(context, nameof(context));
+            EnsureArg.IsNotNull(loggerFactory, nameof(loggerFactory));
 
-            Migrate(context);
+            Migrate(context, loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions)));
 
             builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, loggerFactory, seeder));
 
             return builder;
         }
 
-        private static void Migrate<TContext>(TContext context)
+        private static void Migrate<TContext>(TContext context, ILogger logger)
             where TContext : DbContext, ISettingDbContext
         {
             if (context.Database.IsSqlServer())
             {
+                logger.LogDebug($"");
+
                 context.Database.Migrate();
             }
         }
