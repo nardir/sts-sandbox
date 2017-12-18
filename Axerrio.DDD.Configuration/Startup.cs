@@ -77,7 +77,11 @@ namespace Axerrio.DDD.Configuration
             ////var optionsConfig = Configuration.GetSection("Test:Options");
             var optionsConfig = Configuration.GetSection(nameof(TestOptions));
 
-            var options4 = Configuration.GetValue<TestOptions>(nameof(TestOptions), new TestOptions { Description = "Default", Id = 1000 });
+            //var options4 = Configuration.GetValue<TestOptions>(nameof(TestOptions), new TestOptions { Description = "Default", Id = 1000 });
+            //options4 = Configuration.Get<TestOptions>();
+            var options4 = Configuration.Get(nameof(TestOptions), new TestOptions { Description = "Default", Id = 1000 });
+            var options5 = Configuration.Get("nardi", new TestOptions { Description = "Default", Id = 1000 });
+            var options6 = Configuration.Get(nameof(TestOptions), () => new TestOptions { Description = "Default", Id = 1000 });
 
             //services.Configure<TestOptions>(testOptions => 
             //{
