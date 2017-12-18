@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +13,10 @@ using Axerrio.DDD.Menu.Infrastructure;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Infrastructure.Repositories;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
+using Axerrio.DDD.Menu.Application.Validations;
+using FluentValidation;
+using Axerrio.DDD.Menu.Application.Commands;
+using Axerrio.BuildingBlocks.DDD.Application.Behavior;
 
 namespace Axerrio.DDD.Menu
 {
@@ -28,10 +32,12 @@ namespace Axerrio.DDD.Menu
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc()
+                    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddArtistCommandValidator>());
 
+            
 
-           services.AddDbContext<MenuContext>(options =>
+            services.AddDbContext<MenuContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
@@ -60,6 +66,11 @@ namespace Axerrio.DDD.Menu
 
             //IMediator zaken.
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+            
+
 
             services.AddSwaggerGen(options =>
             {

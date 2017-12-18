@@ -26,19 +26,24 @@ namespace Axerrio.DDD.Menu.Controllers
         [Route("")]
         [HttpPost]
         public async Task<IActionResult> AddArtist([FromBody]AddArtistCommand addArtistCommand, [FromHeader(Name = "x-requestid")] string requestId)
-        {           
-            bool commandResult = false;            
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
-            {
-                var requestAddArtist = new IdentifiedCommand<AddArtistCommand>(addArtistCommand, guid);  
-                await _mediator.Send(requestAddArtist);
+        {
+            bool commandResult = false;
+            try
+            { 
+                if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
+                {
+                    var requestAddArtist = new IdentifiedCommand<AddArtistCommand>(addArtistCommand, guid);  
+                    await _mediator.Send(requestAddArtist);
 
-                commandResult = true;
+                    commandResult = true;
+                }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
 
-            return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();  
-            
-            
         }
     }
 }

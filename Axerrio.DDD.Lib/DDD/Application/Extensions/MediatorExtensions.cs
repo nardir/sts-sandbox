@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BuildingBlocks
 {
-    public static class MediatorExtension
+    public static class MediatorExtensions
     {
         public static async Task DispatchDomainEventsAsync(this IMediator mediator, DbContext context)
         {

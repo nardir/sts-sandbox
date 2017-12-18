@@ -1,5 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,60 +8,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace Axerrio.BuildingBlocks
 {
-    public static class IWebhostExtensions
+    public static class DbContextExtensions
     {
-        public static IWebHost MigrateDbContext<TContext>(this IWebHost webHost, Action<TContext, IServiceProvider> seeder) where TContext : DbContext
+        private static dynamic GetSetWithItemsInChangeTracker<TContext>(this TContext context, Type dbSetGenericType)
+            where TContext : DbContext
         {
-            using (var scope = webHost.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
+            //Get instance of the specific generic DbSet: https://stackoverflow.com/questions/33940507/find-a-generic-dbset-in-a-dbcontext-dynamically
+            var model = context.GetType()
+                                    .GetRuntimeProperties()
+                                    .Where(o =>
+                                        o.PropertyType.IsGenericType &&
+                                        o.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
+                                        o.PropertyType.GenericTypeArguments.Contains(dbSetGenericType))
+                                    .FirstOrDefault();
 
-                var logger = services.GetRequiredService<ILogger<TContext>>();
+            dynamic dbSet = model.GetValue(context);
 
-                var context = services.GetService<TContext>();
+            //Get all items of the dbSet in the change tracker with one db SELECT action, so we have all enumerations in memory.
+            foreach (dynamic record in dbSet) { break; }
 
-                try
-                {
-                    logger.LogInformation($"Migrating database associated with context {typeof(TContext).Name}");
-
-                    context.Database.Migrate();
-                    
-                    //Opmerking: scope meegeven of logger meegeven
-                    context.MigrateEnumerations(logger);
-
-                    seeder(context, services);
-
-                }
-                catch (Exception ex)
-                {
-                    //Opmerking: MicroService start nu gewoon op. Mag dat?
-                    logger.LogError(ex, $"An error occurred while migrating the database used on context {typeof(TContext).Name}");
-                }
-                finally
-                {
-
-                    logger.LogInformation($"Migrated database associated with context {typeof(TContext).Name}");
-                }
-
-            }
-
-            return webHost;
+            return dbSet;
         }
 
-        //Todo: extensionmethod zit in verkeerde class nu.
-        private static void MigrateEnumerations<TContext>(this TContext context, ILogger<TContext> logger) where TContext : DbContext
+        public static void MigrateEnumerations<TContext>(this TContext context, ILogger<TContext> logger) where TContext : DbContext
         {
             logger.LogInformation($"Migrating database enumeration sets associated with context {typeof(TContext).Name}");
-                          
+
             var enumerationDbSets = context.GetType().GetProperties()
-                .Where(p => p.PropertyType.IsGenericType && typeof(DbSet<>) == p.PropertyType.GetGenericTypeDefinition() )   //All DbSets with an Generic type
+                .Where(p => p.PropertyType.IsGenericType && typeof(DbSet<>) == p.PropertyType.GetGenericTypeDefinition())   //All DbSets with an Generic type
                 .Where(p => typeof(IEnumeration).IsAssignableFrom(p.PropertyType.GetGenericArguments().First()));           //Only DbSets with generic Argument of Ienumeration
-            
+
             foreach (var enumerationDbSet in enumerationDbSets)
             {
                 var dbSetGenericType = enumerationDbSet.PropertyType.GetGenericArguments().First();     //Get the Type of the generic argument: DbSet has only one generic argument                                                                                                       
@@ -73,7 +51,7 @@ namespace Axerrio.BuildingBlocks
                 var enumerationItems = (IEnumerable)dbSetGenericType.BaseType.GetProperty("Items", BindingFlags.Static | BindingFlags.Public) //Get the static, public Property Items
                         .GetValue(null);   //GetValue null: static class, so no instantiated object to get the value from. Is ignored at static class.
 
-                var dbSet = context.GetSetWithItemsInChangeTracker(dbSetGenericType);                
+                var dbSet = context.GetSetWithItemsInChangeTracker(dbSetGenericType);
 
                 List<int> existingIds = new List<int>();
                 foreach (dynamic item in enumerationItems)
@@ -109,32 +87,6 @@ namespace Axerrio.BuildingBlocks
             }
 
             logger.LogInformation($"Migrated database enumeration sets associated with context {typeof(TContext).Name}");
-        }
-
-        private static dynamic GetSetWithItemsInChangeTracker<TContext>(this TContext context, Type dbSetGenericType)
-            where TContext : DbContext 
-        {
-            //Get instance of the specific generic DbSet: https://stackoverflow.com/questions/33940507/find-a-generic-dbset-in-a-dbcontext-dynamically
-            var model = context.GetType()
-                                    .GetRuntimeProperties()
-                                    .Where(o =>
-                                        o.PropertyType.IsGenericType &&
-                                        o.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
-                                        o.PropertyType.GenericTypeArguments.Contains(dbSetGenericType))
-                                    .FirstOrDefault();
-
-            dynamic dbSet = model.GetValue(context);       
-
-            //Get all items of the dbSet in the change tracker with one db SELECT action, so we have all enumerations in memory.
-            foreach (dynamic record in dbSet) { break; }
-
-            return dbSet;
-        }
-        
-
-        public static IWebHost MigrateDbContext<TContext>(this IWebHost webHost) where TContext : DbContext
-        {
-            return webHost.MigrateDbContext<TContext>((_, __) => { });
         }
     }
 }

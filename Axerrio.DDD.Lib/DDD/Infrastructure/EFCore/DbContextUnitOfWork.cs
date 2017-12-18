@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BuildingBlocks
 {
+    //Using Microsoft.EntityFrameworkCore --> Daarom infrastructure?
+
     public abstract class DbContextUnitOfWork : DbContext, IUnitOfWork
     {
         protected readonly IMediator _mediator;
