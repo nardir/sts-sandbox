@@ -91,7 +91,7 @@ namespace Axerrio.DDD.Configuration
             //});
             //services.Configure<TestOptions>(optionsConfig);
 
-            services.Configure<TestOptions>(Configuration, testOptions =>
+            services.Configure<TestOptions>(Configuration, nameof(TestOptions), testOptions =>
             {
                 testOptions.Id = 999;
                 testOptions.Description = "Default description";

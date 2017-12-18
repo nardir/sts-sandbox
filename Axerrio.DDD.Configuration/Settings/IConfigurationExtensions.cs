@@ -8,24 +8,36 @@ namespace Axerrio.DDD.Configuration.Settings
 {
     public static class IConfigurationExtensions
     {
+        public static bool SectionExists(this IConfiguration configuration, string key)
+        {
+            return configuration.GetChildren().Any(section => section.Key == key);
+        }
+
+        public static T Get<T>(this IConfiguration configuration, string key) where T : class
+        {
+            return configuration.Get(key, default(T));
+        }
+
         public static T Get<T>(this IConfiguration configuration, string key, T defaultValue) where T : class
         {
-            T value = null;
+            return configuration.SectionExists(key) ? configuration.GetSection(key).Get<T>() : defaultValue;
 
-            IConfiguration section = configuration.GetSection(key);
-            
-            if (section != null)
-                value = section.Get<T>();
+            //T value = configuration.TryGet<T>(key);
 
-            if (value == null)
-                value = defaultValue;
+            ////IConfiguration section = configuration.GetSection(key);
 
-            return value;
+            ////if (section != null)
+            ////    value = section.Get<T>();
+
+            //if (value == null)
+            //    value = defaultValue;
+
+            //return value;
         }
 
         public static T Get<T>(this IConfiguration configuration, string key, Func<T> defaultValueFunc) where T : class
         {
-            return configuration.Get<T>(key, defaultValueFunc());
+            return configuration.Get(key, defaultValueFunc());
         }
     }
 }

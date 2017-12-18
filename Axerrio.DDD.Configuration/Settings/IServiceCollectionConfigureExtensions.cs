@@ -9,18 +9,11 @@ namespace Axerrio.DDD.Configuration.Settings
 {
     public static class IServiceCollectionConfigureExtensions
     {
-        public static IServiceCollection Configure<TOptions>(this IServiceCollection services, IConfiguration configuration, Action<TOptions> configureDefaultOptions = null, string key = null) where TOptions : class, new()
+        public static IServiceCollection Configure<TOptions>(this IServiceCollection services, IConfiguration configuration, string key, Action<TOptions> configureDefaultOptions = null) where TOptions : class
         {
-            //var option = Activator.CreateInstance<TOptions>();
-            var option = new TOptions();
-            var optionType = option.GetType();
-
-            string sectionName = key ?? optionType.Name;
-
-            var section = configuration.GetSection(sectionName);
-
-            if (section.Value != null)
-                return services.Configure<TOptions>(section);
+            //Name variant
+            if (configuration.SectionExists(key))
+                return services.Configure<TOptions>(configuration.GetSection(key));
 
             return services.Configure(configureDefaultOptions);
         }
