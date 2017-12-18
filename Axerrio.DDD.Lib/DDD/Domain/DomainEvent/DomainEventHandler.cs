@@ -13,6 +13,6 @@ namespace Axerrio.BuildingBlocks
         {
         }
 
-        public abstract Task Handle(TDomainEvent notification, CancellationToken cancellationToken = default(CancellationToken));
+        public abstract Task Handle(TDomainEvent notification, CancellationToken cancellationToken = default(CancellationToken)); 
     }
 }
