@@ -17,6 +17,9 @@ using Axerrio.DDD.Menu.Application.Validations;
 using FluentValidation;
 using Axerrio.DDD.Menu.Application.Commands;
 using Axerrio.BuildingBlocks.DDD.Application.Behavior;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Collections.Generic;
+using FluentValidation.Validators;
 
 namespace Axerrio.DDD.Menu
 {
@@ -74,7 +77,7 @@ namespace Axerrio.DDD.Menu
 
             services.AddSwaggerGen(options =>
             {
-  //              options.DescribeAllEnumsAsStrings();
+                //              options.DescribeAllEnumsAsStrings();
                 options.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info
                 {
                     Title = "Menu HTTP API",
@@ -82,6 +85,8 @@ namespace Axerrio.DDD.Menu
                     Description = "The Menu Service HTTP API",
                     TermsOfService = "Terms Of Service"
                 });
+
+                options.SchemaFilter<AddFluentValidationRules>(); 
             });
 
             
@@ -107,4 +112,10 @@ namespace Axerrio.DDD.Menu
             app.UseMvc();
         }
     }
+
+
+    
+
 }
+
+
