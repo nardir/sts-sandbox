@@ -30,7 +30,7 @@ namespace Axerrio.DDD.Configuration.Settings
                 Seed<TContext, TSettingService>(context, seeder, loggerFactory);
             }
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(optionsAction, loggerFactory));
+            builder.Add(new EFSettingConfigurationSource<TContext>(optionsAction, loggerFactory));
 
             return builder;
         }
@@ -48,7 +48,7 @@ namespace Axerrio.DDD.Configuration.Settings
             Migrate(context, loggerFactory.CreateLogger(nameof(EFSettingConfigurationExtensions)));
             Seed<TContext, TSettingService>(context, seeder, loggerFactory);
 
-            builder.Add(new EFSettingConfigurationSource<TContext, TSettingService>(context, loggerFactory));
+            builder.Add(new EFSettingConfigurationSource<TContext>(context, loggerFactory));
 
             return builder;
         }
@@ -61,12 +61,20 @@ namespace Axerrio.DDD.Configuration.Settings
 
             if (seeder != null)
             {
+                var connectionStringBuilder = new SqlConnectionStringBuilder(context.Database.GetDbConnection().ConnectionString);
+
+                logger.LogDebug($"Seeding settings for database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog}");
+
                 var service = (TSettingService)Activator.CreateInstance(typeof(TSettingService), context, loggerFactory.CreateLogger<TSettingService>());
 
                 seeder(service, logger).Wait();
+
+                logger.LogDebug($"Seeded settings for database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog}");
             }
             else
-                logger.LogDebug($"No settings to seed, no setting seeder supplied");
+            {
+                logger.LogDebug($"No settings to seed, no setting seeder was supplied");
+            }
         }
 
         private static void Migrate<TContext>(TContext context, ILogger logger)
@@ -74,13 +82,13 @@ namespace Axerrio.DDD.Configuration.Settings
         {
             if (context.Database.IsSqlServer())
             {
-                var builder = new SqlConnectionStringBuilder(context.Database.GetDbConnection().ConnectionString);
+                var connectionStringBuilder = new SqlConnectionStringBuilder(context.Database.GetDbConnection().ConnectionString);
 
-                logger.LogDebug($"Migrating setting database objects for database {builder.DataSource} {builder.InitialCatalog}");
+                logger.LogDebug($"Migrating setting database objects for database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog}");
 
                 context.Database.Migrate();
 
-                logger.LogDebug($"Migrated setting database objects for database {builder.DataSource} {builder.InitialCatalog}");
+                logger.LogDebug($"Migrated setting database objects for database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog}");
             }
         }
     }

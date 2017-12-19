@@ -29,12 +29,18 @@ namespace Axerrio.DDD.Configuration.Settings
             var setting = await FindByKeyAsync(key);
 
             if (setting != null)
+            {
+                _logger.LogDebug($"Could not add setting. Setting with key {key} already exists");
+
                 return null;
+            }
 
             setting = Setting.Create(key, value);
 
             await _context.Settings.AddAsync(setting);
             await _context.SaveChangesAsync();
+
+            _logger.LogDebug($"Setting added with key {setting.Key} and value {setting.Value}");
 
             return setting;
         }
@@ -52,21 +58,36 @@ namespace Axerrio.DDD.Configuration.Settings
             {
                 _context.Settings.Remove(setting);
                 await _context.SaveChangesAsync();
+
+                _logger.LogDebug($"Setting removed with key {key} and value {setting.Value}");
+            }
+            else
+            {
+                _logger.LogDebug($"Could not remove setting. Setting with key {key} not found");
             }
         }
 
          public async Task<Setting> UpdateOrAddAsync<T>(string key, T value)
         {
+            bool updated = true;
             var setting = await FindByKeyAsync(key);
 
             if (setting == null)
+            {
                 setting = Setting.Create(key, value);
+                updated = false;
+            }
             else
+            {
                 setting.SetValue(value);
+            }
 
             _context.Settings.Update(setting);
 
             await _context.SaveChangesAsync();
+
+            string action = updated ? "updated" : "added";
+            _logger.LogDebug($"Setting {action} with key {setting.Key} and value {setting.Value}");
 
             return setting;
         }

@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Configuration.Settings
 {
-    public class EFSettingConfigurationSource<TContext, TSettingService> : IConfigurationSource
+    public class EFSettingConfigurationSource<TContext> : IConfigurationSource
         where TContext : DbContext, ISettingDbContext, new()
-        where TSettingService : ISettingService
     {
         protected readonly TContext _context;
         protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
@@ -35,9 +34,9 @@ namespace Axerrio.DDD.Configuration.Settings
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
             if (_optionsAction != null)
-                return new EFSettingConfigurationProvider<TContext, TSettingService>(_optionsAction, _loggerFactory);
+                return new EFSettingConfigurationProvider<TContext>(_optionsAction, _loggerFactory);
 
-            return new EFSettingConfigurationProvider<TContext, TSettingService>(_context, _loggerFactory);
+            return new EFSettingConfigurationProvider<TContext>(_context, _loggerFactory);
         }
     }
 }

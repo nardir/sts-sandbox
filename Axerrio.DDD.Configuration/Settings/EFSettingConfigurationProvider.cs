@@ -4,16 +4,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Configuration.Settings
 {
-    public class EFSettingConfigurationProvider<TContext, TSettingService>: ConfigurationProvider
+    public class EFSettingConfigurationProvider<TContext>: ConfigurationProvider
         where TContext : DbContext, ISettingDbContext, new()
-        where TSettingService : ISettingService
     {
-        protected readonly ILogger<EFSettingConfigurationProvider<TContext, TSettingService>> _logger;
+        protected readonly ILogger<EFSettingConfigurationProvider<TContext>> _logger;
         protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
         protected readonly ILoggerFactory _loggerFactory;
 
@@ -24,7 +24,7 @@ namespace Axerrio.DDD.Configuration.Settings
         {
             _loggerFactory = EnsureArg.IsNotNull(loggerFactory, nameof(LoggerFactory));
 
-            _logger = _loggerFactory.CreateLogger<EFSettingConfigurationProvider<TContext, TSettingService>>();
+            _logger = _loggerFactory.CreateLogger<EFSettingConfigurationProvider<TContext>>();
         }
 
         public EFSettingConfigurationProvider(Action<DbContextOptionsBuilder<TContext>> optionsAction, ILoggerFactory loggerFactory): this(loggerFactory)
@@ -61,14 +61,23 @@ namespace Axerrio.DDD.Configuration.Settings
 
                 var settings = Context.Settings.AsNoTracking().ToList();
 
+                var connectionStringBuilder = new SqlConnectionStringBuilder(Context.Database.GetDbConnection().ConnectionString);
+                _logger.LogDebug($"Loading {settings.Count} settings from database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog} using context type {Context.GetType().FullName} (Owns context : {IsContextOwner})");
+
                 foreach (var setting in settings)
                 {
                     var configSettings = JsonConfigurationParser.Parse(setting.Key, setting.Value).AsEnumerable();
 
+                    _logger.LogDebug($"Loading setting {setting.Key} results in {configSettings.Count()} configuration items using value {setting.Value}");
+
                     foreach(var configSetting in configSettings)
                     {
+                        _logger.LogDebug($"Loading configuration item {configSetting.Key} with value {configSetting.Value} for setting {setting.Key}");
+
                         AddSetting(configSetting.Key, configSetting.Value);
                     }
+
+                    _logger.LogDebug($"Loaded setting {setting.Key}");
                 }
             }
             finally

@@ -21,23 +21,6 @@ namespace Axerrio.DDD.Configuration.Settings
         public static T Get<T>(this IConfiguration configuration, string key, T defaultValue) where T : class
         {
             return configuration.SectionExists(key) ? configuration.GetSection(key).Get<T>() : defaultValue;
-
-            //T value = configuration.TryGet<T>(key);
-
-            ////IConfiguration section = configuration.GetSection(key);
-
-            ////if (section != null)
-            ////    value = section.Get<T>();
-
-            //if (value == null)
-            //    value = defaultValue;
-
-            //return value;
-        }
-
-        public static T Get<T>(this IConfiguration configuration, string key, Func<T> defaultValueFunc) where T : class
-        {
-            return configuration.Get(key, defaultValueFunc());
         }
     }
 }

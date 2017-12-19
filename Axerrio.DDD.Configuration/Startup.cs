@@ -81,7 +81,7 @@ namespace Axerrio.DDD.Configuration
             //options4 = Configuration.Get<TestOptions>();
             var options4 = Configuration.Get(nameof(TestOptions), new TestOptions { Description = "Default", Id = 1000 });
             var options5 = Configuration.Get("nardi", new TestOptions { Description = "Default", Id = 1000 });
-            var options6 = Configuration.Get(nameof(TestOptions), () => new TestOptions { Description = "Default", Id = 1000 });
+            //var options6 = Configuration.Get(nameof(TestOptions), () => new TestOptions { Description = "Default", Id = 1000 });
 
             //services.Configure<TestOptions>(testOptions => 
             //{
@@ -91,12 +91,26 @@ namespace Axerrio.DDD.Configuration
             //});
             //services.Configure<TestOptions>(optionsConfig);
 
-            services.Configure<TestOptions>(Configuration, nameof(TestOptions), testOptions =>
+            //services.Configure<TestOptions>(Configuration, nameof(TestOptions));
+            //services.Configure<TestOptions>(key: nameof(TestOptions), configureOptions: testOptions => 
+            //{
+            //    testOptions.Id = 999;
+            //    testOptions.Description = "Default description";
+            //    testOptions.Names = new string[] { };
+            //});
+            //services.Configure<TestOptions>(Configuration, nameof(TestOptions), testOptions =>
+            //{
+            //    testOptions.Id = 999;
+            //    testOptions.Description = "Default description";
+            //    testOptions.Names = new string[] { };
+            //});
+            services.Configure<TestOptions>(Configuration, "notexists", testOptions =>
             {
                 testOptions.Id = 999;
                 testOptions.Description = "Default description";
                 testOptions.Names = new string[] { };
             });
+
 
             var data = optionsConfig.AsEnumerable();
 
