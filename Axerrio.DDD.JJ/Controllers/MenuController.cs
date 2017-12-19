@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using EnsureThat;
 using Axerrio.DDD.Menu.Application.Commands;
-using Axerrio.BuildingBlocks;
 using Microsoft.Extensions.Logging;
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
+using Axerrio.BB.DDD.Application.Commands;
 
 namespace Axerrio.DDD.Menu.Controllers
 {    

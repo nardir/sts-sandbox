@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿using Axerrio.BB.DDD.Domain;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using Axerrio.DDD.Menu.Domain.Events;
 using Newtonsoft.Json;

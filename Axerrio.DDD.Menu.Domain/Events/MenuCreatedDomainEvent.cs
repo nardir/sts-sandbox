@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿using Axerrio.BB.DDD.Domain.DomainEvents;
 using EnsureThat;
 using System;
 using System.Collections.Generic;

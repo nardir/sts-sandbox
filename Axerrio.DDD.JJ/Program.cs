@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-
-using Axerrio.DDD.Menu;
-using Axerrio.BuildingBlocks;
 using Axerrio.DDD.Menu.Infrastructure;
 using Serilog;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
+using Axerrio.BB.DDD.EntityFrameworkCore;
+using Axerrio.BB.AspNetCore.EntityFrameworkCore.Extensions;
+using Axerrio.BB.DDD.Domain;
 
 namespace Axerrio.DDD.Menu
 {
@@ -47,7 +45,7 @@ namespace Axerrio.DDD.Menu
 
                 BuildWebHost(args)
                 .MigrateDbContext<ClientRequestContext>()
-                .MigrateDbContext<MenuContext>()
+                .MigrateDbContext<MenuContext>(typeof(IEnumeration))
                 .Run();
             }
             catch (Exception ex)

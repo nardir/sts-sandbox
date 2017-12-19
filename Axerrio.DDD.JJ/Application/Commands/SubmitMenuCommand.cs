@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿using Axerrio.BB.DDD.Application.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;

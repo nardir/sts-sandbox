@@ -1,4 +1,5 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
+using Axerrio.BB.DDD.Application.Commands;
 using Axerrio.DDD.Menu.Application.Commands;
 using EnsureThat;
 using MediatR;

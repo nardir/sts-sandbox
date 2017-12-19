@@ -14,6 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.1.0" />
+    <PackageReference Include="Axerrio.BB.AspNetCore.EntityFrameworkCore" Version="18.1.0.3" />
+    <PackageReference Include="Axerrio.BB.DDD" Version="18.1.0.4-beta" />
+    <PackageReference Include="Axerrio.BB.DDD.EntityFrameworkCore" Version="18.1.0-beta" />
+    <PackageReference Include="Axerrio.BB.DDD.FluentValidation" Version="18.1.0-beta" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="7.3.1" />
     <PackageReference Include="MediatR" Version="4.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="4.0.0" />
@@ -35,9 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj" />
     <ProjectReference Include="..\Axerrio.DDD.Menu.Domain\Axerrio.DDD.Menu.Domain.csproj" />
-    <ProjectReference Include="..\sts-sandbox\ddd\Axerrio.DDD.BuildingBlocks\Axerrio.DDD.BuildingBlocks.csproj" />
     <ProjectReference Include="..\sts-sandbox\src\Axerrio.DDD.Menu.Infrastructure\Axerrio.DDD.Menu.Infrastructure.csproj" />
   </ItemGroup>
 

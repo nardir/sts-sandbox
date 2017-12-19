@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
 using Axerrio.DDD.Menu.Application.Commands;
 using FluentValidation;
 using MediatR;

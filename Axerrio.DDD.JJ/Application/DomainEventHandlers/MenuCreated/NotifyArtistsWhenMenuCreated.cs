@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Domain.Events;
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using Axerrio.BB.DDD.Domain.DomainEvents;
 
 namespace Axerrio.DDD.Menu.Application.DomainEventHandlers.MenuCreated
 {

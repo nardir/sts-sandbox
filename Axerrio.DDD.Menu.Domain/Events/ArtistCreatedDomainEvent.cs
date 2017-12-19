@@ -1,4 +1,5 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
+using Axerrio.BB.DDD.Domain.DomainEvents;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using EnsureThat;
 using System;

@@ -1,4 +1,5 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
+using Axerrio.BB.DDD;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using EnsureThat;
 using Microsoft.EntityFrameworkCore;

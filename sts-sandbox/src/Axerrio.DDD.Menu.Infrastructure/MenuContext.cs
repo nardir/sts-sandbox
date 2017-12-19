@@ -1,4 +1,4 @@
-﻿using Axerrio.BuildingBlocks;
+﻿
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ using EnsureThat;
 using Microsoft.EntityFrameworkCore.Design;
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
 
 namespace Axerrio.DDD.Menu.Infrastructure
 {

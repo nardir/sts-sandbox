@@ -6,20 +6,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
-using Axerrio.BuildingBlocks;
+
 using MediatR;
 using Axerrio.DDD.Menu.Infrastructure;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Infrastructure.Repositories;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using Axerrio.DDD.Menu.Application.Validations;
-using FluentValidation;
-using Axerrio.DDD.Menu.Application.Commands;
-using Axerrio.BuildingBlocks.DDD.Application.Behavior;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Collections.Generic;
-using FluentValidation.Validators;
+using Axerrio.BB.DDD.EntityFrameworkCore;
+using Axerrio.BB.DDD.Infrastructure.Idempotency;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.Idempotency;
+using Axerrio.BB.DDD.FluentValidation.Application.Behaviors;
+using Axerrio.BB.DDD.Application.Behaviors;
+using Axerrio.BB.DDD.FluentValidation.Application.SchemaFilters;
 
 namespace Axerrio.DDD.Menu
 {
@@ -37,8 +36,7 @@ namespace Axerrio.DDD.Menu
         {
             services.AddMvc()
                     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddArtistCommandValidator>());
-
-            
+                      
 
             services.AddDbContext<MenuContext>(options =>
             {
