@@ -19,6 +19,8 @@ namespace Axerrio.DDD.Logging.Controllers
         {
             ViewData["Message"] = "Your application description page.";
 
+            //throw new Exception("Trigger developer error page");
+
             return View();
         }
 

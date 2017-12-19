@@ -42,9 +42,9 @@ namespace Axerrio.DDD.Configuration.Controllers
 
             var testOptions = new TestOptions()
             {
-                Id = 222,
+                Id = 789,
                 Description = "Adjusted Test options",
-                Names = new string[] { "X", "Y", "Z" }
+                Names = new string[] { "Piet2", "Jan2", "Klaas2" }
             };
 
             var setting = await _settingService.UpdateOrAddAsync(nameof(TestOptions), testOptions);
@@ -63,7 +63,7 @@ namespace Axerrio.DDD.Configuration.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody]string value, [FromServices] IOptionsSnapshot<TestOptions> testOptionsAccessor)
         {
         }
 

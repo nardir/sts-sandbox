@@ -98,18 +98,18 @@ namespace Axerrio.DDD.Configuration
             //    testOptions.Description = "Default description";
             //    testOptions.Names = new string[] { };
             //});
-            //services.Configure<TestOptions>(Configuration, nameof(TestOptions), testOptions =>
-            //{
-            //    testOptions.Id = 999;
-            //    testOptions.Description = "Default description";
-            //    testOptions.Names = new string[] { };
-            //});
-            services.Configure<TestOptions>(Configuration, "notexists", testOptions =>
+            services.Configure<TestOptions>(Configuration, nameof(TestOptions), testOptions =>
             {
                 testOptions.Id = 999;
                 testOptions.Description = "Default description";
                 testOptions.Names = new string[] { };
             });
+            //services.Configure<TestOptions>(Configuration, "notexists", testOptions =>
+            //{
+            //    testOptions.Id = 999;
+            //    testOptions.Description = "Default description";
+            //    testOptions.Names = new string[] { };
+            //});
 
 
             var data = optionsConfig.AsEnumerable();

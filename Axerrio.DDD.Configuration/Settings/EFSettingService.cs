@@ -24,7 +24,7 @@ namespace Axerrio.DDD.Configuration.Settings
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public async Task<Setting> AddAsync<T>(string key, T value)
+        public async Task<Setting> AddIfNotExistsAsync<T>(string key, T value)
         {
             var setting = await FindByKeyAsync(key);
 

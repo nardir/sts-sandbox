@@ -13,6 +13,8 @@ namespace Axerrio.DDD.Configuration.Settings
     public class EFSettingConfigurationProvider<TContext>: ConfigurationProvider
         where TContext : DbContext, ISettingDbContext, new()
     {
+        private object _loadLock = new object();
+
         protected readonly ILogger<EFSettingConfigurationProvider<TContext>> _logger;
         protected readonly Action<DbContextOptionsBuilder<TContext>> _optionsAction;
         protected readonly ILoggerFactory _loggerFactory;
@@ -39,53 +41,56 @@ namespace Axerrio.DDD.Configuration.Settings
 
         public override void Load()
         {
-            try
+            lock (_loadLock)
             {
-                Data = new Dictionary<string, string>();
-
-                if (Context == null)
+                try
                 {
-                    if (_optionsAction != null)
+                    Data = new Dictionary<string, string>();
+
+                    if (Context == null)
                     {
-                        var builder = new DbContextOptionsBuilder<TContext>();
+                        if (_optionsAction != null)
+                        {
+                            var builder = new DbContextOptionsBuilder<TContext>();
 
-                        _optionsAction(builder);
+                            _optionsAction(builder);
 
-                        Context = (TContext)Activator.CreateInstance(typeof(TContext), builder.Options);
-                    }
-                    else
-                        Context = new TContext();
+                            Context = (TContext)Activator.CreateInstance(typeof(TContext), builder.Options);
+                        }
+                        else
+                            Context = new TContext();
 
-                    IsContextOwner = true;
-                }
-
-                var settings = Context.Settings.AsNoTracking().ToList();
-
-                var connectionStringBuilder = new SqlConnectionStringBuilder(Context.Database.GetDbConnection().ConnectionString);
-                _logger.LogDebug($"Loading {settings.Count} settings from database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog} using context type {Context.GetType().FullName} (Owns context : {IsContextOwner})");
-
-                foreach (var setting in settings)
-                {
-                    var configSettings = JsonConfigurationParser.Parse(setting.Key, setting.Value).AsEnumerable();
-
-                    _logger.LogDebug($"Loading setting {setting.Key} results in {configSettings.Count()} configuration items using value {setting.Value}");
-
-                    foreach(var configSetting in configSettings)
-                    {
-                        _logger.LogDebug($"Loading configuration item {configSetting.Key} with value {configSetting.Value} for setting {setting.Key}");
-
-                        AddSetting(configSetting.Key, configSetting.Value);
+                        IsContextOwner = true;
                     }
 
-                    _logger.LogDebug($"Loaded setting {setting.Key}");
+                    var settings = Context.Settings.AsNoTracking().ToList();
+
+                    var connectionStringBuilder = new SqlConnectionStringBuilder(Context.Database.GetDbConnection().ConnectionString);
+                    _logger.LogDebug($"Loading {settings.Count} settings from database {connectionStringBuilder.DataSource} {connectionStringBuilder.InitialCatalog} using context type {Context.GetType().FullName} (Owns context : {IsContextOwner})");
+
+                    foreach (var setting in settings)
+                    {
+                        var configSettings = JsonConfigurationParser.Parse(setting.Key, setting.Value).AsEnumerable();
+
+                        _logger.LogDebug($"Loading setting {setting.Key} results in {configSettings.Count()} configuration items using value {setting.Value}");
+
+                        foreach (var configSetting in configSettings)
+                        {
+                            _logger.LogDebug($"Loading configuration item {configSetting.Key} with value {configSetting.Value} for setting {setting.Key}");
+
+                            AddSetting(configSetting.Key, configSetting.Value);
+                        }
+
+                        _logger.LogDebug($"Loaded setting {setting.Key}");
+                    }
                 }
-            }
-            finally
-            {
-                if (IsContextOwner && Context != null)
+                finally
                 {
-                    Context.Dispose();
-                    Context = null;
+                    if (IsContextOwner && Context != null)
+                    {
+                        Context.Dispose();
+                        Context = null;
+                    }
                 }
             }
         }

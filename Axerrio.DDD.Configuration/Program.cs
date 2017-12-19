@@ -58,7 +58,7 @@ namespace Axerrio.DDD.Configuration
                             Names = new string[] { "aap", "noot", "mies" }
                         };
 
-                        return service.AddAsync(nameof(TestOptions), testOptions);
+                        return service.AddIfNotExistsAsync(nameof(TestOptions), testOptions);
                     };
 
                     builder.AddEntityFrameworkSettings<SettingDbContext, EFSettingService>(options =>
