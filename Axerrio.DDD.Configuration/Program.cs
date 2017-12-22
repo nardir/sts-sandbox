@@ -25,7 +25,7 @@ namespace Axerrio.DDD.Configuration
                 .ConfigureAppConfiguration((context, builder) => 
                 {
                     var config = builder.Build();
-
+                    
                     //var data = config.AsEnumerable();
 
                     var connectionString = config["ConnectionString"];

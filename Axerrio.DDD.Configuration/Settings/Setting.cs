@@ -65,5 +65,10 @@ namespace Axerrio.DDD.Configuration.Settings
             }
             return _value;
         }
+
+        public virtual object GetValue()
+        {
+            return GetValue(Type.GetType(ValueType));
+        }
     }
 }

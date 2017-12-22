@@ -53,6 +53,8 @@ namespace Axerrio.Identity.API
                     //    listenOptions.UseHttps(Certificate.Certificate.Get());
                     //});
 
+                    
+
                     using (var store = new X509Store(StoreName.My))
                     {
                         store.Open(OpenFlags.ReadOnly);

@@ -115,6 +115,16 @@ namespace Axerrio.DDD.Configuration
             var data = optionsConfig.AsEnumerable();
 
             var options1 = optionsConfig.Get<TestOptions>();
+
+            //https://stackoverflow.com/questions/15449800/create-object-instance-of-a-class-having-its-name-in-string-variable
+            var setting1 = Setting.Create(nameof(options1), options1);
+            var typeName = setting1.ValueType;
+            Type setting1Type = Type.GetType(typeName);
+            var to1 = Activator.CreateInstance(setting1Type);
+            var to2 = setting1.GetValue(setting1Type);
+
+            var t03 = setting1.GetValue();
+
             TestOptions options2 = new TestOptions();
             optionsConfig.Bind(options2);
 
