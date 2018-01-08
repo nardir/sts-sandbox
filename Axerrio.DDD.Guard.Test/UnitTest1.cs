@@ -36,7 +36,7 @@ namespace Axerrio.DDD.Guard.Test
 
             //Arrange
             var controller = new ValuesController(null);
-            controller.
+            //controller. JJ: Commentedout to get project building
         }
     }
 }
