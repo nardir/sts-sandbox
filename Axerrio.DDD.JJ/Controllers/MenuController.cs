@@ -10,6 +10,9 @@ using Axerrio.DDD.Menu.Application.Commands;
 using Microsoft.Extensions.Logging;
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.BB.DDD.Application.Commands;
+using Moon.OData;
+using Axerrio.DDD.Menu.Application.Queries;
+using Axerrio.DDD.Menu.Application.DTOs;
 
 namespace Axerrio.DDD.Menu.Controllers
 {    
@@ -18,11 +21,45 @@ namespace Axerrio.DDD.Menu.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<MenuController> _logger;
+        private readonly IReadQueries _readQueries;
 
-        public MenuController(IMediator mediator, ILogger<MenuController> logger)
+        public MenuController(IMediator mediator, ILogger<MenuController> logger, IReadQueries readQueries)
         {
             _mediator = EnsureArg.IsNotNull(mediator);
             _logger = EnsureArg.IsNotNull(logger);
+            _readQueries = EnsureArg.IsNotNull(readQueries);
+        }
+
+        [Route("")]
+        [HttpGet]
+        //TODO: Swagger definitie Filter oid?
+        //Nu breekt swagger op ODataOptions wanneer schemafilter aanstaat --> //options.SchemaFilter<AddFluentValidationRules>(); 
+
+        //http://localhost:49675/api/menu/?$filter=Status%20eq%20%27Created%27&$orderby=Menu%20desc&$top=2
+        //localhost:49675/api/menu/?$filter=Status eq 'Created'&$orderby=Menu desc&$top=2&$select=Menu
+        public async Task<IActionResult> Get([FromQuery]ODataOptions<MenuWithStatusDTO> options)
+        {
+            var queryDefinition = MenuReadQueries.MenuWithStatusQuery;
+
+            //QueryDefinition meegeven.
+            //Check in Execute of typeof(t) == queryDefinition.DTOType
+
+            var resultList = await _readQueries.QueryWithODataOptionsAsync(queryDefinition.SqlQuery, options);
+
+            //Todo: geef in een formaat terug, met alle info nodig voor Odata Result etc. 
+
+            return Ok(resultList);
+        }
+
+        [Route("v1801")]// jaja, versioning verhaal anders!
+        [HttpGet]
+        public async Task<IActionResult> Get(ODataOptions<MenuWithStatusDTO_v1801> options)
+        {
+            var resultList = await _readQueries.QueryWithODataOptionsAsync(MenuReadQueries_v1801.MenuWithStatusQuery.SqlQuery, options);
+
+            //Todo: geef in een formaat terug, met alle info nodig.
+
+            return Ok(resultList);
         }
 
         [Route("submit")]
@@ -53,6 +90,8 @@ namespace Axerrio.DDD.Menu.Controllers
                 return (IActionResult)BadRequest(ex);
             }
         }
+
+
 
 
     }
