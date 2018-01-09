@@ -43,7 +43,7 @@ namespace Axerrio.DDD.Menu.Application.Queries
           //          FROM 
           //              XXX",
           //    oDataOptions
-          //);
+          //); // ERROR ERROR ERROR
 
           //  var moonSqlQuery4 = new ODataSqlQuery(
           //    @"SELECT FROM (SELCT '',2   FROM  XXX) As AAA"

@@ -19,6 +19,8 @@ namespace Axerrio.DDD.Menu.Application.DTOs
         public Type DTOType { get; private set; }
     }
 
+    //TODO: query moet ge-unittest worden, dat moon validatie/conversie naar dapper werkt. (Unittest?)
+    //TODO: query moet ook op db werken!! (Integratietest?)
     public class MenuReadQueries
     {
         public static readonly ReadQueryDefinition<MenuWithStatusDTO> MenuWithStatusQuery = new ReadQueryDefinition<MenuWithStatusDTO>(

@@ -30,19 +30,22 @@ namespace Axerrio.DDD.Menu.Controllers
             _readQueries = EnsureArg.IsNotNull(readQueries);
         }
 
+        //Test odata strings:
+        //http://localhost:49675/api/menu/?$filter=Status%20eq%20%27Created%27&$orderby=Menu%20desc&$top=2
+        //localhost:49675/api/menu/?$filter=Status eq 'Created'&$orderby=Menu desc&$top=2&$select=Menu
+
         [Route("")]
         [HttpGet]
         //TODO: Swagger definitie Filter oid?
-        //Nu breekt swagger op ODataOptions wanneer schemafilter aanstaat --> //options.SchemaFilter<AddFluentValidationRules>(); 
-
-        //http://localhost:49675/api/menu/?$filter=Status%20eq%20%27Created%27&$orderby=Menu%20desc&$top=2
-        //localhost:49675/api/menu/?$filter=Status eq 'Created'&$orderby=Menu desc&$top=2&$select=Menu
+        //1. In swagger queryoptions in kunnen geven? todo: Kijk naar swagger odata extensions nuget.
+        //2. Nu breekt swagger op ODataOptions wanneer schemafilter aanstaat voor validatie (fluent)--> //options.SchemaFilter<AddFluentValidationRules>(); 
+               
         public async Task<IActionResult> Get([FromQuery]ODataOptions<MenuWithStatusDTO> options)
         {
             var queryDefinition = MenuReadQueries.MenuWithStatusQuery;
 
-            //QueryDefinition meegeven.
-            //Check in Execute of typeof(t) == queryDefinition.DTOType
+            //QueryDefinition meegeven?
+            //Dan check in QueryWithODataOptionsAsync of typeof(t) == queryDefinition.DTOType?
 
             var resultList = await _readQueries.QueryWithODataOptionsAsync(queryDefinition.SqlQuery, options);
 
