@@ -8,6 +8,6 @@ namespace Axerrio.DDD.Menu.Application.Queries
 {
     public interface IReadQueries
     {
-        Task<IEnumerable<T>> QueryWithODataOptionsAsync<T>(string sqlQuery, ODataOptions<T> oDataOptions) where T : QueryDTO;
+        Task<IEnumerable<dynamic>> QueryWithODataOptionsAsync<T>(string sqlQuery, ODataOptions<T> oDataOptions) where T : QueryDTO;
     }
 }

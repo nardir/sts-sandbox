@@ -32,7 +32,7 @@ namespace Axerrio.DDD.Menu.Controllers
 
         //Test odata strings:
         //http://localhost:49675/api/menu/?$filter=Status%20eq%20%27Created%27&$orderby=Menu%20desc&$top=2
-        //localhost:49675/api/menu/?$filter=Status eq 'Created'&$orderby=Menu desc&$top=2&$select=Menu
+        //localhost:49675/api/menu/?$filter=Status eq 'Created'&$orderby=Menu desc&$top=2&$select=Menu&$take=1
 
         [Route("")]
         [HttpGet]
