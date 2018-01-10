@@ -111,6 +111,43 @@ namespace Axerrio.DDD.Configuration
             //    testOptions.Names = new string[] { };
             //});
 
+            var testoptions2 = new TestOptions
+            {
+                Id = 200,
+                //Description = "Description test options2",
+                Description = null,
+                Names = null
+                //Names = new string[] { "test", "nardi" }
+            };
+
+            var jsontestoptions2 = JsonConvert.SerializeObject(testoptions2);
+
+            var cd = JsonConfigurationParser.Parse(nameof(testoptions2), jsontestoptions2);
+
+            //cd["testoptions2:Names"] = "null";
+            //cd["testoptions2:Description"] = "null";
+
+            //string s1 = "Dit is { een [ string ] met resvered }";
+            //var jsons1 = JsonConvert.SerializeObject(s1);
+
+            //var cd = new Dictionary<string, string>();
+            //cd.Add(nameof(s1), null);
+            //cd.Add("i1", "100");
+            //cd.Add("i2", "");
+
+            var cb = new ConfigurationBuilder()
+                .AddInMemoryCollection(cd);
+
+            var c = cb.Build();
+
+            //var i1 = c.GetValue<int?>("i1");
+            //var i2 = c.GetValue<int?>("i2");
+
+            services.Configure<TestOptions>(configuration: c, name: nameof(testoptions2), key: nameof(testoptions2));
+
+            var p = services.BuildServiceProvider();
+            var oa = p.GetService<IOptionsSnapshot<TestOptions>>();
+            var testoptionsr = oa.Get(nameof(testoptions2));
 
             var data = optionsConfig.AsEnumerable();
 
