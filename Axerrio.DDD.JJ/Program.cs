@@ -8,6 +8,12 @@ using System;
 using Axerrio.BB.DDD.EntityFrameworkCore;
 using Axerrio.BB.AspNetCore.EntityFrameworkCore.Extensions;
 using Axerrio.BB.DDD.Domain;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
+using Axerrio.BB.AspNetCore.EntityFrameworkCore.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Axerrio.BB.DDD.Infrastructure.Idempotency;
+using EnsureThat;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Axerrio.DDD.Menu
 {
@@ -30,6 +36,7 @@ namespace Axerrio.DDD.Menu
                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
                .Build();
+                       
 
             //Setup Serilog
             Log.Logger = new LoggerConfiguration()
@@ -44,7 +51,7 @@ namespace Axerrio.DDD.Menu
                 Log.Information("Starting web host");
 
                 BuildWebHost(args)
-                .MigrateDbContext<ClientRequestContext>()
+                .MigrateDbContext<ClientRequestDbContext>()
                 .MigrateDbContext<MenuContext>(typeof(IEnumeration))
                 .Run();
             }
@@ -65,4 +72,5 @@ namespace Axerrio.DDD.Menu
                 .UseSerilog()
                 .Build();
     }
+
 }

@@ -19,6 +19,10 @@ using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.Idempotency;
 using Axerrio.BB.DDD.FluentValidation.Application.Behaviors;
 using Axerrio.BB.DDD.Application.Behaviors;
 using Axerrio.BB.DDD.FluentValidation.Application.SchemaFilters;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
+using Axerrio.DDD.Menu.Application.Queries;
+using Microsoft.Extensions.Options;
+using Axerrio.BB.AspNetCore.Extensions.Configuration;
 
 namespace Axerrio.DDD.Menu
 {
@@ -35,9 +39,23 @@ namespace Axerrio.DDD.Menu
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddArtistCommandValidator>());
-                      
+                    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AddArtistCommandValidator>())
+                    .AddOData();
 
+
+            services.Configure<MenuDomainOptions>(Configuration);
+            services.AddSingleton<IConfigureOptions<MenuDomainOptions>, ConfigureMenuDomainOptions>();
+
+            //Todo: die hele settingstructuur!
+            var queryOptions = new ReadQueryOptions() { ConnectionString = Configuration["ConnectionString"] };
+            services.AddSingleton<ReadQueryOptions>(queryOptions);
+           
+
+            //Todo: ConnectionString options? MenuDomainOptions is teveel voor de MenuQueries?
+            services.AddTransient<IReadQueries, DapperReadQueries>();
+
+
+            //Todo: verwerkt BB hierin!
             services.AddDbContext<MenuContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionString"],
@@ -48,12 +66,12 @@ namespace Axerrio.DDD.Menu
                     });
             });
 
-            services.AddDbContext<ClientRequestContext>(options =>
+            services.AddDbContext<ClientRequestDbContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
                     {
-                        sqlOptions.MigrationsAssembly(typeof(ClientRequestContext).GetTypeInfo().Assembly.GetName().Name);                        
+                        sqlOptions.MigrationsAssembly(typeof(ClientRequestDbContext).GetTypeInfo().Assembly.GetName().Name);                        
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
             });
@@ -63,16 +81,14 @@ namespace Axerrio.DDD.Menu
             services.AddScoped<IArtistRepository, ArtistRepository>();
 
             services.AddTransient<IClientRequestService, ClientRequestService>();
-
+                        
+           
 
             //IMediator zaken.
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-
             
-
-
             services.AddSwaggerGen(options =>
             {
                 //              options.DescribeAllEnumsAsStrings();
@@ -84,7 +100,8 @@ namespace Axerrio.DDD.Menu
                     TermsOfService = "Terms Of Service"
                 });
 
-                options.SchemaFilter<AddFluentValidationRules>(); 
+                //TODO: ODataOptions breken hierop!!
+                //options.SchemaFilter<AddFluentValidationRules>(); 
             });
 
             
