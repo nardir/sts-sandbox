@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
-    public class StoreAndForwardEventBus : IEventBusStoreAndForward
+    public class RabbitMQEventBus : IEventBus
     {
         public void Publish(IntegrationEvent @event)
         {

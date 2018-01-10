@@ -34,8 +34,13 @@ namespace Axerrio.BB.DDD
 
             services.AddTransient<IIntegrationEventsEnqueueService, IntegrationEventsEnqueueService<OrderingDbContext>>();
 
-            services.AddTransient<IEventBusPublishOnly, StoreAndForwardEventBus>();
+            services.AddTransient<IEventBusStoreAndForward, StoreAndForwardEventBus>();
             services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService>();
+            services.AddSingleton<IEventBus, RabbitMQEventBus>();
+            services.AddSingleton<IEventBusPublishOnly>(provider => 
+            {
+                return provider.GetRequiredService<IEventBus>();
+            });
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

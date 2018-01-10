@@ -12,9 +12,9 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
     public class StoreAndForwardIntegrationEventsService : IIntegrationEventsService
     {
         private readonly ILogger<StoreAndForwardIntegrationEventsService> _logger;
-        private readonly IEventBusPublishOnly _eventBus;
+        private readonly IEventBusStoreAndForward _eventBus;
 
-        public StoreAndForwardIntegrationEventsService(IEventBusPublishOnly eventBus, ILogger<StoreAndForwardIntegrationEventsService> logger)
+        public StoreAndForwardIntegrationEventsService(IEventBusStoreAndForward eventBus, ILogger<StoreAndForwardIntegrationEventsService> logger)
         {
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
             _eventBus = EnsureArg.IsNotNull(eventBus, nameof(eventBus));
