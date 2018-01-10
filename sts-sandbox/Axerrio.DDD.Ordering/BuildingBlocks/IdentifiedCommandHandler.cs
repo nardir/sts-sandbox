@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Ordering.BuildingBlocks
 {
-    public class IdentifiedCommandHandler<TCommand, TResult> : IAsyncRequestHandler<IdentifiedCommand<TCommand, TResult>, TResult>
+    public class IdentifiedCommandHandler<TCommand, TResult> //: IRequestHandler<IdentifiedCommand<TCommand, TResult>, TResult>
         where TCommand : Command<TCommand, TResult>
     {
         private readonly IMediator _mediator;

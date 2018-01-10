@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
+using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
-using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using System.Reflection;
 
 namespace Axerrio.BB.DDD
 {
@@ -39,6 +33,9 @@ namespace Axerrio.BB.DDD
             });
 
             services.AddTransient<IIntegrationEventsEnqueueService, IntegrationEventsEnqueueService<OrderingDbContext>>();
+
+            services.AddTransient<IEventBusPublishOnly, StoreAndForwardEventBus>();
+            services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

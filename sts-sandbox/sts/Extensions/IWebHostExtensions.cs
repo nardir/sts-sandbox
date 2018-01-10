@@ -25,17 +25,21 @@ namespace sts.Extensions
                 {
                     logger.LogInformation($"Migrating database associated with context {typeof(TContext).Name}");
 
-                    context.Database
-                        .Migrate();
-
+                    context.Database.Migrate();
+                    
                     seeder(context, services);
 
-                    logger.LogInformation($"Migrated database associated with context {typeof(TContext).Name}");
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, $"An error occurred while migrating the database used on context {typeof(TContext).Name}");
                 }
+                finally
+                {
+
+                    logger.LogInformation($"Migrated database associated with context {typeof(TContext).Name}");
+                }               
+
             }
 
             return webHost;
