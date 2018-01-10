@@ -20,6 +20,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _context = EnsureArg.IsNotNull(context, nameof(context));
 
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
+            //_context.Database.GetDbConnection().ConnectionString
         }
 
         public async Task EnqueueAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))

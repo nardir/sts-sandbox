@@ -8,9 +8,16 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
     public class StoreAndForwardEventBus : IEventBusStoreAndForward
     {
+        private readonly IIntegrationEventsQueueService _integrationEventsQueueService;
+
+        public StoreAndForwardEventBus(IIntegrationEventsQueueService integrationEventsQueueService)
+        {
+
+        }
+
         public void Publish(IntegrationEvent @event)
         {
-            throw new NotImplementedException();
+            _integrationEventsQueueService.EnqueueEvent(@event);
         }
     }
 }
