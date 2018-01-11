@@ -21,6 +21,18 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             TimesSent = 0;
         }
 
+        [JsonIgnore]
+        public IntegrationEvent IntegrationEvent {
+            get
+            {
+                Type type = Type.GetType(EventTypeName);
+
+                var @event = JsonConvert.DeserializeObject(Content, type);
+
+                return (IntegrationEvent) @event;
+            }
+        }
+
         public Guid EventId { get; private set; }
         public string EventTypeName { get; private set; }
         public IntegrationEventsQueueItemState State { get; set; }

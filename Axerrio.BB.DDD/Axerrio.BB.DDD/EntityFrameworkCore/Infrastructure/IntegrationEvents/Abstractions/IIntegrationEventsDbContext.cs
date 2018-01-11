@@ -8,6 +8,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Ab
 {
     public interface IIntegrationEventsDbContext
     {
+        IntegrationEventsDatabaseOptions IntegrationEventsDatabaseOptions { get; }
+
         DbSet<IntegrationEventsQueueItem> IntegrationEventsQueueItems { get; set; }
     }
 }

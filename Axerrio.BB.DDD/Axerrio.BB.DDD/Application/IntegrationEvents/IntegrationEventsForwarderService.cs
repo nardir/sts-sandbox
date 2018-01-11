@@ -20,18 +20,20 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             , IIntegrationEventsQueueService integrationEventsQueueService
             , ILogger<IntegrationEventsForwarderService<TEventBus>> logger)
         {
-            EnsureArg.IsNotNull(eventBusPublishOnlyFactory, nameof(eventBusPublishOnlyFactory));
-
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
+            EnsureArg.IsNotNull(eventBusPublishOnlyFactory, nameof(eventBusPublishOnlyFactory));
 
             //_eventBus = eventBusPublishOnlyFactory.Create<IEventBus>();
             _eventBus = eventBusPublishOnlyFactory.Create<TEventBus>();
+
+            _integrationEventsQueueService = EnsureArg.IsNotNull(integrationEventsQueueService, nameof(integrationEventsQueueService));
         }
 
         public async Task ForwardAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             //Dequeue Store
-            var events = await _integrationEventsQueueService.DequeueEventsAsync(maxNumberOfEvents: 10, cancellationToken: cancellationToken);
+            var events = await _integrationEventsQueueService.DequeueEventsAsync(cancellationToken: cancellationToken);
 
             foreach (var @event in events)
             {

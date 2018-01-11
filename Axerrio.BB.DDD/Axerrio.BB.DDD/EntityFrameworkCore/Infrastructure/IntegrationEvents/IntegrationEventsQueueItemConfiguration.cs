@@ -11,15 +11,17 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
     public class IntegrationEventsQueueItemConfiguration : IEntityTypeConfiguration<IntegrationEventsQueueItem>
     {
         private readonly string _schema;
+        private readonly string _tableName;
 
-        public IntegrationEventsQueueItemConfiguration(string schema = "dbo")
+        public IntegrationEventsQueueItemConfiguration(string schema = "dbo", string tableName = "IntegrationEventQueue")
         {
             _schema = EnsureArg.IsNotNullOrWhiteSpace(schema, nameof(schema));
+            _tableName = EnsureArg.IsNotNullOrWhiteSpace(tableName, nameof(tableName));
         }
 
         public void Configure(EntityTypeBuilder<IntegrationEventsQueueItem> builder)
         {
-            builder.ToTable("IntegrationEventQueue", _schema);
+            builder.ToTable(_tableName, _schema);
 
             builder.HasKey(e => e.EventId);
 

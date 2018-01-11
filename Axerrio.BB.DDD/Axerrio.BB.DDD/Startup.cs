@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
 using System.Reflection;
 
 namespace Axerrio.BB.DDD
@@ -24,6 +26,19 @@ namespace Axerrio.BB.DDD
         {
             var connectionString = Configuration.GetValue<string>("ConnectionString");
 
+            services.AddOptions();
+
+            services.Configure<IntegrationEventsDatabaseOptions>(options => 
+            {
+                options.Schema = "dbo";
+                options.TableName = "IntegrationEventQueue";
+            });
+
+            services.Configure<IntegrationEventsQueueServiceOptions>(options => 
+            {
+                options.MaxEventsToDequeue = 6;
+            });
+
             services.AddDbContext<OrderingDbContext>(options => 
             {
                 options.UseSqlServer(connectionString, sqlOptions => 
@@ -35,7 +50,6 @@ namespace Axerrio.BB.DDD
 
             //TODO NR: Extensions methods to Add services
             services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
-            //services.AddTransient<IEventBusStoreAndForward, StoreAndForwardEventBus>();
             services.AddTransient<StoreAndForwardEventBus>();
             services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
             services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
@@ -45,12 +59,6 @@ namespace Axerrio.BB.DDD
             {
                 return provider.GetRequiredService<RabbitMQEventBus>();
             });
-
-            //services.AddSingleton<IEventBus, RabbitMQEventBus>();
-            //services.AddSingleton<IEventBusPublishOnly>(provider => 
-            //{
-            //    return provider.GetRequiredService<IEventBus>();
-            //});
             
             services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
@@ -61,6 +69,9 @@ namespace Axerrio.BB.DDD
             //var ie = new PaymentMethodCreatedIntegrationEvent(pm);
             //var iejson = JsonConvert.SerializeObject(ie);
             //var ierestored = JsonConvert.DeserializeObject<PaymentMethodCreatedIntegrationEvent>(iejson);
+
+            //var queueItem = new IntegrationEventsQueueItem(ierestored);
+            //var iefromQueueItem = queueItem.IntegrationEvent;
 
             services.AddMvc();
         }

@@ -2,6 +2,7 @@
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace Axerrio.BB.DDD.Controllers
@@ -11,12 +12,37 @@ namespace Axerrio.BB.DDD.Controllers
     {
         
 
-        public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory)
+        public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory
+            , IIntegrationEventsQueueService integrationEventsQueueService
+            , OrderingDbContext orderingDbContext)
         {
-            var storeAndForward = eventBusPublishOnlyFactory.Create<StoreAndForwardEventBus>();
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    var pm = new PaymentMethod(i, $"VISA-{i}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
+            //    var ie = new PaymentMethodCreatedIntegrationEvent(pm);
 
-            var publishOnly = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
-            var publishOnly2 = eventBusPublishOnlyFactory.Create<IEventBus>();
+            //    integrationEventsQueueService.EnqueueEvent(ie);
+            //}
+
+            //orderingDbContext.SaveChanges();
+
+            var items1 = integrationEventsQueueService.DequeueEventsAsync().Result;
+            var items2 = integrationEventsQueueService.DequeueEventsAsync().Result;
+
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    var pm = new PaymentMethod(i, $"VISA-{i}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
+            //    var ie = new PaymentMethodCreatedIntegrationEvent(pm);
+
+            //    integrationEventsQueueService.EnqueueEvent(ie);
+            //}
+
+            //orderingDbContext.SaveChanges();
+
+            //var storeAndForward = eventBusPublishOnlyFactory.Create<StoreAndForwardEventBus>();
+
+            //var publishOnly = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+            //var publishOnly2 = eventBusPublishOnlyFactory.Create<IEventBus>();
         }
 
         // GET api/values
