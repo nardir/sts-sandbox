@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using EnsureThat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
-    public class StoreAndForwardEventBus : IEventBusStoreAndForward
+    public class StoreAndForwardEventBus : IEventBusPublishOnly
     {
         private readonly IIntegrationEventsQueueService _integrationEventsQueueService;
 
         public StoreAndForwardEventBus(IIntegrationEventsQueueService integrationEventsQueueService)
         {
-
+            _integrationEventsQueueService = EnsureArg.IsNotNull(integrationEventsQueueService, nameof(integrationEventsQueueService));
         }
 
         public void Publish(IntegrationEvent @event)

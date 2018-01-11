@@ -32,16 +32,27 @@ namespace Axerrio.BB.DDD
                 });
             });
 
-            services.AddTransient<IIntegrationEventsEnqueueService, IntegrationEventsEnqueueService<OrderingDbContext>>();
-            services.AddSingleton<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
-            services.AddTransient<IEventBusStoreAndForward, StoreAndForwardEventBus>();
-            services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService>();
-            services.AddSingleton<IEventBus, RabbitMQEventBus>();
-            services.AddSingleton<IEventBusPublishOnly>(provider => 
+
+            //TODO NR: Extensions methods to Add services
+            services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
+            //services.AddTransient<IEventBusStoreAndForward, StoreAndForwardEventBus>();
+            services.AddTransient<StoreAndForwardEventBus>();
+            services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
+            services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
+
+            services.AddSingleton<RabbitMQEventBus>();
+            services.AddSingleton<IEventBus>(provider => 
             {
-                return provider.GetRequiredService<IEventBus>();
+                return provider.GetRequiredService<RabbitMQEventBus>();
             });
+
+            //services.AddSingleton<IEventBus, RabbitMQEventBus>();
+            //services.AddSingleton<IEventBusPublishOnly>(provider => 
+            //{
+            //    return provider.GetRequiredService<IEventBus>();
+            //});
             
+            services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

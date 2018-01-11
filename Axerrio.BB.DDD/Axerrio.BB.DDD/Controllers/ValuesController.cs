@@ -1,4 +1,5 @@
-﻿using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
+using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -8,11 +9,14 @@ namespace Axerrio.BB.DDD.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        private readonly IIntegrationEventsEnqueueService _integrationEventsEnqueueService;
+        
 
-        public ValuesController(IIntegrationEventsEnqueueService integrationEventsEnqueueService)
+        public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory)
         {
-            _integrationEventsEnqueueService = EnsureArg.IsNotNull(integrationEventsEnqueueService);
+            var storeAndForward = eventBusPublishOnlyFactory.Create<StoreAndForwardEventBus>();
+
+            var publishOnly = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+            var publishOnly2 = eventBusPublishOnlyFactory.Create<IEventBus>();
         }
 
         // GET api/values

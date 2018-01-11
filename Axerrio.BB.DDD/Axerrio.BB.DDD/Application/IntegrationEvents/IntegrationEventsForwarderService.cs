@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using EnsureThat;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -8,17 +9,23 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
-    public class IntegrationEventsForwarderService : IIntegrationEventsForwarderService
+    public class IntegrationEventsForwarderService<TEventBus> : IIntegrationEventsForwarderService
+        where TEventBus: IEventBusPublishOnly
     {
         private readonly IEventBusPublishOnly _eventBus;
         private readonly IIntegrationEventsQueueService _integrationEventsQueueService;
-        private readonly ILogger<IntegrationEventsForwarderService> _logger;
+        private readonly ILogger<IntegrationEventsForwarderService<TEventBus>> _logger;
 
-        public IntegrationEventsForwarderService(IEventBusPublishOnly eventBus
+        public IntegrationEventsForwarderService(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory 
             , IIntegrationEventsQueueService integrationEventsQueueService
-            , ILogger<IntegrationEventsForwarderService> logger)
+            , ILogger<IntegrationEventsForwarderService<TEventBus>> logger)
         {
+            EnsureArg.IsNotNull(eventBusPublishOnlyFactory, nameof(eventBusPublishOnlyFactory));
 
+            _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
+            //_eventBus = eventBusPublishOnlyFactory.Create<IEventBus>();
+            _eventBus = eventBusPublishOnlyFactory.Create<TEventBus>();
         }
 
         public async Task ForwardAsync(CancellationToken cancellationToken = default(CancellationToken))

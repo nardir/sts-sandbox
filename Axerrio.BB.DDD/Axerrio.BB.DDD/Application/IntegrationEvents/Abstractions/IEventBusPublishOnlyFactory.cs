@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
 {
-    public interface IEventBusStoreAndForward: IEventBusPublishOnly
+    public interface IEventBusPublishOnlyFactory
     {
+        IEventBusPublishOnly Create<TEventBus>() where TEventBus : IEventBusPublishOnly;
     }
 }
