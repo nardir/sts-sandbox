@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
@@ -61,6 +62,8 @@ namespace Axerrio.BB.DDD
             });
             
             services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
+
+            services.AddSingleton<IHostedService, TestHostedService>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

@@ -26,8 +26,8 @@ namespace Axerrio.BB.DDD.Controllers
 
             //orderingDbContext.SaveChanges();
 
-            var items1 = integrationEventsQueueService.DequeueEventsAsync().Result;
-            var items2 = integrationEventsQueueService.DequeueEventsAsync().Result;
+            //var items1 = integrationEventsQueueService.DequeueEventsAsync().Result;
+            //var items2 = integrationEventsQueueService.DequeueEventsAsync().Result;
 
             //for (int i = 0; i < 10; i++)
             //{
