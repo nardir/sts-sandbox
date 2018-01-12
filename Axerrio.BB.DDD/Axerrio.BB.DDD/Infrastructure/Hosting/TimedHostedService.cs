@@ -123,7 +123,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
 
         public void ReturnJob(IJob job)
         {
-            //throw new NotImplementedException();
+            var disposable = job as IDisposable;
+
+            disposable?.Dispose();
         }
     }
 }
