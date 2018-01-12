@@ -29,10 +29,13 @@ namespace Axerrio.BB.DDD
             
             
             webHost.Run();
+
+            //Console.ReadLine();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseShutdownTimeout(TimeSpan.FromSeconds(10)) //Aanpassen shutdown tijd
                 .UseStartup<Startup>()
                 .Build();
     }

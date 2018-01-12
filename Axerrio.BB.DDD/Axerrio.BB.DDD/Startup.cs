@@ -1,6 +1,7 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.Infrastructure.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Quartz.Spi;
 using System;
 using System.Reflection;
 
@@ -63,7 +65,10 @@ namespace Axerrio.BB.DDD
             
             services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
-            services.AddSingleton<IHostedService, TestHostedService>();
+            //services.AddSingleton<IHostedService, TestHostedService>();
+            services.AddSingleton<IJobFactory, JobFactory>();
+            services.AddTransient<TestJob>();
+            services.AddSingleton<IHostedService, TimedHostedService<TestJob>>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);
