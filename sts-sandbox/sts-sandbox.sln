@@ -57,9 +57,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.AppInsights.Test", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Lib", "..\Axerrio.DDD.Lib\Axerrio.DDD.Lib.csproj", "{50E1B8ED-FC42-454D-8727-4872ADAE6744}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Menu", "..\Axerrio.DDD.JJ\Axerrio.DDD.Menu.csproj", "{FEAC737D-C338-4B4A-A839-D9058ADBFA81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{5C46D5AB-2F44-4ADA-A8A3-1EC8F0EC96BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Menu", "Menu", "{C015BF68-9A4A-4FC9-AD8F-CCFAAD432049}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.Menu.Domain", "..\Axerrio.DDD.Menu.Domain\Axerrio.DDD.Menu.Domain.csproj", "{E32A355E-B23A-4F01-A35D-725E8BB986C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.DDD.Menu.Infrastructure", "src\Axerrio.DDD.Menu.Infrastructure\Axerrio.DDD.Menu.Infrastructure.csproj", "{72AAD77C-EA70-4B55-968D-63A787924783}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.EB.ASB.ConsoleTest", "..\Axerrio.DDD.EB.ASB.ConsoleTest\Axerrio.DDD.EB.ASB.ConsoleTest.csproj", "{D6C06EA2-767F-4A5A-B637-F82DD8D4D716}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitMQ", "RabbitMQ", "{62F2B678-D2E6-4046-9793-05AFEDE7ECB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD", "..\Axerrio.BB.DDD\Axerrio.BB.DDD\Axerrio.BB.DDD.csproj", "{D985828B-505D-4204-A427-B9C854152B0B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.DDD.EB.RabbitMQ.ConsoleSend", "..\Axerrio.DDD.EB.RabbitMQ.ConsoleSend\Axerrio.DDD.EB.RabbitMQ.ConsoleSend.csproj", "{02AE2BCA-9F0F-4035-B951-3D2AB41E9B98}"
 EndProject
@@ -235,6 +247,8 @@ Global
 		{281039E5-FB44-4B6B-A2ED-9A28D6C9FCDB} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{D985828B-505D-4204-A427-B9C854152B0B} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
+
+
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}
