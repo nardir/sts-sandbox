@@ -65,10 +65,12 @@ namespace Axerrio.BB.DDD
             
             services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
-            //services.AddSingleton<IHostedService, TestHostedService>();
+            
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddTransient<TestJob>();
-            services.AddSingleton<IHostedService, TimedHostedService<TestJob>>();
+            services.AddSingleton<TestTriggerFactory>();
+            services.AddSingleton<IHostedService, TimedHostedService<TestJob, TestTriggerFactory>>();
+            services.AddSingleton<IHostedService, TestHostedService>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

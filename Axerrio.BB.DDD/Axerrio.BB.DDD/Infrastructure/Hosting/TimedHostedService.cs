@@ -12,20 +12,22 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Infrastructure.Hosting
 {
-    public class TimedHostedService<TJob> : BackgroundService
+    public class TimedHostedService<TJob, TTriggerFactory> : BackgroundService
         where TJob : IJob
+        where TTriggerFactory : ITriggerFactory
     {
-        private readonly ILogger<TimedHostedService<TJob>> _logger;
+        private readonly ILogger<TimedHostedService<TJob, TTriggerFactory>> _logger;
         private readonly ISchedulerFactory _schedulerFactory;
         private IScheduler _scheduler;
         private readonly IJobDetail _job;
         private readonly ITrigger _trigger;
         private readonly IJobFactory _jobFactory;
 
-        public TimedHostedService(ILogger<TimedHostedService<TJob>> logger, IJobFactory jobFactory)
+        public TimedHostedService(ILogger<TimedHostedService<TJob, TTriggerFactory>> logger, IJobFactory jobFactory, TTriggerFactory triggerFactory)
         {
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
 
+            //http://www.quartz-scheduler.org/documentation/quartz-2.x/configuration/ConfigMain.html
             NameValueCollection props = new NameValueCollection
                 {
                     { "quartz.serializer.type", "binary" }
@@ -47,18 +49,11 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
                                     .Build();
 
             //Build trigger
-            _trigger = TriggerBuilder.Create()
-                                    .WithIdentity("trigger1")
-                                    .StartNow()
-                                    .WithSimpleSchedule(x => x
-                                        .WithIntervalInSeconds(10)
-                                        .RepeatForever())
-                                    .Build();
+            _trigger = EnsureArg.IsNotNull(triggerFactory, nameof(triggerFactory)).Create();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //var scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
             _scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
 
             _scheduler.JobFactory = _jobFactory;
@@ -66,12 +61,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
             await _scheduler.ScheduleJob(_job, _trigger, stoppingToken);
 
             await _scheduler.Start(stoppingToken);
-
-            //await Task.Delay(Timeout.Infinite, stoppingToken);
-
-            //await scheduler.Shutdown();
-
-            //_logger.LogInformation("TimedHostedService is stopping");
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
@@ -96,7 +85,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
         {
             await context.Scheduler.PauseAll();
 
-            //Logger.LogInformation($"{context.JobDetail.Key}");
+            //context.CancellationToken
+
             _logger.LogInformation($"{context.JobDetail.Key}");
 
             await context.Scheduler.ResumeAll();
@@ -126,6 +116,35 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
             var disposable = job as IDisposable;
 
             disposable?.Dispose();
+        }
+    }
+
+    public interface ITriggerFactory
+    {
+        ITrigger Create();
+    }
+
+    public class TestTriggerFactory : ITriggerFactory
+    {
+        private readonly int _intervalInSeconds;
+        private readonly int _intervalInMilliseconds;
+
+        public TestTriggerFactory()
+        {
+            _intervalInSeconds = 5; //Fetch from options supplied by DI
+            _intervalInMilliseconds = 5000;
+        }
+
+        public ITrigger Create()
+        {
+            return TriggerBuilder.Create()
+                        .WithIdentity("TestTrigger")
+                        .StartNow()
+                        .WithSimpleSchedule(sb => sb
+                            //.WithIntervalInSeconds(_intervalInSeconds)
+                            .WithInterval(TimeSpan.FromMilliseconds(_intervalInMilliseconds))
+                            .RepeatForever())
+                        .Build();
         }
     }
 }
