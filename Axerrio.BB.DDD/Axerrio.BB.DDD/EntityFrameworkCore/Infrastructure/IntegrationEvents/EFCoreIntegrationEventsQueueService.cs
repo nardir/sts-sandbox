@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
@@ -62,13 +63,23 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             var executionStrategy = _context.Database.CreateExecutionStrategy();
 
+            //var items2 = _context.IntegrationEventsQueueItems.FromSql(_dequeueSql).ToListAsync(cancellationToken);
+
             return await executionStrategy.ExecuteAsync(async () =>
             {
+                if (cancellationToken.IsCancellationRequested) //NR : check ipv meegeven aan diverse methods, hierdoor krijgen we controle over wat we doen ipv exceptions
+                    return Enumerable.Empty<IntegrationEvent>();
 
                 var connection = _context.Database.GetDbConnection();
 
-                await connection.OpenAsync(cancellationToken);
+                //await connection.OpenAsync(cancellationToken);
+                await connection.OpenAsync();
 
+                //var cmd = new CommandDefinition(commandText: _dequeueSql, cancellationToken: cancellationToken);
+                //var items = await connection.QueryAsync<IntegrationEventsQueueItem>(cmd);
+
+
+                //TODO NR: Meegegeven dequeue batch id (GUID?), maakt het mogelijk om in 1 keer alles terug te zetten naar NotPublished
                 var items = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql);
 
                 var integrationEvents = items.Select(item => item.IntegrationEvent);
