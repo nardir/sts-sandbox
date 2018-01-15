@@ -50,17 +50,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
         }
 
-        public async Task<IEnumerable<IntegrationEvent>> DequeueEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<IntegrationEvent>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            //var sql = $@"with qi as
-            //            (
-            //                select top {_integrationEventsQueueServiceOptions.MaxEventsToDequeue} l.*
-            //                from {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} as l with (rowlock, readpast)
-            //                where l.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}
-            //            )
-            //            update qi set qi.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
-            //            output inserted.*";
-
             var executionStrategy = _context.Database.CreateExecutionStrategy();
 
             //var items2 = _context.IntegrationEventsQueueItems.FromSql(_dequeueSql).ToListAsync(cancellationToken);
@@ -135,6 +126,11 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         }
 
         public Task MarkEventAsPublishedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }

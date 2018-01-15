@@ -33,10 +33,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
         public async Task ForwardAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             bool cancel = false;
+            var batchId = Guid.NewGuid();
 
             //Dequeue Store
             //Meegeven Forward batch id (GUID?) als Dequeue ID
-            var events = await _integrationEventsQueueService.DequeueEventsAsync(cancellationToken: cancellationToken);
+            var events = await _integrationEventsQueueService.DequeueEventsAsync(batchId, cancellationToken);
 
             foreach (var @event in events)
             {
@@ -69,6 +70,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             if (cancel)
             {
                 //Mark all events with forward/dequeue batch id as NotPublished
+                _integrationEventsQueueService.RequeueEventsForBatchAsync(batchId).Wait(); //In case of cancel the reenque needs to finish, check GetAwaiter!!!
             }
         }
     }
