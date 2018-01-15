@@ -37,9 +37,9 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
             //Dequeue Store
             //Meegeven Forward batch id (GUID?) als Dequeue ID
-            var events = await _integrationEventsQueueService.DequeueEventsAsync(batchId, cancellationToken);
+            var eventQueueItems = await _integrationEventsQueueService.DequeueEventsAsync(batchId, cancellationToken);
 
-            foreach (var @event in events)
+            foreach (var eventQueueItem in eventQueueItems)
             {
                 try
                 {
@@ -51,11 +51,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                     }
 
                     //Publish eventbus
-                    _eventBus.Publish(@event);
+                    _eventBus.Publish(eventQueueItem.IntegrationEvent);
 
                     //MarkAsPublished store
                     //await _integrationEventsQueueService.MarkEventAsPublishedAsync(@event, cancellationToken);
-                    await _integrationEventsQueueService.MarkEventAsPublishedAsync(@event);
+                    await _integrationEventsQueueService.MarkEventAsPublishedAsync(eventQueueItem);
                 }
                 catch (Exception ex)
                 {
@@ -63,7 +63,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                     //If max retries bereikt dan MarkAsPublishedFailed
                     //else MarkAsNotPublished
                     //await _integrationEventsQueueService.MarkEventAsNotPublishedAsync(@event, cancellationToken);
-                    await _integrationEventsQueueService.MarkEventAsNotPublishedAsync(@event);
+                    await _integrationEventsQueueService.MarkEventAsNotPublishedAsync(eventQueueItem);
                 }
             }
 

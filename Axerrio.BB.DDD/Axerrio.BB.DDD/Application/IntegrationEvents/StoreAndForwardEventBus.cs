@@ -16,9 +16,13 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             _integrationEventsQueueService = EnsureArg.IsNotNull(integrationEventsQueueService, nameof(integrationEventsQueueService));
         }
 
-        public void Publish(IntegrationEvent @event)
+        public async void Publish(IntegrationEvent @event)
         {
-            _integrationEventsQueueService.EnqueueEvent(@event);
+            //_integrationEventsQueueService.EnqueueEvent(@event);
+
+            EnsureArg.IsNotNull(@event, nameof(@event));
+
+            await _integrationEventsQueueService.EnqueueEventAsync(new IntegrationEventsQueueItem(@event));
         }
     }
 }

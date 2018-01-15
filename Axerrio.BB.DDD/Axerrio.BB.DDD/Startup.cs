@@ -33,8 +33,8 @@ namespace Axerrio.BB.DDD
 
             services.Configure<IntegrationEventsDatabaseOptions>(options => 
             {
-                options.Schema = "dbo";
-                options.TableName = "IntegrationEventQueue";
+                options.Schema = "integrationevents";
+                options.TableName = "EventQueueItem";
             });
 
             services.Configure<IntegrationEventsQueueServiceOptions>(options => 

@@ -7,6 +7,12 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 {
     public class IntegrationEventsDatabaseOptions
     {
+        public IntegrationEventsDatabaseOptions()
+        {
+            Schema = "integrationevents";
+            TableName = "EventQueueItem";
+        }
+
         public string Schema { get; set; }
         public string TableName { get; set; }
     }

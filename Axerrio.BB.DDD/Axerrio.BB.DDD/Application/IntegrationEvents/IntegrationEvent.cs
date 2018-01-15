@@ -10,10 +10,10 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
         public IntegrationEvent()
         {
             Id = Guid.NewGuid();
-            CreationDate = DateTime.UtcNow;
+            CreationTimestamp = DateTime.UtcNow;
         }
 
         public Guid Id { get; }
-        public DateTime CreationDate { get; }
+        public DateTime CreationTimestamp { get; }
     }
 }

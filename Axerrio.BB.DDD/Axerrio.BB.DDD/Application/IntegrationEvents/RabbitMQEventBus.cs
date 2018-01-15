@@ -19,7 +19,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         public void Publish(IntegrationEvent @event)
         {
-            _logger.LogInformation($"Event {@event.Id} created on {@event.CreationDate.ToShortTimeString()} is published");
+            _logger.LogInformation($"Event {@event.Id} created on {@event.CreationTimestamp.ToShortTimeString()} is published");
         }
     }
 }

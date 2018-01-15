@@ -8,10 +8,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
 {
     public interface IIntegrationEventsQueueService
     {
-        void EnqueueEvent(IntegrationEvent @event);
-        Task<IEnumerable<IntegrationEvent>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken));
-        Task MarkEventAsNotPublishedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
-        Task MarkEventAsPublishedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
+        //void EnqueueEvent(IntegrationEvent @event);
+        Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem);
+        Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken));
+        Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken));
+        Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken));
         //Task MarkEventAsPublishedFailedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
 
         Task RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken));

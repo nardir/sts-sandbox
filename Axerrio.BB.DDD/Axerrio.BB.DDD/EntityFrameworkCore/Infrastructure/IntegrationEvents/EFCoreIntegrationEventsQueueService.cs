@@ -50,7 +50,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
         }
 
-        public async Task<IEnumerable<IntegrationEvent>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var executionStrategy = _context.Database.CreateExecutionStrategy();
 
@@ -59,7 +59,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             return await executionStrategy.ExecuteAsync(async () =>
             {
                 if (cancellationToken.IsCancellationRequested) //NR : check ipv meegeven aan diverse methods, hierdoor krijgen we controle over wat we doen ipv exceptions
-                    return Enumerable.Empty<IntegrationEvent>();
+                    return Enumerable.Empty<IntegrationEventsQueueItem>();
 
                 var connection = _context.Database.GetDbConnection();
 
@@ -71,29 +71,13 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
 
                 //TODO NR: Meegegeven dequeue batch id (GUID?), maakt het mogelijk om in 1 keer alles terug te zetten naar NotPublished
-                var items = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql);
+                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql);
 
-                var integrationEvents = items.Select(item => item.IntegrationEvent);
+                //var integrationEvents = items.Select(item => item.IntegrationEvent);
 
                 connection.Close();
 
-                return integrationEvents;
-
-                //try
-                //{
-                //    var items = (await connection.QueryAsync<IntegrationEventsQueueItem>(sql)).Select(item => item.IntegrationEvent);
-
-                //    return items;
-                //}
-                //catch (Exception ex)
-                //{
-                //    throw;
-                //}
-                //finally
-                //{
-                //    connection.Close();
-                //}
-
+                return eventQueueitems;
             });
 
             //using (var connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
@@ -113,19 +97,19 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             //}
         }
 
-        public void EnqueueEvent(IntegrationEvent @event)
+        public Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem)
         {
-            EnsureArg.IsNotNull(@event, nameof(@event));
+            EnsureArg.IsNotNull(eventQueueItem, nameof(eventQueueItem));
 
-            _context.IntegrationEventsQueueItems.Add(new IntegrationEventsQueueItem(@event));
+            return _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sequence
         }
 
-        public Task MarkEventAsNotPublishedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }
 
-        public Task MarkEventAsPublishedAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }
