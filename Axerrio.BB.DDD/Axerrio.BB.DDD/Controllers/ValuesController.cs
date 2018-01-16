@@ -16,25 +16,29 @@ namespace Axerrio.BB.DDD.Controllers
             , IIntegrationEventsQueueService integrationEventsQueueService
             , OrderingDbContext orderingDbContext)
         {
-            //for (int i = 0; i < 10; i++)
+            //for (int i = 0; i < 5; i++)
             //{
             //    var pm = new PaymentMethod(i, $"VISA-{i}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //    var ie = new PaymentMethodCreatedIntegrationEvent(pm);
 
-            //    integrationEventsQueueService.EnqueueEvent(ie);
+            //    var eqi = new IntegrationEventsQueueItem(ie);
+
+            //    integrationEventsQueueService.EnqueueEventAsync(eqi);
             //}
 
             //orderingDbContext.SaveChanges();
 
-            //var items1 = integrationEventsQueueService.DequeueEventsAsync().Result;
-            //var items2 = integrationEventsQueueService.DequeueEventsAsync().Result;
+            //var items1 = integrationEventsQueueService.DequeueEventsAsync(Guid.NewGuid()).Result;
+            //var items2 = integrationEventsQueueService.DequeueEventsAsync(Guid.NewGuid()).Result;
 
             //for (int i = 0; i < 10; i++)
             //{
             //    var pm = new PaymentMethod(i, $"VISA-{i}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //    var ie = new PaymentMethodCreatedIntegrationEvent(pm);
 
-            //    integrationEventsQueueService.EnqueueEvent(ie);
+            //    var eqi = new IntegrationEventsQueueItem(ie);
+
+            //    integrationEventsQueueService.EnqueueEventAsync(eqi);
             //}
 
             //orderingDbContext.SaveChanges();

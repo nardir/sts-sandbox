@@ -39,13 +39,16 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         private string _dequeueSql;
         private void SetDequeueSql()
         {
-                _dequeueSql = $@"with qi as
+                _dequeueSql = $@"with eqi as
                                 (
-                                    select top {_integrationEventsQueueServiceOptions.MaxEventsToDequeue} l.*
-                                    from {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} as l with (rowlock, readpast)
-                                    where l.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}
+                                    select top {_integrationEventsQueueServiceOptions.MaxEventsToDequeue} q.*
+                                    from {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} as q with (rowlock, readpast)
+                                    where q.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}
                                 )
-                                update qi set qi.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
+                                update eqi set eqi.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
+                                     , eqi.PublishAttempts = eqi.PublishAttempts + 1
+                                     , eqi.PublishBatchId = @BatchId
+                                     , eqi.LatestDequeuedTimestamp = @DequeueTimestamp
                                 output inserted.*";
 
         }
@@ -71,7 +74,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
 
                 //TODO NR: Meegegeven dequeue batch id (GUID?), maakt het mogelijk om in 1 keer alles terug te zetten naar NotPublished
-                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql);
+                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow });
 
                 //var integrationEvents = items.Select(item => item.IntegrationEvent);
 
