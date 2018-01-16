@@ -4,6 +4,7 @@ using EnsureThat;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Controllers
 {
@@ -14,7 +15,8 @@ namespace Axerrio.BB.DDD.Controllers
 
         public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory
             , IIntegrationEventsQueueService integrationEventsQueueService
-            , OrderingDbContext orderingDbContext)
+            , OrderingDbContext orderingDbContext
+            , IIntegrationEventsForwarderService integrationEventsForwarderService)
         {
             //for (int i = 0; i < 5; i++)
             //{
@@ -47,6 +49,28 @@ namespace Axerrio.BB.DDD.Controllers
 
             //var publishOnly = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
             //var publishOnly2 = eventBusPublishOnlyFactory.Create<IEventBus>();
+
+            //try
+            //{
+            //    integrationEventsForwarderService.ForwardAsync().GetAwaiter().GetResult();
+            //}
+            //catch (Exception ex)
+            //{
+
+            //}
+        }
+
+        [HttpGet("publish/{id}")]
+        public async Task<IActionResult> Publish(int id, [FromServices] IIntegrationEventsService integrationEventsService, [FromServices] OrderingDbContext orderingDbContext)
+        {
+            var pm = new PaymentMethod(id, $"VISA-{id}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
+            var ie = new PaymentMethodCreatedIntegrationEvent(pm);
+
+            await integrationEventsService.PublishAsync(ie);
+
+            await orderingDbContext.SaveChangesAsync(); //UoW 
+
+            return Ok();
         }
 
         // GET api/values

@@ -40,12 +40,12 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             //Queue properties
             //PK
-            entityTypeBuilder.Property(eqi => eqi.Id)
-                .HasColumnName("EventQueueItemId")
+            entityTypeBuilder.Property(eqi => eqi.EventQueueItemId)
+                //.HasColumnName("EventQueueItemId")
                 .IsRequired()
                 .ForSqlServerUseSequenceHiLo(_sequenceName, _schema);
 
-            entityTypeBuilder.HasKey(eqi => eqi.Id);
+            entityTypeBuilder.HasKey(eqi => eqi.EventQueueItemId);
 
             entityTypeBuilder.Property(eqi => eqi.State)
                 .IsRequired();

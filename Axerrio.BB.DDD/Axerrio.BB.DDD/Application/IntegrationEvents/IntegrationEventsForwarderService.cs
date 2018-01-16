@@ -35,8 +35,6 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             bool cancel = false;
             var batchId = Guid.NewGuid();
 
-            //Dequeue Store
-            //Meegeven Forward batch id (GUID?) als Dequeue ID
             var eventQueueItems = await _integrationEventsQueueService.DequeueEventsAsync(batchId, cancellationToken);
 
             foreach (var eventQueueItem in eventQueueItems)
@@ -50,28 +48,22 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                         break;
                     }
 
-                    //Publish eventbus
                     await _eventBus.PublishAsync(eventQueueItem.IntegrationEvent);
 
-                    //MarkAsPublished store
-                    //await _integrationEventsQueueService.MarkEventAsPublishedAsync(@event, cancellationToken);
                     await _integrationEventsQueueService.MarkEventAsPublishedAsync(eventQueueItem);
                 }
                 catch (Exception ex)
                 {
-                    //Exception:
-                    //If max retries bereikt dan MarkAsPublishedFailed
-                    //else MarkAsNotPublished
-                    //await _integrationEventsQueueService.MarkEventAsNotPublishedAsync(@event, cancellationToken);
                     await _integrationEventsQueueService.MarkEventAsNotPublishedAsync(eventQueueItem);
                 }
             }
 
             if (cancel)
             {
+                //https://stackoverflow.com/questions/36426937/what-is-the-difference-between-wait-vs-getawaiter-getresult
                 //Mark all events with forward/dequeue batch id as NotPublished
-                //In case of cancel the reenque needs to finish
-                _integrationEventsQueueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
+                //In case of cancel the reenqueue needs to finish
+                var requeuedItems =_integrationEventsQueueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
             }
         }
     }

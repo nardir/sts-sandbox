@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
 {
-    public interface IIntegrationEventsQueueService
+    public interface IntegrationEventsDequeueService
     {
-        //void EnqueueEvent(IntegrationEvent @event);
-        Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem);
         Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken));
         Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken));
         Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken));

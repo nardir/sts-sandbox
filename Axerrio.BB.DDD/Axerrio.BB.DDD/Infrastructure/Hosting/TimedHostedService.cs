@@ -1,4 +1,5 @@
-﻿using EnsureThat;
+﻿using Axerrio.BB.DDD.Infrastructure.Hosting.Abstractions;
+using EnsureThat;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using Quartz.Impl;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace Axerrio.BB.DDD.Infrastructure.Hosting
 {
     public class TimedHostedService<TJob, TTriggerFactory> : BackgroundService
-        where TJob : IJob
+        where TJob : TimedJob
         where TTriggerFactory : ITriggerFactory
     {
         private readonly ILogger<TimedHostedService<TJob, TTriggerFactory>> _logger;
@@ -68,83 +69,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
             await _scheduler.Shutdown();
 
             await base.StopAsync(cancellationToken);
-        }
-    }
-
-    public class TestJob : IJob
-    {
-        //public ILogger Logger { get; set; }
-        private readonly ILogger<TestJob> _logger;
-
-        public TestJob(ILogger<TestJob> logger)
-        {
-            _logger = EnsureArg.IsNotNull(logger, nameof(_logger));
-        }
-
-        public async Task Execute(IJobExecutionContext context)
-        {
-            await context.Scheduler.PauseAll();
-
-            //context.CancellationToken
-
-            _logger.LogInformation($"{context.JobDetail.Key}");
-
-            await context.Scheduler.ResumeAll();
-
-            //return Task.CompletedTask;
-        }
-    }
-
-    public class JobFactory : IJobFactory
-    {
-        //https://stackoverflow.com/questions/42157775/net-core-quartz-dependency-injection
-
-        private readonly IServiceProvider _serviceProvider;
-
-        public JobFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = EnsureArg.IsNotNull(serviceProvider, nameof(serviceProvider));
-        }
-
-        public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
-        {
-            return _serviceProvider.GetService(bundle.JobDetail.JobType) as IJob;
-        }
-
-        public void ReturnJob(IJob job)
-        {
-            var disposable = job as IDisposable;
-
-            disposable?.Dispose();
-        }
-    }
-
-    public interface ITriggerFactory
-    {
-        ITrigger Create();
-    }
-
-    public class TestTriggerFactory : ITriggerFactory
-    {
-        private readonly int _intervalInSeconds;
-        private readonly int _intervalInMilliseconds;
-
-        public TestTriggerFactory()
-        {
-            _intervalInSeconds = 5; //Fetch from options supplied by DI
-            _intervalInMilliseconds = 5000;
-        }
-
-        public ITrigger Create()
-        {
-            return TriggerBuilder.Create()
-                        .WithIdentity("TestTrigger")
-                        .StartNow()
-                        .WithSimpleSchedule(sb => sb
-                            //.WithIntervalInSeconds(_intervalInSeconds)
-                            .WithInterval(TimeSpan.FromMilliseconds(_intervalInMilliseconds))
-                            .RepeatForever())
-                        .Build();
         }
     }
 }

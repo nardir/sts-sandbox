@@ -1,6 +1,7 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,16 +32,17 @@ namespace Axerrio.BB.DDD
 
             services.AddOptions();
 
-            services.Configure<IntegrationEventsDatabaseOptions>(options => 
-            {
-                options.Schema = "integrationevents";
-                options.TableName = "EventQueueItem";
-            });
+            //services.Configure<IntegrationEventsDatabaseOptions>(options => 
+            //{
+            //    options.Schema = "integrationevents";
+            //    options.TableName = "EventQueueItem";
+            //});
 
-            services.Configure<IntegrationEventsQueueServiceOptions>(options => 
-            {
-                options.MaxEventsToDequeue = 6;
-            });
+            //services.Configure<IntegrationEventsQueueServiceOptions>(options => 
+            //{
+            //    options.MaxEventsToDequeue = 3;
+            //    options.MaxPublishAttempts = 2;
+            //});
 
             services.AddDbContext<OrderingDbContext>(options => 
             {
@@ -50,27 +52,29 @@ namespace Axerrio.BB.DDD
                 });
             });
 
-
-            //TODO NR: Extensions methods to Add services
-            services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
-            services.AddTransient<StoreAndForwardEventBus>();
-            services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
-            //services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
-            services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<FileEventBus>>();
-
             services.AddSingleton<RabbitMQEventBus>();
             services.AddSingleton<FileEventBus>();
-            services.AddSingleton<IEventBus>(provider => 
+            services.AddSingleton<IEventBus>(provider =>
             {
                 return provider.GetRequiredService<RabbitMQEventBus>();
             });
+
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(Configuration);
+
+            ////TODO NR: Extensions methods to Add services
+            //services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
+            //services.AddTransient<StoreAndForwardEventBus>();
+            //services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
+            ////services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
+
+            //services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<FileEventBus>>();
             
-            services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
+            //services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
             
-            services.AddSingleton<IJobFactory, JobFactory>();
-            services.AddTransient<TestJob>();
-            services.AddSingleton<TestTriggerFactory>();
+            //services.AddSingleton<IJobFactory, JobFactory>();
+            //services.AddTransient<TestJob>();
+            //services.AddSingleton<TestTriggerFactory>();
             //services.AddSingleton<IHostedService, TimedHostedService<TestJob, TestTriggerFactory>>();
             //services.AddSingleton<IHostedService, TestHostedService>();
 

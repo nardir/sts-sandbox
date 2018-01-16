@@ -42,7 +42,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
         }
 
         //Queue properties
-        public int Id { get; set; }
+        public int EventQueueItemId { get; set; }
         public IntegrationEventsQueueItemState State { get; set; }
         public int PublishAttempts { get; set; }
         public Guid? PublishBatchId { get; set; }

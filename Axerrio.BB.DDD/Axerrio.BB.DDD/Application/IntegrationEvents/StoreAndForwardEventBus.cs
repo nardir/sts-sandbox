@@ -10,11 +10,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
     public class StoreAndForwardEventBus : IEventBusPublishOnly
     {
-        private readonly IIntegrationEventsQueueService _integrationEventsQueueService;
+        private readonly IIntegrationEventsEnqueueService _integrationEventsEnqueueService;
 
-        public StoreAndForwardEventBus(IIntegrationEventsQueueService integrationEventsQueueService)
+        public StoreAndForwardEventBus(IIntegrationEventsEnqueueService integrationEventsEnqueueService)
         {
-            _integrationEventsQueueService = EnsureArg.IsNotNull(integrationEventsQueueService, nameof(integrationEventsQueueService));
+            _integrationEventsEnqueueService = EnsureArg.IsNotNull(integrationEventsEnqueueService, nameof(integrationEventsEnqueueService));
         }
 
         public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
@@ -23,7 +23,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
             EnsureArg.IsNotNull(@event, nameof(@event));
 
-            await _integrationEventsQueueService.EnqueueEventAsync(new IntegrationEventsQueueItem(@event));
+            await _integrationEventsEnqueueService.EnqueueEventAsync(new IntegrationEventsQueueItem(@event));
         }
     }
 }

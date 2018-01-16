@@ -7,6 +7,13 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 {
     public class IntegrationEventsQueueServiceOptions
     {
+        public IntegrationEventsQueueServiceOptions()
+        {
+            MaxEventsToDequeue = 10;
+            MaxPublishAttempts = 3;
+        }
+
         public int MaxEventsToDequeue { get; set; }
+        public int MaxPublishAttempts { get; set; }
     }
 }

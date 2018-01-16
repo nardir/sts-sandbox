@@ -34,6 +34,36 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _integrationEventsQueueServiceOptions = EnsureArg.IsNotNull(integrationEventsQueueServiceOptionsAccessor, nameof(integrationEventsQueueServiceOptionsAccessor)).Value;
 
             SetDequeueSql();
+            SetRequeueEventSql();
+            SetRequeueForBatchSql();
+            SetMarkEventAsPublishedSql();
+            SetMarkEventAsPublishedFailedSql();
+        }
+
+        #region Sql
+
+        private string _requeueForBatchSql;
+
+        private void SetRequeueForBatchSql()
+        {
+            _requeueForBatchSql = $@"update {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} set [State] = {(int)IntegrationEventsQueueItemState.NotPublished}
+                                    , RequeuedTimestamp = @RequeueTimestamp
+                                    , PublishBatchId = null
+                                    , PublishAttempts = PublishAttempts - 1
+                                    output inserted.*
+                                    where PublishBatchId = @BatchId And [State] = {(int)IntegrationEventsQueueItemState.Publishing}
+                                    ";
+        }
+
+        private string _requeueEventSql;
+
+        private void SetRequeueEventSql()
+        {
+            _requeueEventSql = $@"update {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} set [State] = {(int)IntegrationEventsQueueItemState.NotPublished}
+                                    , RequeuedTimestamp = @Timestamp
+                                    , PublishBatchId = null
+                                    where EventQueueItemId = @EventQueueItemId
+                                    ";
         }
 
         private string _dequeueSql;
@@ -52,6 +82,28 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                                 output inserted.*";
 
         }
+
+        private string _markEventAsPublishedFailedSql;
+
+        private void SetMarkEventAsPublishedFailedSql()
+        {
+            _markEventAsPublishedFailedSql = $@"update {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} set [State] = {(int)IntegrationEventsQueueItemState.PublishedFailed}
+                                               , PublishedFailedTimestamp = @Timestamp
+                                               where EventQueueItemId = @EventQueueItemId
+                                               ";
+        }
+
+        private string _markEventAsPublishedSql;
+
+        private void SetMarkEventAsPublishedSql()
+        {
+            _markEventAsPublishedSql = $@"update {_integrationEventsDatabaseOptions.Schema}.{_integrationEventsDatabaseOptions.TableName} set [State] = {(int)IntegrationEventsQueueItemState.Published}
+                                    , PublishedTimestamp = @PublishedTimestamp
+                                    where EventQueueItemId = @EventQueueItemId
+                                    ";
+        }
+
+        #endregion
 
         public async Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -72,8 +124,6 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 //var cmd = new CommandDefinition(commandText: _dequeueSql, cancellationToken: cancellationToken);
                 //var items = await connection.QueryAsync<IntegrationEventsQueueItem>(cmd);
 
-
-                //TODO NR: Meegegeven dequeue batch id (GUID?), maakt het mogelijk om in 1 keer alles terug te zetten naar NotPublished
                 var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow });
 
                 //var integrationEvents = items.Select(item => item.IntegrationEvent);
@@ -107,19 +157,84 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             return _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sequence
         }
 
-        public Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var param = new { eventQueueItem.EventQueueItemId, Timestamp = DateTime.UtcNow };
+            string sql;
+            IntegrationEventsQueueItemState state;
+
+            sql = _requeueEventSql;
+            state = IntegrationEventsQueueItemState.NotPublished;
+
+            if (eventQueueItem.PublishAttempts >= _integrationEventsQueueServiceOptions.MaxPublishAttempts)
+            {
+                sql = _markEventAsPublishedFailedSql;
+                state = IntegrationEventsQueueItemState.PublishedFailed;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                var connection = _context.Database.GetDbConnection();
+
+                await connection.OpenAsync();
+
+                var rowsAffected = await connection.ExecuteAsync(sql, param);
+
+                connection.Close();
+
+                eventQueueItem.State = state;
+                eventQueueItem.PublishedTimestamp = param.Timestamp;
+            });
         }
 
-        public Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                var connection = _context.Database.GetDbConnection();
+
+                await connection.OpenAsync();
+
+                var param = new { eventQueueItem.EventQueueItemId, PublishedTimestamp = DateTime.UtcNow };
+
+                var rowsAffected = await connection.ExecuteAsync(_markEventAsPublishedSql, param);
+
+                connection.Close();
+
+                eventQueueItem.State = IntegrationEventsQueueItemState.Published;
+                eventQueueItem.PublishedTimestamp = param.PublishedTimestamp;
+            });
         }
 
-        public Task RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<IntegrationEventsQueueItem>> RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+
+            return await executionStrategy.ExecuteAsync(async () =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return Enumerable.Empty<IntegrationEventsQueueItem>();
+
+                var connection = _context.Database.GetDbConnection();
+
+                await connection.OpenAsync();
+
+                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
+
+                connection.Close();
+
+                return eventQueueitems;
+            });
         }
     }
 }
