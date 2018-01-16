@@ -51,7 +51,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                     }
 
                     //Publish eventbus
-                    _eventBus.Publish(eventQueueItem.IntegrationEvent);
+                    await _eventBus.PublishAsync(eventQueueItem.IntegrationEvent);
 
                     //MarkAsPublished store
                     //await _integrationEventsQueueService.MarkEventAsPublishedAsync(@event, cancellationToken);
@@ -70,7 +70,8 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             if (cancel)
             {
                 //Mark all events with forward/dequeue batch id as NotPublished
-                _integrationEventsQueueService.RequeueEventsForBatchAsync(batchId).Wait(); //In case of cancel the reenque needs to finish, check GetAwaiter!!!
+                //In case of cancel the reenque needs to finish
+                _integrationEventsQueueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
             }
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
@@ -17,9 +18,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public void Publish(IntegrationEvent @event)
+        public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
             _logger.LogInformation($"Event {@event.Id} created on {@event.CreationTimestamp.ToShortTimeString()} is published");
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -3,6 +3,7 @@ using EnsureThat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
@@ -16,7 +17,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             _integrationEventsQueueService = EnsureArg.IsNotNull(integrationEventsQueueService, nameof(integrationEventsQueueService));
         }
 
-        public async void Publish(IntegrationEvent @event)
+        public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
             //_integrationEventsQueueService.EnqueueEvent(@event);
 

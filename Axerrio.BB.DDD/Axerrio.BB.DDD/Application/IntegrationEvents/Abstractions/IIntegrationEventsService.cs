@@ -9,6 +9,6 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
     public interface IIntegrationEventsService
     {
         //Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
-        void Publish(IntegrationEvent @event);
+        Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -27,11 +27,11 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             _eventBus = factory.Create<TEventBus>();
         }
 
-        public void Publish(IntegrationEvent @event)
+        public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
             //TODO NR : Logging
 
-            _eventBus.Publish(@event);
+            await _eventBus.PublishAsync(@event, cancellationToken);
         }
     }
 }
