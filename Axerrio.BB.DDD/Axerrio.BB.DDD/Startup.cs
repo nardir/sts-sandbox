@@ -55,9 +55,11 @@ namespace Axerrio.BB.DDD
             services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
             services.AddTransient<StoreAndForwardEventBus>();
             services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
-            services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
+            //services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
+            services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<FileEventBus>>();
 
             services.AddSingleton<RabbitMQEventBus>();
+            services.AddSingleton<FileEventBus>();
             services.AddSingleton<IEventBus>(provider => 
             {
                 return provider.GetRequiredService<RabbitMQEventBus>();
