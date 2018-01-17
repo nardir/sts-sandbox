@@ -35,35 +35,52 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             bool cancel = false;
             var batchId = Guid.NewGuid();
 
-            var eventQueueItems = await _integrationEventsDequeueService.DequeueEventsAsync(batchId, cancellationToken);
-
-            foreach (var eventQueueItem in eventQueueItems)
+            try
             {
-                try
+                var eventQueueItems = await _integrationEventsDequeueService.DequeueEventsAsync(batchId, cancellationToken);
+
+                foreach (var eventQueueItem in eventQueueItems)
                 {
-                    if (cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        cancel = true;
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            cancel = true;
 
-                        break;
+                            break;
+                        }
+
+                        _logger.LogDebug($"Forwarding event {eventQueueItem.EventQueueItemId}");
+
+                        await _eventBus.PublishAsync(eventQueueItem.IntegrationEvent);
+
+                        await _integrationEventsDequeueService.MarkEventAsPublishedAsync(eventQueueItem);
+
+                        _logger.LogDebug($"Forwarded event {eventQueueItem.EventQueueItemId}");
                     }
+                    catch (Exception exception)
+                    {
+                        _logger.LogError(exception, $"Exception while forwarding event {eventQueueItem.EventQueueItemId}");
 
-                    await _eventBus.PublishAsync(eventQueueItem.IntegrationEvent);
-
-                    await _integrationEventsDequeueService.MarkEventAsPublishedAsync(eventQueueItem);
+                        await _integrationEventsDequeueService.MarkEventAsNotPublishedAsync(eventQueueItem);
+                    }
                 }
-                catch (Exception ex)
+
+                if (cancel)
                 {
-                    await _integrationEventsDequeueService.MarkEventAsNotPublishedAsync(eventQueueItem);
-                }
-            }
+                    _logger.LogDebug($"Forwarding cancelled for batch {batchId}");
 
-            if (cancel)
+                    //https://stackoverflow.com/questions/36426937/what-is-the-difference-between-wait-vs-getawaiter-getresult
+                    //Mark all events with forward/dequeue batch id as NotPublished
+                    //In case of cancel the reenqueue needs to finish
+                    var requeuedItems = _integrationEventsDequeueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
+                }
+
+                _logger.LogDebug($"Forwarded events ");
+            }
+            catch (Exception exception)
             {
-                //https://stackoverflow.com/questions/36426937/what-is-the-difference-between-wait-vs-getawaiter-getresult
-                //Mark all events with forward/dequeue batch id as NotPublished
-                //In case of cancel the reenqueue needs to finish
-                var requeuedItems =_integrationEventsDequeueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
+                _logger.LogError(exception, $"Error while forwarding events for batch {batchId}");
             }
         }
     }

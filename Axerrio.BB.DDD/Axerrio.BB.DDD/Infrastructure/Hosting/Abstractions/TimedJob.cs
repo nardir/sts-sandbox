@@ -28,9 +28,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting.Abstractions
             {
                 await ExecuteAsync(context.CancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-
+                _logger.LogCritical(exception, $"Unhandled critical exception for timed job");
             }
             finally
             {
