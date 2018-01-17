@@ -4,6 +4,7 @@ using Dapper;
 using EnsureThat;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -18,6 +19,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         private readonly ILogger<EFCoreIntegrationEventsDequeueService> _logger;
         private readonly IntegrationEventsDatabaseOptions _integrationEventsDatabaseOptions;
         private readonly IntegrationEventsDequeueServiceOptions _integrationEventsDequeueServiceOptions;
+        private readonly Policy _retryPolicy;
 
         public EFCoreIntegrationEventsDequeueService(ILogger<EFCoreIntegrationEventsDequeueService> logger
         , IOptions<IntegrationEventsDequeueServiceOptions> integrationEventsDequeueServiceOptionsAccessor
@@ -27,6 +29,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             _integrationEventsDequeueServiceOptions = EnsureArg.IsNotNull(integrationEventsDequeueServiceOptionsAccessor, nameof(integrationEventsDequeueServiceOptionsAccessor)).Value;
             _integrationEventsDatabaseOptions = EnsureArg.IsNotNull(integrationEventsDatabaseOptionsAccessor, nameof(integrationEventsDatabaseOptionsAccessor)).Value;
+
+            _retryPolicy = CreatePolicy();
 
             SetDequeueSql();
             SetRequeueEventSql();
@@ -40,18 +44,26 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             if (cancellationToken.IsCancellationRequested) //NR : check ipv meegeven aan diverse methods, hierdoor krijgen we controle over wat we doen ipv exceptions
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
 
-            using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+            return (await _retryPolicy.ExecuteAndCaptureAsync(async () => 
             {
-                await connection.OpenAsync();
+                using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+                {
+                    await connection.OpenAsync();
 
-                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow });
+                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow });
 
-                return eventQueueitems;
-            }
+                    return eventQueueitems;
+                }
+
+            })).Result;
+
         }
 
-        public async Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (cancellationToken.IsCancellationRequested)
+                return Task.CompletedTask;
+
             var param = new { eventQueueItem.EventQueueItemId, Timestamp = DateTime.UtcNow };
             string sql;
             IntegrationEventsQueueItemState state;
@@ -65,36 +77,39 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 state = IntegrationEventsQueueItemState.PublishedFailed;
             }
 
-            if (cancellationToken.IsCancellationRequested)
-                return;
+            return _retryPolicy.ExecuteAsync(async () => 
+            {
+                using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+                {
+                    await connection.OpenAsync();
 
-            using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
-            { 
-                await connection.OpenAsync();
+                    var rowsAffected = await connection.ExecuteAsync(sql, param);
 
-                var rowsAffected = await connection.ExecuteAsync(sql, param);
-
-                eventQueueItem.State = state;
-                eventQueueItem.PublishedTimestamp = param.Timestamp;
-            }
+                    eventQueueItem.State = state;
+                    eventQueueItem.PublishedTimestamp = param.Timestamp;
+                }
+            });
         }
 
-        public async Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
-                return;
+                return Task.CompletedTask;
 
-            using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
-            {
-                await connection.OpenAsync();
+            return _retryPolicy.ExecuteAsync(async () =>
+                { 
+                    using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+                    {
+                        await connection.OpenAsync();
 
-                var param = new { eventQueueItem.EventQueueItemId, PublishedTimestamp = DateTime.UtcNow };
+                        var param = new { eventQueueItem.EventQueueItemId, PublishedTimestamp = DateTime.UtcNow };
 
-                var rowsAffected = await connection.ExecuteAsync(_markEventAsPublishedSql, param);
+                        var rowsAffected = await connection.ExecuteAsync(_markEventAsPublishedSql, param);
 
-                eventQueueItem.State = IntegrationEventsQueueItemState.Published;
-                eventQueueItem.PublishedTimestamp = param.PublishedTimestamp;
-            }
+                        eventQueueItem.State = IntegrationEventsQueueItemState.Published;
+                        eventQueueItem.PublishedTimestamp = param.PublishedTimestamp;
+                    }
+                });
         }
 
         public async Task<IEnumerable<IntegrationEventsQueueItem>> RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
@@ -102,14 +117,39 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             if (cancellationToken.IsCancellationRequested)
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
 
-            using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+            return (await _retryPolicy.ExecuteAndCaptureAsync(async () =>
             {
-                await connection.OpenAsync();
+                using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+                {
+                    await connection.OpenAsync();
 
-                var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
+                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
 
-                return eventQueueitems;
-            }
+                    return eventQueueitems;
+                }
+            })).Result;
+
+            //using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
+            //{
+            //    await connection.OpenAsync();
+
+            //    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
+
+            //    return eventQueueitems;
+            //}
+        }
+
+        private Policy CreatePolicy(int retries = 3)
+        {
+            return Policy.Handle<SqlException>().
+                WaitAndRetryAsync(
+                    retryCount: retries,
+                    sleepDurationProvider: retry => TimeSpan.FromMilliseconds(200 * retry),
+                    onRetry: (exception, timeSpan, retry, ctx) =>
+                    {
+                        _logger.LogTrace($"Exception {exception.GetType().Name} with message ${exception.Message} detected on attempt {retry} of {retries}");
+                    }
+                );
         }
 
         #region Sql
