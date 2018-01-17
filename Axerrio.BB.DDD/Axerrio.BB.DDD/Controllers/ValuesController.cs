@@ -14,7 +14,7 @@ namespace Axerrio.BB.DDD.Controllers
         
 
         public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory
-            , IIntegrationEventsQueueService integrationEventsQueueService
+            //, IIntegrationEventsQueueService integrationEventsQueueService
             , OrderingDbContext orderingDbContext
             , IIntegrationEventsForwarderService integrationEventsForwarderService)
         {

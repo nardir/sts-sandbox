@@ -23,10 +23,18 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting.Abstractions
         {
             await context.Scheduler.PauseAll();
 
-            await ExecuteAsync(context.CancellationToken);
+            try
+            {
+                await ExecuteAsync(context.CancellationToken);
+            }
+            catch (Exception ex)
+            {
 
-            await context.Scheduler.ResumeAll();
-            
+            }
+            finally
+            {
+                await context.Scheduler.ResumeAll();
+            }
         }
     }
 }

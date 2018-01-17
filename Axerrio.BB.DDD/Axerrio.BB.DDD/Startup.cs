@@ -32,18 +32,6 @@ namespace Axerrio.BB.DDD
 
             services.AddOptions();
 
-            //services.Configure<IntegrationEventsDatabaseOptions>(options => 
-            //{
-            //    options.Schema = "integrationevents";
-            //    options.TableName = "EventQueueItem";
-            //});
-
-            //services.Configure<IntegrationEventsQueueServiceOptions>(options => 
-            //{
-            //    options.MaxEventsToDequeue = 3;
-            //    options.MaxPublishAttempts = 2;
-            //});
-
             services.AddDbContext<OrderingDbContext>(options => 
             {
                 options.UseSqlServer(connectionString, sqlOptions => 
@@ -59,24 +47,9 @@ namespace Axerrio.BB.DDD
                 return provider.GetRequiredService<RabbitMQEventBus>();
             });
 
-            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(Configuration);
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
 
-            ////TODO NR: Extensions methods to Add services
-            //services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
-            //services.AddTransient<StoreAndForwardEventBus>();
-            //services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
-            ////services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
-
-            //services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<FileEventBus>>();
-            
-            //services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
-
-            
-            //services.AddSingleton<IJobFactory, JobFactory>();
-            //services.AddTransient<TestJob>();
-            //services.AddSingleton<TestTriggerFactory>();
             //services.AddSingleton<IHostedService, TimedHostedService<TestJob, TestTriggerFactory>>();
-            //services.AddSingleton<IHostedService, TestHostedService>();
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

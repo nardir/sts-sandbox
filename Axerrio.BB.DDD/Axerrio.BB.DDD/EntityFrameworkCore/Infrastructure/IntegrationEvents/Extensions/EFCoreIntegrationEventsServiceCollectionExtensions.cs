@@ -17,45 +17,39 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Ex
 {
     public static class EFCoreIntegrationEventsServiceCollectionExtensions
     {
-        public static IServiceCollection AddEFCoreStoreAndForwardIntegrationEventsServices<TContext, TForwardEventBus>(this IServiceCollection services, IConfiguration configuration = null)
+        public static IServiceCollection AddEFCoreStoreAndForwardIntegrationEventsServices<TContext, TForwardEventBus>(this IServiceCollection services, string connectionString, IConfiguration configuration = null)
             where TContext: DbContext, IIntegrationEventsDbContext
             where TForwardEventBus: IEventBusPublishOnly
         {
-            services.AddEFCoreStoreAndForwardIntegrationEventsServices<TContext>(configuration);
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<TContext>(connectionString, configuration);
 
+            services.AddTransient<IIntegrationEventsDequeueService, EFCoreIntegrationEventsDequeueService>();
             services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<TForwardEventBus>>();
 
             services.AddTransient<IJobFactory, JobFactory>();
             services.AddTransient<IntegrationEventsForwarderJob>();
             services.AddTransient<IntegrationEventsForwarderTriggerFactory>();
-            //services.AddSingleton<IHostedService, TimedHostedService<IntegrationEventsForwarderJob, IntegrationEventsForwarderTriggerFactory>>();
+            services.AddSingleton<IHostedService, TimedHostedService<IntegrationEventsForwarderJob, IntegrationEventsForwarderTriggerFactory>>();
 
             return services;
         }
 
-        public static IServiceCollection AddEFCoreStoreAndForwardIntegrationEventsServices<TContext>(this IServiceCollection services, IConfiguration configuration = null)
+        public static IServiceCollection AddEFCoreStoreAndForwardIntegrationEventsServices<TContext>(this IServiceCollection services, string connectionString, IConfiguration configuration = null)
             where TContext : DbContext, IIntegrationEventsDbContext
         {
             services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
 
             services.Configure<IntegrationEventsDatabaseOptions>(options =>
             {
-                options = new IntegrationEventsDatabaseOptions();
+                options.ConnectionString = connectionString;
             });
-
-            services.Configure<IntegrationEventsQueueServiceOptions>(options =>
-            {
-                options = new IntegrationEventsQueueServiceOptions();
-            });
-            
+           
             if (configuration != null)
             {
                 //TODO : Config via key!!!!! Building Blocks
-                var section = configuration.GetSection(nameof(IntegrationEventsQueueServiceOptions));
-                services.Configure<IntegrationEventsQueueServiceOptions>(section);
+                var section = configuration.GetSection(nameof(IntegrationEventsDequeueServiceOptions));
+                services.Configure<IntegrationEventsDequeueServiceOptions>(section);
             }
-
-            services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<TContext>>();
 
             services.AddScoped<IIntegrationEventsEnqueueService, EFCoreIntegrationEventsEnqueueService<TContext>>();
             services.AddScoped<StoreAndForwardEventBus>();

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 {
-    public class IntegrationEventsQueueServiceOptions
+    public class IntegrationEventsDequeueServiceOptions
     {
-        public IntegrationEventsQueueServiceOptions()
+        public IntegrationEventsDequeueServiceOptions()
         {
             MaxEventsToDequeue = 10;
             MaxPublishAttempts = 3;
