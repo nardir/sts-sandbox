@@ -36,6 +36,10 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
 
             _schedulerFactory = new StdSchedulerFactory(props);
 
+
+            //Build trigger
+            _trigger = EnsureArg.IsNotNull(triggerFactory, nameof(triggerFactory)).Create();
+
             _jobFactory = EnsureArg.IsNotNull(jobFactory, nameof(jobFactory));
 
             //Build job
@@ -44,29 +48,57 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting
 
             //var jobDataMap = new JobDataMap(map);
 
+            //Type jobType = typeof(TJob);
+
             _job = JobBuilder.Create<TJob>()
-                                    .WithIdentity(nameof(TJob))
+                                    .WithIdentity(typeof(TJob).Name, _trigger.Key.Group)
                                     //.UsingJobData(jobDataMap)
                                     .Build();
 
-            //Build trigger
-            _trigger = EnsureArg.IsNotNull(triggerFactory, nameof(triggerFactory)).Create();
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
+            
 
-            _scheduler.JobFactory = _jobFactory;
+            try
+            {
+                stoppingToken.Register(() => _logger.LogDebug($"Timed hosted service for job {_job.Key.Name} and trigger {_trigger.Key.Name} is stopping"));
 
-            await _scheduler.ScheduleJob(_job, _trigger, stoppingToken);
+                //throw new InvalidOperationException();
 
-            await _scheduler.Start(stoppingToken);
+                _scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
+
+                _scheduler.JobFactory = _jobFactory;
+
+                await _scheduler.ScheduleJob(_job, _trigger, stoppingToken);
+
+                await _scheduler.Start(stoppingToken);
+
+                _logger.LogDebug($"Timed hosted service started for job {_job.Key.Name} and trigger {_trigger.Key.Name}");
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, $"Timed hosted service could not start for job {_job.Key.Name} and trigger {_trigger.Key.Name}");
+
+                await ShutDownScheduler(stoppingToken);
+            }
+        }
+
+        private async Task ShutDownScheduler(CancellationToken cancellationToken)
+        {
+            if (_scheduler?.IsStarted == true)
+            {
+                await _scheduler.Shutdown(cancellationToken);
+
+                _logger.LogDebug($"Timed hosted service scheduler stopped for job {_job.Key.Name} and trigger {_trigger.Key.Name}");
+            }
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _scheduler.Shutdown();
+            await ShutDownScheduler(cancellationToken);
 
             await base.StopAsync(cancellationToken);
         }

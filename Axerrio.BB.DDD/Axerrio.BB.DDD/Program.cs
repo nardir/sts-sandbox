@@ -26,11 +26,9 @@ namespace Axerrio.BB.DDD
             //    context.Database.Migrate();
             //}
 
-
-
             webHost.Run();
 
-            //Console.ReadLine();
+            Console.ReadLine();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

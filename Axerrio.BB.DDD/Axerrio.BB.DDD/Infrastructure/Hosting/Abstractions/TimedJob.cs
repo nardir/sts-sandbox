@@ -22,12 +22,10 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting.Abstractions
 
         public async Task Execute(IJobExecutionContext context)
         {
-            //context.Scheduler.PauseAll().GetAwaiter().GetResult();
             await context.Scheduler.PauseAll();
 
             try
             {
-                //ExecuteAsync(context.CancellationToken).GetAwaiter().GetResult();
                 await ExecuteAsync(context.CancellationToken);
             }
             catch (Exception ex)

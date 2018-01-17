@@ -22,11 +22,11 @@ namespace Axerrio.BB.DDD.Migrations
                 columns: table => new
                 {
                     EventQueueItemId = table.Column<int>(nullable: false),
-                    EnqueuedTimestamp = table.Column<DateTime>(nullable: false, defaultValueSql: "getutcdate()"),
+                    EnqueuedTimestamp = table.Column<DateTime>(nullable: false),
                     EventContent = table.Column<string>(nullable: false),
                     EventCreationTimestamp = table.Column<DateTime>(nullable: false),
                     EventId = table.Column<Guid>(nullable: false),
-                    EventTypeName = table.Column<string>(nullable: true),
+                    EventTypeName = table.Column<string>(nullable: false),
                     LatestDequeuedTimestamp = table.Column<DateTime>(nullable: true),
                     PublishAttempts = table.Column<int>(nullable: false, defaultValue: 0),
                     PublishBatchId = table.Column<Guid>(nullable: true),

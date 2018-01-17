@@ -27,7 +27,16 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Ex
             services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<TForwardEventBus>>();
 
             services.AddTransient<IJobFactory, JobFactory>();
+
             services.AddTransient<IntegrationEventsForwarderJob>();
+
+            if (configuration != null)
+            {
+                //TODO : Config via key!!!!! Building Blocks
+                var section = configuration.GetSection(nameof(IntegrationEventsForwarderTriggerOptions));
+                services.Configure<IntegrationEventsForwarderTriggerOptions>(section);
+            }
+
             services.AddTransient<IntegrationEventsForwarderTriggerFactory>();
             services.AddSingleton<IHostedService, TimedHostedService<IntegrationEventsForwarderJob, IntegrationEventsForwarderTriggerFactory>>();
 

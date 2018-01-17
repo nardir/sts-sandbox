@@ -41,7 +41,6 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             //Queue properties
             //PK
             entityTypeBuilder.Property(eqi => eqi.EventQueueItemId)
-                //.HasColumnName("EventQueueItemId")
                 .IsRequired()
                 .ForSqlServerUseSequenceHiLo(_sequenceName, _schema);
 
@@ -54,15 +53,13 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 .IsRequired()
                 .HasDefaultValue(0);
 
-            //public Guid? PublishBatchId { get; set; }
             entityTypeBuilder.Property(eqi => eqi.PublishBatchId)
                 .IsRequired(false);
 
             entityTypeBuilder.Property(eqi => eqi.EnqueuedTimestamp)
-                .IsRequired()
-                .HasDefaultValueSql("getutcdate()");
-
-            //.HasDefaultValue(DateTime.UtcNow);
+                .IsRequired();
+                //.HasDefaultValue(DateTime.UtcNow);
+                //.HasDefaultValueSql("getutcdate()");
 
             entityTypeBuilder.Property(eqi => eqi.LatestDequeuedTimestamp)
                 .IsRequired(false);
@@ -77,7 +74,6 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 .IsRequired(false);
 
 
-
             //Event properties
             entityTypeBuilder.Property(eqi => eqi.EventId)
                 .IsRequired();
@@ -90,12 +86,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             entityTypeBuilder.Property(e => e.EventContent)
                 .IsRequired();
 
-
-            //entityTypeBuilder.Property(e => e.PublishAttempts)
-            //    .IsRequired();
-
-            //entityTypeBuilder.Property(e => e.EventTypeName)
-            //    .IsRequired();
+            entityTypeBuilder.Property(e => e.EventTypeName)
+                .IsRequired();
         }
     }
 }

@@ -24,16 +24,13 @@ namespace Axerrio.BB.DDD.Migrations
 
             modelBuilder.Entity("Axerrio.BB.DDD.Application.IntegrationEvents.IntegrationEventsQueueItem", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("EventQueueItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("EventQueueItemId")
                         .HasAnnotation("SqlServer:HiLoSequenceName", "EventQueueItemId")
                         .HasAnnotation("SqlServer:HiLoSequenceSchema", "integrationevents")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.SequenceHiLo);
 
-                    b.Property<DateTime>("EnqueuedTimestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("getutcdate()");
+                    b.Property<DateTime>("EnqueuedTimestamp");
 
                     b.Property<string>("EventContent")
                         .IsRequired();
@@ -42,7 +39,8 @@ namespace Axerrio.BB.DDD.Migrations
 
                     b.Property<Guid>("EventId");
 
-                    b.Property<string>("EventTypeName");
+                    b.Property<string>("EventTypeName")
+                        .IsRequired();
 
                     b.Property<DateTime?>("LatestDequeuedTimestamp");
 
@@ -60,7 +58,7 @@ namespace Axerrio.BB.DDD.Migrations
 
                     b.Property<int>("State");
 
-                    b.HasKey("Id");
+                    b.HasKey("EventQueueItemId");
 
                     b.HasAlternateKey("EventId");
 

@@ -15,7 +15,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         public RabbitMQEventBus(ILogger<RabbitMQEventBus> logger)
         {
-            logger = EnsureArg.IsNotNull(logger, nameof(logger));
+            _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
         public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))

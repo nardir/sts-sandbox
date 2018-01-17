@@ -12,7 +12,7 @@ using System;
 namespace Axerrio.BB.DDD.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
-    [Migration("20180115162432_Initial")]
+    [Migration("20180117135043_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,16 +25,13 @@ namespace Axerrio.BB.DDD.Migrations
 
             modelBuilder.Entity("Axerrio.BB.DDD.Application.IntegrationEvents.IntegrationEventsQueueItem", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("EventQueueItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("EventQueueItemId")
                         .HasAnnotation("SqlServer:HiLoSequenceName", "EventQueueItemId")
                         .HasAnnotation("SqlServer:HiLoSequenceSchema", "integrationevents")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.SequenceHiLo);
 
-                    b.Property<DateTime>("EnqueuedTimestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("getutcdate()");
+                    b.Property<DateTime>("EnqueuedTimestamp");
 
                     b.Property<string>("EventContent")
                         .IsRequired();
@@ -43,7 +40,8 @@ namespace Axerrio.BB.DDD.Migrations
 
                     b.Property<Guid>("EventId");
 
-                    b.Property<string>("EventTypeName");
+                    b.Property<string>("EventTypeName")
+                        .IsRequired();
 
                     b.Property<DateTime?>("LatestDequeuedTimestamp");
 
@@ -61,7 +59,7 @@ namespace Axerrio.BB.DDD.Migrations
 
                     b.Property<int>("State");
 
-                    b.HasKey("Id");
+                    b.HasKey("EventQueueItemId");
 
                     b.HasAlternateKey("EventId");
 

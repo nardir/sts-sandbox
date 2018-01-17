@@ -23,11 +23,15 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem)
+        public async Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem)
         {
             EnsureArg.IsNotNull(eventQueueItem, nameof(eventQueueItem));
 
-            return _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sequence
+            eventQueueItem.EnqueuedTimestamp = DateTime.UtcNow;
+
+            await _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sequence
+
+            _logger.LogDebug($"Integration event queue item {eventQueueItem.EventQueueItemId} enqueued on {eventQueueItem.EnqueuedTimestamp} for event {eventQueueItem.EventId} with type {eventQueueItem.EventTypeName} content: {eventQueueItem.EventContent}");
         }
     }
 }

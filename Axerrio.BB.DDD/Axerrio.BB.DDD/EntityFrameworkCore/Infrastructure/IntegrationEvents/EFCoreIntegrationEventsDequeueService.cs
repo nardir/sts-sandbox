@@ -42,7 +42,11 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public async Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested) //NR : check ipv meegeven aan diverse methods, hierdoor krijgen we controle over wat we doen ipv exceptions
+            {
+                _logger.LogDebug($"Dequeue events cancelled for batch {batchId}");
+
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
+            }
 
             return (await _retryPolicy.ExecuteAndCaptureAsync(async () => 
             {
@@ -50,7 +54,11 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 {
                     await connection.OpenAsync();
 
-                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow });
+                    var queryParams = new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow };
+
+                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, queryParams);
+
+                    _logger.LogDebug($"Dequeue events for batch {batchId} on {queryParams.DequeueTimestamp} dequeued {eventQueueitems.Count()} events");
 
                     return eventQueueitems;
                 }
@@ -62,9 +70,13 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
-                return Task.CompletedTask;
+            {
+                _logger.LogDebug($"Mark event {eventQueueItem.EventQueueItemId} as not published was cancelled");
 
-            var param = new { eventQueueItem.EventQueueItemId, Timestamp = DateTime.UtcNow };
+                return Task.CompletedTask;
+            }
+
+            var queryParams = new { eventQueueItem.EventQueueItemId, Timestamp = DateTime.UtcNow };
             string sql;
             IntegrationEventsQueueItemState state;
 
@@ -83,10 +95,15 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 {
                     await connection.OpenAsync();
 
-                    var rowsAffected = await connection.ExecuteAsync(sql, param);
+                    var rowsAffected = await connection.ExecuteAsync(sql, queryParams);
 
                     eventQueueItem.State = state;
-                    eventQueueItem.PublishedTimestamp = param.Timestamp;
+                    eventQueueItem.PublishedTimestamp = queryParams.Timestamp;
+
+                    if (state == IntegrationEventsQueueItemState.PublishedFailed)
+                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as failed after exceeding the maximum {_integrationEventsDequeueServiceOptions.MaxPublishAttempts} publish attempts ");
+                    else
+                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as not published after {eventQueueItem.PublishAttempts} publish attempts");
                 }
             });
         }
@@ -94,7 +111,11 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug($"Mark event {eventQueueItem.EventQueueItemId} as published was cancelled");
+
                 return Task.CompletedTask;
+            }
 
             return _retryPolicy.ExecuteAsync(async () =>
                 { 
@@ -108,6 +129,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
                         eventQueueItem.State = IntegrationEventsQueueItemState.Published;
                         eventQueueItem.PublishedTimestamp = param.PublishedTimestamp;
+
+                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as published on publish attempt {eventQueueItem.PublishAttempts}");
                     }
                 });
         }
@@ -115,7 +138,11 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public async Task<IEnumerable<IntegrationEventsQueueItem>> RequeueEventsForBatchAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug($"Requeue events for batch {batchId} was cancelled");
+
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
+            }
 
             return (await _retryPolicy.ExecuteAndCaptureAsync(async () =>
             {
@@ -123,20 +150,15 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 {
                     await connection.OpenAsync();
 
-                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
+                    var queryParams = new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow };
+
+                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, queryParams);
+
+                    _logger.LogDebug($"Requeue events for batch {batchId} on {queryParams.RequeueTimestamp} dequeued {eventQueueitems.Count()} events");
 
                     return eventQueueitems;
                 }
             })).Result;
-
-            //using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
-            //{
-            //    await connection.OpenAsync();
-
-            //    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow });
-
-            //    return eventQueueitems;
-            //}
         }
 
         private Policy CreatePolicy(int retries = 3)
