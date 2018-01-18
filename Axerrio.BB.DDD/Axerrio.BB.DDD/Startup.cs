@@ -1,12 +1,17 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Extensions;
+using Axerrio.BB.DDD.Infrastructure.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Quartz.Spi;
 using System;
 using System.Reflection;
 
@@ -28,18 +33,8 @@ namespace Axerrio.BB.DDD
 
             services.AddOptions();
 
-            services.Configure<IntegrationEventsDatabaseOptions>(options => 
-            {
-                options.Schema = "dbo";
-                options.TableName = "IntegrationEventQueue";
-            });
-
-            services.Configure<IntegrationEventsQueueServiceOptions>(options => 
-            {
-                options.MaxEventsToDequeue = 6;
-            });
-
-            services.AddDbContext<OrderingDbContext>(options => 
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<OrderingDbContext>(options => 
             {
                 options.UseSqlServer(connectionString, sqlOptions => 
                 {
@@ -47,20 +42,29 @@ namespace Axerrio.BB.DDD
                 });
             });
 
-
-            //TODO NR: Extensions methods to Add services
-            services.AddTransient<IIntegrationEventsQueueService, EFCoreIntegrationEventsQueueService<OrderingDbContext>>();
-            services.AddTransient<StoreAndForwardEventBus>();
-            services.AddTransient<IIntegrationEventsService, StoreAndForwardIntegrationEventsService<StoreAndForwardEventBus>>();
-            services.AddTransient<IIntegrationEventsForwarderService, IntegrationEventsForwarderService<RabbitMQEventBus>>();
-
             services.AddSingleton<RabbitMQEventBus>();
-            services.AddSingleton<IEventBus>(provider => 
+            services.AddSingleton<FileEventBus>();
+            services.AddSingleton<IEventBus>(provider =>
             {
                 return provider.GetRequiredService<RabbitMQEventBus>();
             });
-            
-            services.AddTransient<IEventBusPublishOnlyFactory, EventBusPublishOnlyFactory>();
+
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+
+            //services.AddSingleton<IHostedService, TestHostedService>();
+            //services.AddSingleton<IHostedService, TestHostedService>(p =>
+            //{
+            //    using (var scope = p.CreateScope())
+            //    {
+            //        var context = scope.ServiceProvider.GetService<OrderingDbContext>();
+            //        var logger = p.GetService<ILogger<TestHostedService>>();
+
+            //        return new TestHostedService(logger, context);
+            //    }
+            //});
+
+            //http://autofaccn.readthedocs.io/en/latest/integration/aspnetcore.html
+
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);

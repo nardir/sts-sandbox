@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
 {
-    public interface IEventBusPublishOnly
+    public interface IIntegrationEventsEnqueueService
     {
-        Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken));
+        Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem);
     }
 }

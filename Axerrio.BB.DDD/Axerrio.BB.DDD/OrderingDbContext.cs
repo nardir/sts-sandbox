@@ -1,4 +1,5 @@
-﻿using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
+﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ namespace Axerrio.BB.DDD
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new IntegrationEventsQueueItemConfiguration(_integrationEventsDatabaseOptions.Schema, _integrationEventsDatabaseOptions.TableName));
+            modelBuilder.ApplyConfiguration(new IntegrationEventsQueueItemConfiguration(modelBuilder, _integrationEventsDatabaseOptions));
         }
     }
 }
