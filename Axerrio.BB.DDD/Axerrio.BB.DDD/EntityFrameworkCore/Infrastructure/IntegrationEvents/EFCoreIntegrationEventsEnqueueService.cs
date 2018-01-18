@@ -25,13 +25,17 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
         public async Task EnqueueEventAsync(IntegrationEventsQueueItem eventQueueItem)
         {
+            _logger.LogDebug($"Enqueueing integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId}");
+
             EnsureArg.IsNotNull(eventQueueItem, nameof(eventQueueItem));
 
             eventQueueItem.EnqueuedTimestamp = DateTime.UtcNow;
 
-            await _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sequence
+            await _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sql sequence
 
-            _logger.LogDebug($"Integration event queue item {eventQueueItem.EventQueueItemId} enqueued on {eventQueueItem.EnqueuedTimestamp} for event {eventQueueItem.EventId} with type {eventQueueItem.EventTypeName} content: {eventQueueItem.EventContent}");
+            _logger.LogDebug($"Enqueued integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId}");
+
+            _logger.LogTrace($"Enqueued integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId} type: {eventQueueItem.EventTypeName} content: {eventQueueItem.EventContent}");
         }
     }
 }

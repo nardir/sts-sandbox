@@ -41,37 +41,38 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
         public async Task<IEnumerable<IntegrationEventsQueueItem>> DequeueEventsAsync(Guid batchId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (cancellationToken.IsCancellationRequested) //NR : check ipv meegeven aan diverse methods, hierdoor krijgen we controle over wat we doen ipv exceptions
+            if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"Dequeue events cancelled for batch {batchId}");
+                _logger.LogDebug($"Dequeueing integration events cancelled for batch {batchId}");
 
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
             }
 
             return (await _retryPolicy.ExecuteAndCaptureAsync(async () => 
             {
+                _logger.LogDebug($"Dequeueing integration events for batch {batchId}");
+
                 using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
                 {
                     await connection.OpenAsync();
 
                     var queryParams = new { BatchId = batchId, DequeueTimestamp = DateTime.UtcNow };
 
-                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, queryParams);
+                    var eventQueueItems = await connection.QueryAsync<IntegrationEventsQueueItem>(_dequeueSql, queryParams);
 
-                    _logger.LogDebug($"Dequeue events for batch {batchId} on {queryParams.DequeueTimestamp} dequeued {eventQueueitems.Count()} events");
+                    _logger.LogDebug($"Dequeued integration events for batch {batchId} #queue items: {eventQueueItems.Count()}");
 
-                    return eventQueueitems;
+                    return eventQueueItems;
                 }
 
             })).Result;
-
         }
 
-        public Task MarkEventAsNotPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public Task RequeueOrFailEventAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"Mark event {eventQueueItem.EventQueueItemId} as not published was cancelled");
+                _logger.LogDebug($"Requeueing integration event cancelled for queue item: {eventQueueItem.EventQueueItemId}");
 
                 return Task.CompletedTask;
             }
@@ -91,6 +92,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             return _retryPolicy.ExecuteAsync(async () => 
             {
+                _logger.LogDebug($"Requeueing integration event as {state} on attempt {eventQueueItem.PublishAttempts} for queue item {eventQueueItem.EventQueueItemId}");
+
                 using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
                 {
                     await connection.OpenAsync();
@@ -100,25 +103,24 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                     eventQueueItem.State = state;
                     eventQueueItem.PublishedTimestamp = queryParams.Timestamp;
 
-                    if (state == IntegrationEventsQueueItemState.PublishedFailed)
-                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as failed after exceeding the maximum {_integrationEventsDequeueServiceOptions.MaxPublishAttempts} publish attempts ");
-                    else
-                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as not published after {eventQueueItem.PublishAttempts} publish attempts");
+                    _logger.LogDebug($"Requeued integration event as {state} on attempt {eventQueueItem.PublishAttempts} for queue item {eventQueueItem.EventQueueItemId}");
                 }
             });
         }
 
-        public Task MarkEventAsPublishedAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        public Task PublishEventAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"Mark event {eventQueueItem.EventQueueItemId} as published was cancelled");
+                _logger.LogDebug($"Publishing integration event cancelled for queue item {eventQueueItem.EventQueueItemId}");
 
                 return Task.CompletedTask;
             }
 
             return _retryPolicy.ExecuteAsync(async () =>
-                { 
+                {
+                    _logger.LogDebug($"Publishing integration event for queue item {eventQueueItem.EventQueueItemId} on attempt {eventQueueItem.PublishAttempts}");
+
                     using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
                     {
                         await connection.OpenAsync();
@@ -130,7 +132,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                         eventQueueItem.State = IntegrationEventsQueueItemState.Published;
                         eventQueueItem.PublishedTimestamp = param.PublishedTimestamp;
 
-                        _logger.LogDebug($"Event {eventQueueItem.EventQueueItemId} was marked as published on publish attempt {eventQueueItem.PublishAttempts}");
+                        _logger.LogDebug($"Published integration event for queue item {eventQueueItem.EventQueueItemId} on attempt {eventQueueItem.PublishAttempts}");
                     }
                 });
         }
@@ -139,24 +141,26 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"Requeue events for batch {batchId} was cancelled");
+                _logger.LogDebug($"Requeueing integration events cancelled for batch {batchId}");
 
                 return Enumerable.Empty<IntegrationEventsQueueItem>();
             }
 
             return (await _retryPolicy.ExecuteAndCaptureAsync(async () =>
             {
+                _logger.LogDebug($"Requeueing integration events for batch {batchId}");
+
                 using (var connection = new SqlConnection(_integrationEventsDatabaseOptions.ConnectionString))
                 {
                     await connection.OpenAsync();
 
                     var queryParams = new { BatchId = batchId, RequeueTimestamp = DateTime.UtcNow };
 
-                    var eventQueueitems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, queryParams);
+                    var eventQueueItems = await connection.QueryAsync<IntegrationEventsQueueItem>(_requeueForBatchSql, queryParams);
 
-                    _logger.LogDebug($"Requeue events for batch {batchId} on {queryParams.RequeueTimestamp} dequeued {eventQueueitems.Count()} events");
+                    _logger.LogDebug($"Requeueing integration events for batch {batchId} #queue items: {eventQueueItems.Count()}");
 
-                    return eventQueueitems;
+                    return eventQueueItems;
                 }
             })).Result;
         }
@@ -169,7 +173,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                     sleepDurationProvider: retry => TimeSpan.FromMilliseconds(200 * retry),
                     onRetry: (exception, timeSpan, retry, ctx) =>
                     {
-                        _logger.LogTrace($"Exception {exception.GetType().Name} with message ${exception.Message} detected on attempt {retry} of {retries}");
+                        _logger.LogTrace(exception, $"Exception {exception.GetType().Name} with message ${exception.Message} detected on attempt {retry} of {retries}");
                     }
                 );
         }

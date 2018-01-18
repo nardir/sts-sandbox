@@ -24,7 +24,6 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
             EnsureArg.IsNotNull(eventBusPublishOnlyFactory, nameof(eventBusPublishOnlyFactory));
 
-            //_eventBus = eventBusPublishOnlyFactory.Create<IEventBus>();
             _eventBus = eventBusPublishOnlyFactory.Create<TEventBus>();
 
             _integrationEventsDequeueService = EnsureArg.IsNotNull(integrationEventsDequeueService, nameof(integrationEventsDequeueService));
@@ -37,9 +36,12 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
             try
             {
-                var eventQueueItems = await _integrationEventsDequeueService.DequeueEventsAsync(batchId, cancellationToken);
+                _logger.LogDebug($"Forwarding integration events for batch {batchId}");
 
-                foreach (var eventQueueItem in eventQueueItems)
+                var requeuedItems = Enumerable.Empty<IntegrationEventsQueueItem>();
+                var dequeuedItems = await _integrationEventsDequeueService.DequeueEventsAsync(batchId, cancellationToken);
+
+                foreach (var eventQueueItem in dequeuedItems)
                 {
                     try
                     {
@@ -50,37 +52,37 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                             break;
                         }
 
-                        _logger.LogDebug($"Forwarding event {eventQueueItem.EventQueueItemId}");
+                        _logger.LogDebug($"Forwarding integration event for queue item {eventQueueItem.EventQueueItemId}");
 
                         await _eventBus.PublishAsync(eventQueueItem.IntegrationEvent);
 
-                        await _integrationEventsDequeueService.MarkEventAsPublishedAsync(eventQueueItem);
+                        await _integrationEventsDequeueService.PublishEventAsync(eventQueueItem);
 
-                        _logger.LogDebug($"Forwarded event {eventQueueItem.EventQueueItemId}");
+                        _logger.LogDebug($"Forwarded integration event for queue item {eventQueueItem.EventQueueItemId}");
                     }
                     catch (Exception exception)
                     {
-                        _logger.LogError(exception, $"Exception while forwarding event {eventQueueItem.EventQueueItemId}");
+                        _logger.LogError(exception, $"Exception while forwarding integration event for queue item {eventQueueItem.EventQueueItemId}");
 
-                        await _integrationEventsDequeueService.MarkEventAsNotPublishedAsync(eventQueueItem);
+                        await _integrationEventsDequeueService.RequeueOrFailEventAsync(eventQueueItem);
                     }
                 }
 
                 if (cancel)
                 {
-                    _logger.LogDebug($"Forwarding cancelled for batch {batchId}");
+                    _logger.LogDebug($"Forwarding integration events cancelled for batch {batchId}");
 
                     //https://stackoverflow.com/questions/36426937/what-is-the-difference-between-wait-vs-getawaiter-getresult
                     //Mark all events with forward/dequeue batch id as NotPublished
                     //In case of cancel the reenqueue needs to finish
-                    var requeuedItems = _integrationEventsDequeueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
+                    requeuedItems = _integrationEventsDequeueService.RequeueEventsForBatchAsync(batchId).GetAwaiter().GetResult(); //In case of cancel the reenqueue needs to finish. GetAwaiter().GetResult() is used because it rearranges the stack trace in case of exception
                 }
 
-                _logger.LogDebug($"Forwarded events ");
+                _logger.LogDebug($"Forwarded integration events for batch {batchId} published #items {dequeuedItems.Count() - requeuedItems.Count()} requeued #items {requeuedItems.Count()}");
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Error while forwarding events for batch {batchId}");
+                _logger.LogError(exception, $"Exception {exception.GetType().Name} with message ${exception.Message} detected while forwarding integration events for batch {batchId}");
             }
         }
     }

@@ -19,8 +19,6 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            //_integrationEventsQueueService.EnqueueEvent(@event);
-
             EnsureArg.IsNotNull(@event, nameof(@event));
 
             await _integrationEventsEnqueueService.EnqueueEventAsync(new IntegrationEventsQueueItem(@event));

@@ -30,7 +30,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Hosting.Abstractions
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, $"Unhandled critical exception for timed job");
+                _logger.LogCritical(exception, $"Unhandled critical exception {exception.GetType().Name} with message ${exception.Message} for timed job");
             }
             finally
             {
