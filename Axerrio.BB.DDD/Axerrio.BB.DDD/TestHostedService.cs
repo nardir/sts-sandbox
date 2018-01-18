@@ -1,5 +1,6 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Hosting;
 using EnsureThat;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,22 @@ namespace Axerrio.BB.DDD
     {
         ILogger<TestHostedService> _logger;
 
-        public TestHostedService(ILogger<TestHostedService> logger)
+        public TestHostedService(ILogger<TestHostedService> logger, IServiceProvider provider)
         {
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
+            using (var scope = provider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
+
+                
+            }
+        }
+
+        public TestHostedService(ILogger<TestHostedService> logger, OrderingDbContext context)
+        {
+            _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

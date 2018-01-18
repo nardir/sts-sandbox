@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Quartz.Spi;
 using System;
@@ -32,7 +33,8 @@ namespace Axerrio.BB.DDD
 
             services.AddOptions();
 
-            services.AddDbContext<OrderingDbContext>(options => 
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<OrderingDbContext>(options => 
             {
                 options.UseSqlServer(connectionString, sqlOptions => 
                 {
@@ -49,7 +51,20 @@ namespace Axerrio.BB.DDD
 
             services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
 
-            //services.AddSingleton<IHostedService, TimedHostedService<TestJob, TestTriggerFactory>>();
+            //services.AddSingleton<IHostedService, TestHostedService>();
+            //services.AddSingleton<IHostedService, TestHostedService>(p =>
+            //{
+            //    using (var scope = p.CreateScope())
+            //    {
+            //        var context = scope.ServiceProvider.GetService<OrderingDbContext>();
+            //        var logger = p.GetService<ILogger<TestHostedService>>();
+
+            //        return new TestHostedService(logger, context);
+            //    }
+            //});
+
+            //http://autofaccn.readthedocs.io/en/latest/integration/aspnetcore.html
+
 
             //var pm = new PaymentMethod(1, "VISA", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
             //var pmjson = JsonConvert.SerializeObject(pm);
