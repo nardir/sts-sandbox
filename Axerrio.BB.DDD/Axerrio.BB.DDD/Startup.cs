@@ -105,7 +105,7 @@ namespace Axerrio.BB.DDD
             //builder.RegisterType<FileEventBus>().As<IEventBusPublishOnly>().UsingConstructor();
 
             //builder.RegisterType<TestHostedServiceFactory>();
-            builder.RegisterType<TestHostedService>();
+            builder.RegisterType<TestHostedService>().InstancePerLifetimeScope();
             builder.Register<TestHostedService>(context =>
                 {
                     var factory = context.Resolve<TestHostedService.Factory>();
@@ -123,6 +123,26 @@ namespace Axerrio.BB.DDD
                 .SingleInstance();
 
             ApplicationContainer = builder.Build();
+
+            //var scope = ApplicationContainer.BeginLifetimeScope("testhostedservice", b => 
+            //{
+            //    b.RegisterType<TestHostedService>();
+            //    b.Register<TestHostedService>(context =>
+            //    {
+            //        var factory = context.Resolve<TestHostedService.Factory>();
+
+            //        //return factory.Invoke();
+            //        return factory();
+
+            //        //var factory = context.Resolve<TestHostedServiceFactory>();
+
+            //        //return factory.Create();
+
+            //        //return new TestHostedService(context.Resolve<ILogger<TestHostedService>>(), context.Resolve<OrderingDbContext>());
+            //    })
+            //        .As<IHostedService>()
+            //        .SingleInstance();
+            //});
 
             // Create the IServiceProvider based on the container.
             return new AutofacServiceProvider(ApplicationContainer);
