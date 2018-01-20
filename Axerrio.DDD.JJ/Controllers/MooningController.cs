@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OData.UriParser;
 using Moon.OData;
 using Moon.OData.Sql;
 using System.Text.RegularExpressions;
@@ -19,6 +20,19 @@ namespace Axerrio.DDD.Menu.Controllers
         [HttpGet("")]
         public IActionResult Index(ODataOptions<Entity> options) 
         {
+            var validationSettings = new ValidationSettings()
+            {
+                AllowedOperators = AllowedOperators.Divide | AllowedOperators.Equal | AllowedOperators.Has,
+                AllowedFunctions = AllowedFunctions.EndsWith | AllowedFunctions.Contains | AllowedFunctions.Length,
+                AllowedOptions = AllowedOptions.Filter | AllowedOptions.OrderBy | AllowedOptions.Skip | AllowedOptions.Top,
+                MaxTop = 50,
+                
+            };
+
+            options.Validate(validationSettings);
+
+            FilterClause filterClause = options.Filter; 
+
             var moonSqlQuery = new ODataSqlQuery(
                 "SELECT FROM Entities WHERE OwnerId = @p0",
                 10456, options
