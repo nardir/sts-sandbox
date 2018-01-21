@@ -38,7 +38,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Ex
             }
 
             services.AddTransient<IntegrationEventsForwarderTriggerFactory>();
-            //services.AddSingleton<IHostedService, TimedHostedService<IntegrationEventsForwarderJob, IntegrationEventsForwarderTriggerFactory>>();
+            services.AddSingleton<IHostedService, TimedHostedService<IntegrationEventsForwarderJob, IntegrationEventsForwarderTriggerFactory>>();
 
             return services;
         }

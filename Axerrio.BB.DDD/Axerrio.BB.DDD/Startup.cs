@@ -105,22 +105,23 @@ namespace Axerrio.BB.DDD
             //builder.RegisterType<FileEventBus>().As<IEventBusPublishOnly>().UsingConstructor();
 
             //builder.RegisterType<TestHostedServiceFactory>();
-            builder.RegisterType<TestHostedService>().InstancePerLifetimeScope();
-            builder.Register<TestHostedService>(context =>
-                {
-                    var factory = context.Resolve<TestHostedService.Factory>();
+            ////NR: Onderstaand is uiteindelijk de beste oplossing
+            //builder.RegisterType<TestHostedService>().InstancePerLifetimeScope();
+            //builder.Register<TestHostedService>(context =>
+            //    {
+            //        var factory = context.Resolve<TestHostedService.Factory>();
 
-                    //return factory.Invoke();
-                    return factory();
+            //        //return factory.Invoke();
+            //        return factory();
 
-                    //var factory = context.Resolve<TestHostedServiceFactory>();
+            //        //var factory = context.Resolve<TestHostedServiceFactory>();
 
-                    //return factory.Create();
+            //        //return factory.Create();
 
-                    //return new TestHostedService(context.Resolve<ILogger<TestHostedService>>(), context.Resolve<OrderingDbContext>());
-                })
-                .As<IHostedService>()
-                .SingleInstance();
+            //        //return new TestHostedService(context.Resolve<ILogger<TestHostedService>>(), context.Resolve<OrderingDbContext>());
+            //    })
+            //    .As<IHostedService>()
+            //    .SingleInstance();
 
             ApplicationContainer = builder.Build();
 
