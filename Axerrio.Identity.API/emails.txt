@@ -1,0 +1,8 @@
+To: nardirens@axerrio.com
+Subject: Verify your email
+Message: Click <a href="https://localhost:50000/Account/ConfirmEmail/9?token=CfDJ8GsmMLi8MThOrh%2FMPCHXSU0Bqy28uJVkY2RiWr3OVeuoICAR%2BhgbcmfBH99l7F3K%2BB8HvdYpUdKwH6hT33Eh2sxATPjxdSksPRIegeqCEhIlABOzZkWVSBWrfWxTDbswhy382tLhaCjOCqgovacPArB0nH0XsFnDIAY%2F61HraNpa63DVCKG1cPWE4ie6j4mk%2Fle7OvUUKJ1Q7zgh8Xdi8ts%3D">here</a> to verify your email
+
+To: nardirens@axerrio.com
+Subject: Password reset
+Message: Click <a href="https://localhost:50000/Account/ResetPassword/9?token=CfDJ8GsmMLi8MThOrh%2FMPCHXSU2kNeM%2F0ALlu3VL3085wEp0KL57AukhUPRfqx3ffy7DxP5KR1Z3Q2FzIRQRZiNyrKHuYJeE5qn6o1f15Thvhq%2FIb%2BLixDwfa9mLly%2BC3IBtGvAxBaMiLlTMpBQt9Nrv4P2%2FJzlMKGoW5mlvpf8UIh7s11AaDgQ1SNWOZ86UIGQhrg%3D%3D">here</a> to reset your password
+

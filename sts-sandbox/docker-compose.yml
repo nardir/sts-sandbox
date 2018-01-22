@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  sts:
+    image: sts
+    build:
+      context: ./sts
+      dockerfile: Dockerfile
+
+  id-sts:
+    image: id-sts
+    build:
+      context: ./../id-sts
+      dockerfile: Dockerfile
+
+  api:
+    image: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+
+  axerrio.identity.api:
+    image: axerrio.identity.api
+    build:
+      context: ./../Axerrio.Identity.API
+      dockerfile: Dockerfile
+
+  axerrio.client.mvc:
+    image: axerrio.client.mvc
+    build:
+      context: ./Axerrio.Client.MVC
+      dockerfile: Dockerfile
+
+  axerrio.ddd.ordering:
+    image: axerrio.ddd.ordering
+    build:
+      context: ./Axerrio.DDD.Ordering
+      dockerfile: Dockerfile
+
+  axerrio.appinsights.test:
+    image: axerrio.appinsights.test
+    build:
+      context: ./../Axerrio.AppInsights.Test
+      dockerfile: Dockerfile
+
+  axerrio.ddd.configuration:
+    image: axerrio.ddd.configuration
+    build:
+      context: .
+      dockerfile: ../Axerrio.DDD.Configuration/Dockerfile
+

@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using sts.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using sts.Models;
+using Microsoft.AspNetCore.Identity;
+
+namespace sts
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+             options.UseSqlServer(Configuration["ConnectionString"],
+                                     sqlServerOptionsAction: sqlOptions =>
+                                     {
+                                         sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                                     }));
+
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+                {
+                    options.Password.RequireNonAlphanumeric = false;
+
+                    options.User.RequireUniqueEmail = true;
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //CreateUserTest(services).Wait();
+            //ValidateCredentials(services).Wait();
+
+            services.AddMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseMvc();
+        }
+
+        private async Task CreateUserTest(IServiceCollection services)
+        {
+            UserManager<ApplicationUser> userManager = services.BuildServiceProvider().GetRequiredService<UserManager<ApplicationUser>>();
+            string email = "nardir@axerrio.com";
+            string password = "Vexcherk1";
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser()
+                {
+                    Email = email,
+                    UserName = email,
+                    FirstName = "Nardi",
+                    LastName = "Rens",
+                    //PhoneNumber = "+31653261731"
+                };
+
+                var result = await userManager.CreateAsync(user, password);
+            }
+        }
+
+        private async Task ValidateCredentials(IServiceCollection services)
+        {
+            UserManager<ApplicationUser> userManager = services.BuildServiceProvider().GetRequiredService<UserManager<ApplicationUser>>();
+            string email = "nardir@axerrio.com";
+            string password = "Vexcherk1";
+
+            var user = await userManager.FindByNameAsync(email);
+            var valid = await userManager.CheckPasswordAsync(user, password);
+            valid = await userManager.CheckPasswordAsync(user, "wrong");
+
+            user = null;
+            valid = await userManager.CheckPasswordAsync(user, password);
+        }
+    }
+}
