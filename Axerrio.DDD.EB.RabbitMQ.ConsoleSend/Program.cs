@@ -21,14 +21,18 @@ namespace Axerrio.DDD.EB.RabbitMQ.ConsoleSend
                 {
                     using (var channel = connection.CreateModel())
                     {
-                        channel.ExchangeDeclare(exchange: "logs", type: "fanout");
+                        //channel.ExchangeDeclare(exchange: "logs", type: "fanout");
+                        channel.ExchangeDeclare(exchange: "logs", type: "fanout", durable: true, autoDelete: false);
 
                         var message = GetMessage(args);
                         var body = Encoding.UTF8.GetBytes(message);
 
+                        var properties = channel.CreateBasicProperties();
+                        properties.Persistent = true;
+
                         channel.BasicPublish(exchange: "logs",
                                              routingKey: "",
-                                             basicProperties: null,
+                                             basicProperties: properties,
                                              body: body);
 
                         Console.WriteLine(" [x] Sent {0}", message);
