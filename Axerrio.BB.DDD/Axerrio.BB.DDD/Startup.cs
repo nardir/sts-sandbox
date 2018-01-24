@@ -5,6 +5,7 @@ using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Hosting;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,8 @@
-﻿using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+﻿using Autofac;
+using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using EnsureThat;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +15,13 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
         private readonly Dictionary<string, List<IntegrationEventsSubscription>> _eventHandlers;
         private readonly List<Type> _eventTypes;
 
-        public InMemoryEventBusSubscriptionsManager()
+        private readonly ILifetimeScope _lifetimeScope;
+        //private readonly string AUTOFAC_SCOPE_NAME = "eshop_event_bus";
+
+        public InMemoryEventBusSubscriptionsManager(ILifetimeScope lifetimeScope)
         {
+            _lifetimeScope = EnsureArg.IsNotNull(lifetimeScope, nameof(lifetimeScope));
+
             _eventHandlers = new Dictionary<string, List<IntegrationEventsSubscription>>();
             _eventTypes = new List<Type>();
         }
@@ -160,6 +169,39 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             if (handler != null)
             {
                 OnEventRemoved(this, eventName);
+            }
+        }
+
+        public async Task DispatchEventAsync(string eventName, string eventMessage)
+        {
+            if (HasSubscriptionsForEvent(eventName))
+            {
+                using (var scope = _lifetimeScope.BeginLifetimeScope())
+                {
+                    var subscriptions = GetHandlersForEvent(eventName);
+                    foreach (var subscription in subscriptions)
+                    {
+                        if (subscription.IsDynamicHandler)
+                        {
+                            var eventHandler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
+
+                            dynamic @event = JObject.Parse(eventMessage);
+
+                            await eventHandler.HandleAsync(@event);
+                        }
+                        else
+                        {
+                            var eventType = GetEventTypeByName(eventName);
+
+                            var @event = JsonConvert.DeserializeObject(eventMessage, eventType);
+
+                            var eventHandler = scope.ResolveOptional(subscription.HandlerType);
+                            var closedEventHandlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+
+                            await (Task) closedEventHandlerType.GetMethod("HandleAsync").Invoke(eventHandler, new object[] { @event });
+                        }
+                    }
+                }
             }
         }
     }
