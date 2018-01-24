@@ -4,11 +4,15 @@ using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,12 +34,37 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             , IOptions<RabbitMQEventBusOptions> eventBusOptionsAccessor)
         {
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
+
             _persistentConnection = EnsureArg.IsNotNull(persistentConnection, nameof(persistentConnection));
+
             _subscriptionManager = EnsureArg.IsNotNull(subscriptionManager, nameof(subscriptionManager));
+            _subscriptionManager.EventRemoved += OnEventRemoved;
 
             _eventBusOptions = EnsureArg.IsNotNull(eventBusOptionsAccessor, nameof(eventBusOptionsAccessor)).Value;
 
             _consumerChannel = CreateConsumerChannel();
+        }
+
+        private void OnEventRemoved(object sender, string eventName)
+        {
+            if (!_persistentConnection.IsConnected)
+            {
+                _persistentConnection.TryConnect();
+            }
+
+            using (var channel = _persistentConnection.CreateModel())
+            {
+                channel.QueueUnbind(queue: _eventBusOptions.QueueName,
+                    exchange: _eventBusOptions.Exchange,
+                    routingKey: eventName);
+
+                if (_subscriptionManager.IsEmpty)
+                {
+                    //_queueName = string.Empty; //TODO ?????????
+
+                    _consumerChannel.Close();
+                }
+            }
         }
 
         #region IDisposable
@@ -53,7 +82,35 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
         public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            _logger.LogInformation($"Event {@event.Id} created on {@event.CreationTimestamp.ToShortTimeString()} is published");
+            if (!_persistentConnection.IsConnected)
+            {
+                _persistentConnection.TryConnect();
+            }
+
+            var policy = Policy.Handle<BrokerUnreachableException>()
+                .Or<SocketException>()
+                .WaitAndRetry(_eventBusOptions.PublishRetryAttempts, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                {
+                    _logger.LogWarning(ex.ToString());
+                });
+
+            using (var channel = _persistentConnection.CreateModel())
+            {
+                var eventName = @event.GetType().Name;
+
+                CreateExchange(channel);
+
+                var eventMessage = JsonConvert.SerializeObject(@event);
+                var body = Encoding.UTF8.GetBytes(eventMessage);
+
+                policy.Execute(() =>
+                {
+                    channel.BasicPublish(exchange: _eventBusOptions.Exchange,
+                                     routingKey: eventName,
+                                     basicProperties: null,
+                                     body: body);
+                });
+            }
 
             return Task.CompletedTask;
         }
@@ -62,24 +119,30 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             where TIntegrationEvent : IntegrationEvent
             where TIntegrationEventHandler : IIntegrationEventHandler<TIntegrationEvent>
         {
-            throw new NotImplementedException();
+            var eventName = _subscriptionManager.GetEventName<TIntegrationEvent>();
+
+            AddBrokerSubscription(eventName);
+
+            _subscriptionManager.AddSubscription<TIntegrationEvent, TIntegrationEventHandler>();
         }
 
         public void Subscribe<TIntegrationEventHandler>(string eventName) where TIntegrationEventHandler : IDynamicIntegrationEventHandler
         {
-            throw new NotImplementedException();
+            AddBrokerSubscription(eventName);
+
+            _subscriptionManager.AddSubscription<TIntegrationEventHandler>(eventName);
         }
 
         public void Unsubscribe<TIntegrationEventHandler>(string eventName) where TIntegrationEventHandler : IDynamicIntegrationEventHandler
         {
-            throw new NotImplementedException();
+            _subscriptionManager.RemoveSubscription<TIntegrationEventHandler>(eventName);
         }
 
         public void Unsubscribe<TIntegrationEvent, TIntegrationEventHandler>()
             where TIntegrationEvent : IntegrationEvent
             where TIntegrationEventHandler : IIntegrationEventHandler<TIntegrationEvent>
         {
-            throw new NotImplementedException();
+            _subscriptionManager.RemoveSubscription<TIntegrationEvent, TIntegrationEventHandler>();
         }
 
         #endregion
@@ -134,6 +197,26 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             await _subscriptionManager.DispatchEventAsync(eventName, eventMessage);
 
             _consumerChannel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
+        }
+
+        private void AddBrokerSubscription(string eventName)
+        {
+            var containsKey = _subscriptionManager.HasSubscriptionsForEvent(eventName);
+
+            if (!containsKey)
+            {
+                if (!_persistentConnection.IsConnected)
+                {
+                    _persistentConnection.TryConnect();
+                }
+
+                using (var channel = _persistentConnection.CreateModel())
+                {
+                    channel.QueueBind(queue: _eventBusOptions.QueueName,
+                                      exchange: _eventBusOptions.Exchange,
+                                      routingKey: eventName);
+                }
+            }
         }
     }
 }

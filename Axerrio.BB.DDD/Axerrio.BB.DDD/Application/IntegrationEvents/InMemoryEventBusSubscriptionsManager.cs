@@ -28,7 +28,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         #region IEventBusSubscriptionsManager
 
-        public event EventHandler<string> OnEventRemoved;
+        public event EventHandler<string> EventRemoved;
 
         public bool IsEmpty => !_eventHandlers.Keys.Any();
 
@@ -165,10 +165,10 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         private void RaiseOnEventRemoved(string eventName)
         {
-            var handler = OnEventRemoved; //Notice: handler is a C# event handler not an integration event handler
+            var handler = EventRemoved; //Notice: handler is a C# event handler not an integration event handler
             if (handler != null)
             {
-                OnEventRemoved(this, eventName);
+                EventRemoved(this, eventName);
             }
         }
 

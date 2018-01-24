@@ -6,6 +6,7 @@ using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Hosting;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz.Spi;
+using RabbitMQ.Client;
 using System;
 using System.Reflection;
 
@@ -49,7 +52,37 @@ namespace Axerrio.BB.DDD
                 });
             });
 
+            services.Configure<RabbitMQEventBusOptions>(options => 
+            {
+                options.ConnectRetryAttempts = 3;
+
+                options.Exchange = "AFO-Test-Exchange";
+                options.QueueName = "AFO-Test-Queue";
+
+                options.PublishRetryAttempts = 2;
+
+                //"amqp://user:pass@hostName:port/vhost"
+                options.ConnectionString = @"amqp://user:password@localhost:8081//";
+            });
+
+            services.AddSingleton<IRabbitMQPersistentConnection>(p =>
+            {
+                var options = p.GetRequiredService<IOptions<RabbitMQEventBusOptions>>().Value;
+
+                var factory = new ConnectionFactory()
+                {
+                    Uri = new Uri(options.ConnectionString),
+                };
+
+                var logger = p.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+
+                return new DefaultRabbitMQPersistentConnection(factory, logger, options.ConnectRetryAttempts);
+            });
+
+            services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
+
             services.AddSingleton<RabbitMQEventBus>();
+
             services.AddSingleton<FileEventBus>();
             services.AddSingleton<IEventBus>(provider =>
             {
@@ -57,6 +90,7 @@ namespace Axerrio.BB.DDD
             });
 
             services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+
 
             //services.AddSingleton<IHostedService, TestHostedService>();
             //services.AddSingleton<IHostedService, TestHostedService>(p =>
