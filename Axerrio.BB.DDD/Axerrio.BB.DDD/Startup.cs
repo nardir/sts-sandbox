@@ -95,6 +95,7 @@ namespace Axerrio.BB.DDD
 
             //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
             services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext>(connectionString, Configuration);
+            //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, RabbitMQEventBus>(connectionString, Configuration);
 
 
             //services.AddSingleton<IHostedService, TestHostedService>();
@@ -210,6 +211,7 @@ namespace Axerrio.BB.DDD
 
             subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
             subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
+            subscriptionsManager.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 

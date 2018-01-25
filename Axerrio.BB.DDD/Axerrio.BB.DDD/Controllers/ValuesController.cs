@@ -88,6 +88,18 @@ namespace Axerrio.BB.DDD.Controllers
             return Ok();
         }
 
+        [HttpGet("createorder/{id}")]
+        public async Task<IActionResult> CreateOrder2(int id, [FromServices] IEventBusPublishOnlyFactory eventBusPublishOnlyFactory)
+        {
+            var ie = new OrderCreatedIntegrationEvent() { OrderNumber = id.ToString() };
+
+            var eventBus = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+
+            await eventBus.PublishAsync(ie);
+
+            return Ok();
+        }
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
