@@ -1,5 +1,6 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
 using EnsureThat;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,10 +14,11 @@ namespace Axerrio.BB.DDD.Controllers
     {
         
 
-        public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory
-            //, IIntegrationEventsQueueService integrationEventsQueueService
-            , OrderingDbContext orderingDbContext
-            , IIntegrationEventsForwarderService integrationEventsForwarderService)
+        //public ValuesController(IEventBusPublishOnlyFactory eventBusPublishOnlyFactory
+        //    //, IIntegrationEventsQueueService integrationEventsQueueService
+        //    , OrderingDbContext orderingDbContext
+        //    , IIntegrationEventsForwarderService integrationEventsForwarderService)
+        public ValuesController()
         {
             //for (int i = 0; i < 5; i++)
             //{
@@ -69,6 +71,19 @@ namespace Axerrio.BB.DDD.Controllers
             await integrationEventsService.PublishAsync(ie);
 
             await orderingDbContext.SaveChangesAsync(); //UoW 
+
+            return Ok();
+        }
+
+        [HttpGet("publish2/{id}")]
+        public async Task<IActionResult> Publish2(int id, [FromServices] IEventBusPublishOnlyFactory eventBusPublishOnlyFactory)
+        {
+            var pm = new PaymentMethod(id, $"VISA-{id}", "1234-4567-9999-1111", "123", "Piet", DateTime.UtcNow.AddYears(1));
+            var ie = new PaymentMethodCreatedIntegrationEvent(pm);
+
+            var eventBus = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+
+            await eventBus.PublishAsync(ie);
 
             return Ok();
         }

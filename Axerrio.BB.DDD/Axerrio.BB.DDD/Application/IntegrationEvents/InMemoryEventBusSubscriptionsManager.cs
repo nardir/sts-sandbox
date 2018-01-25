@@ -29,6 +29,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
         #region IEventBusSubscriptionsManager
 
         public event EventHandler<string> EventRemoved;
+        public event EventHandler<string> EventAdded;
 
         public bool IsEmpty => !_eventHandlers.Keys.Any();
 
@@ -45,6 +46,8 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             return typeof(TIntegrationEvent).Name;
         }
 
+        public IEnumerable<string> Events => _eventHandlers.Keys;
+
         public void AddSubscription<TIntegrationEventHandler>(string eventName) where TIntegrationEventHandler : IDynamicIntegrationEventHandler
         {
             AddSubscription(typeof(TIntegrationEventHandler), eventName, isDynamicHandler: true);
@@ -58,7 +61,8 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
             AddSubscription(typeof(TIntegrationEventHandler), eventName, isDynamicHandler: false);
 
-            _eventTypes.Add(typeof(TIntegrationEvent));
+            if (!_eventTypes.Contains(typeof(TIntegrationEvent)))
+                _eventTypes.Add(typeof(TIntegrationEvent));
         }
 
         private void AddSubscription(Type handlerType, string eventName, bool isDynamicHandler)
@@ -66,6 +70,8 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             if (!HasSubscriptionsForEvent(eventName))
             {
                 _eventHandlers.Add(eventName, new List<IntegrationEventsSubscription>());
+
+                OnEventAdded(eventName);
             }
 
             if (_eventHandlers[eventName].Any(s => s.HandlerType == handlerType))
@@ -74,6 +80,19 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             }
 
             _eventHandlers[eventName].Add(IntegrationEventsSubscription.Create(isDynamicHandler, handlerType));
+        }
+
+        private void OnEventAdded(string eventName)
+        {
+            var handler = EventAdded; //Notice: handler is a C# event handler not an integration event handler
+
+            handler?.Invoke(this, eventName);
+
+            //if (handler != null)
+            //{
+            //    //EventRemoved(this, eventName);
+            //    handler.Invoke(this, eventName);
+            //}
         }
 
         public IEnumerable<IntegrationEventsSubscription> GetHandlersForEvent<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent
@@ -129,7 +148,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
                         _eventTypes.Remove(eventType);
                     }
 
-                    RaiseOnEventRemoved(eventName);
+                    OnEventRemoved(eventName);
                 }
             }
         }
@@ -163,13 +182,17 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
 
         }
 
-        private void RaiseOnEventRemoved(string eventName)
+        private void OnEventRemoved(string eventName)
         {
             var handler = EventRemoved; //Notice: handler is a C# event handler not an integration event handler
-            if (handler != null)
-            {
-                EventRemoved(this, eventName);
-            }
+
+            handler?.Invoke(this, eventName);
+
+            //if (handler != null)
+            //{
+            //    //EventRemoved(this, eventName);
+            //    handler.Invoke(this, eventName);
+            //}
         }
 
         public async Task DispatchEventAsync(string eventName, string eventMessage)

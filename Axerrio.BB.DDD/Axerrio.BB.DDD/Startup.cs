@@ -52,6 +52,10 @@ namespace Axerrio.BB.DDD
                 });
             });
 
+            //services.AddTransient<PaymentMethodCreatedIntegrationEventHandler>();
+            //services.AddTransient<PaymentMethodCreatedIntegrationEventHandlerSecond>();
+            //services.AddTransient<IIntegrationEventHandler<PaymentMethodCreatedIntegrationEvent>, PaymentMethodCreatedIntegrationEventHandler>();
+
             services.Configure<RabbitMQEventBusOptions>(options => 
             {
                 options.ConnectRetryAttempts = 3;
@@ -89,7 +93,8 @@ namespace Axerrio.BB.DDD
                 return provider.GetRequiredService<RabbitMQEventBus>();
             });
 
-            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+            //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext>(connectionString, Configuration);
 
 
             //services.AddSingleton<IHostedService, TestHostedService>();
@@ -158,6 +163,9 @@ namespace Axerrio.BB.DDD
             //    .As<IHostedService>()
             //    .SingleInstance();
 
+            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+                       .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
+
             ApplicationContainer = builder.Build();
 
             //var scope = ApplicationContainer.BeginLifetimeScope("testhostedservice", b => 
@@ -197,6 +205,16 @@ namespace Axerrio.BB.DDD
             app.UseMvc();
 
             appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());
+
+            var subscriptionsManager = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsManager>();
+
+            subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
+            subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
+
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+
+            //eventBus.Subscribe<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
+            //eventBus.Subscribe<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
         }
     }
 }

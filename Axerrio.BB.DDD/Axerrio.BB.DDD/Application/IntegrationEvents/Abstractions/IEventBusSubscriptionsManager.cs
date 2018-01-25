@@ -10,6 +10,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
         bool IsEmpty { get; }
 
         event EventHandler<string> EventRemoved;
+        event EventHandler<string> EventAdded;
 
         void AddSubscription<TIntegrationEventHandler>(string eventName)
            where TIntegrationEventHandler : IDynamicIntegrationEventHandler;
@@ -28,6 +29,8 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
 
         Type GetEventTypeByName(string eventName);
         string GetEventName<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
+
+        IEnumerable<string> Events { get; }
 
         void Clear();
 
