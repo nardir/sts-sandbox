@@ -41,8 +41,6 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
             _subscriptionManager = EnsureArg.IsNotNull(subscriptionManager, nameof(subscriptionManager));
 
-            AddBrokerSubscriptions(_subscriptionManager.Events);
-
             _subscriptionManager.EventRemoved += OnEventRemoved;
             _subscriptionManager.EventAdded += OnEventAdded;
 
@@ -184,6 +182,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
                                  autoDelete: false,
                                  arguments: null);
 
+            AddBrokerSubscriptions();
 
             var consumer = new EventingBasicConsumer(_consumerChannel);
 
@@ -215,16 +214,11 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             _consumerChannel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
         }
 
-        private void AddBrokerSubscriptions(IEnumerable<string> eventNames)
+         private void AddBrokerSubscriptions()
         {
-            CheckConnection();
-
-            using (var channel = _persistentConnection.CreateModel())
+            foreach (var eventName in _subscriptionManager.Events)
             {
-                foreach (var eventName in eventNames)
-                {
-                    CreateBinding(channel, eventName);
-                }
+                CreateBinding(_consumerChannel, eventName);
             }
         }
 
