@@ -9,5 +9,6 @@ namespace Axerrio.BB.DDD
     public class OrderCreatedIntegrationEvent: IntegrationEvent
     {
         public string OrderNumber { get; set; }
+        public string CustomerCode { get; set; }
     }
 }

@@ -91,7 +91,11 @@ namespace Axerrio.BB.DDD.Controllers
         [HttpGet("createorder/{id}")]
         public async Task<IActionResult> CreateOrder2(int id, [FromServices] IEventBusPublishOnlyFactory eventBusPublishOnlyFactory)
         {
-            var ie = new OrderCreatedIntegrationEvent() { OrderNumber = id.ToString() };
+            var ie = new OrderCreatedIntegrationEvent
+            {
+                OrderNumber = id.ToString(),
+                CustomerCode = "HOL"
+            };
 
             var eventBus = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
 

@@ -167,6 +167,8 @@ namespace Axerrio.BB.DDD
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
                        .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
 
+            builder.RegisterType<OrderCreatedIntegrationEventHandlerDynamic>();
+
             ApplicationContainer = builder.Build();
 
             //var scope = ApplicationContainer.BeginLifetimeScope("testhostedservice", b => 
@@ -212,6 +214,7 @@ namespace Axerrio.BB.DDD
             subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
             subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
             subscriptionsManager.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+            subscriptionsManager.AddSubscription<OrderCreatedIntegrationEventHandlerDynamic>(nameof(OrderCreatedIntegrationEvent));
 
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 
