@@ -122,7 +122,8 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
                 {
                     channel.BasicPublish(exchange: _eventBusOptions.Exchange,
                                      routingKey: eventName,
-                                     basicProperties: null, //properties
+                                     basicProperties: properties,
+                                     //basicProperties: null, //properties
                                      body: body);
                 });
             }
