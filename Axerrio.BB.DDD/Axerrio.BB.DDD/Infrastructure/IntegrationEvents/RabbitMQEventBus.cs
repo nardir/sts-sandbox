@@ -114,11 +114,15 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
                 var eventMessage = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(eventMessage);
 
+                //TODO: Wel of geen message perrsistence
+                var properties = channel.CreateBasicProperties();
+                properties.Persistent = true;
+
                 policy.Execute(() =>
                 {
                     channel.BasicPublish(exchange: _eventBusOptions.Exchange,
                                      routingKey: eventName,
-                                     basicProperties: null,
+                                     basicProperties: null, //properties
                                      body: body);
                 });
             }
