@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
@@ -37,6 +38,6 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
         IEnumerable<IntegrationEventsSubscription> GetHandlersForEvent<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
         IEnumerable<IntegrationEventsSubscription> GetHandlersForEvent(string eventName);
 
-        Task DispatchEventAsync(string eventName, string eventMessage);
+        Task DispatchEventAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

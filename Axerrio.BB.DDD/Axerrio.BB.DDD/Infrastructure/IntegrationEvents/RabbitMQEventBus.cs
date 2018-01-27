@@ -24,14 +24,14 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
         private readonly ILogger<RabbitMQEventBus> _logger;
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly IEventBusSubscriptionsManager _subscriptionManager;
-        private readonly RabbitMQEventBusOptions _eventBusOptions;
+        private readonly EventBusOptions _eventBusOptions;
 
         private IModel _consumerChannel;
 
         public RabbitMQEventBus(ILogger<RabbitMQEventBus> logger
             , IRabbitMQPersistentConnection persistentConnection
             , IEventBusSubscriptionsManager subscriptionManager
-            , IOptions<RabbitMQEventBusOptions> eventBusOptionsAccessor)
+            , IOptions<EventBusOptions> eventBusOptionsAccessor)
         {
             _eventBusOptions = EnsureArg.IsNotNull(eventBusOptionsAccessor, nameof(eventBusOptionsAccessor)).Value;
 
@@ -58,8 +58,8 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
             using (var channel = _persistentConnection.CreateModel())
             {
-                channel.QueueUnbind(queue: _eventBusOptions.QueueName,
-                    exchange: _eventBusOptions.Exchange,
+                channel.QueueUnbind(queue: _eventBusOptions.SubscriptionName,
+                    exchange: _eventBusOptions.BrokerName,
                     routingKey: eventName);
 
                 if (_subscriptionManager.IsEmpty)
@@ -107,10 +107,10 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             {
                 var eventName = @event.GetType().Name;
 
-                CreateExchange(channel);
-
                 var eventMessage = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(eventMessage);
+
+                CreateExchange(channel);
 
                 //TODO: Wel of geen message perrsistence
                 var properties = channel.CreateBasicProperties();
@@ -118,7 +118,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
                 policy.Execute(() =>
                 {
-                    channel.BasicPublish(exchange: _eventBusOptions.Exchange,
+                    channel.BasicPublish(exchange: _eventBusOptions.BrokerName,
                                      routingKey: eventName,
                                      basicProperties: properties,
                                      //basicProperties: null, //properties
@@ -163,7 +163,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
         private void CreateExchange(IModel channel)
         {
-            channel.ExchangeDeclare(exchange: _eventBusOptions.Exchange, type: "direct", durable: true, autoDelete: false);
+            channel.ExchangeDeclare(exchange: _eventBusOptions.BrokerName, type: "direct", durable: true, autoDelete: false);
         }
 
         private void CreateConsumerChannel()
@@ -176,7 +176,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
             CreateExchange(_consumerChannel);
 
-            _consumerChannel.QueueDeclare(queue: _eventBusOptions.QueueName,
+            _consumerChannel.QueueDeclare(queue: _eventBusOptions.SubscriptionName,
                                  durable: true,
                                  exclusive: false,
                                  autoDelete: false,
@@ -186,16 +186,16 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
             var consumer = new EventingBasicConsumer(_consumerChannel);
 
-            consumer.Received += OnEventReceived;
+            consumer.Received += OnMessageReceived;
 
-            _consumerChannel.CallbackException += OnCallBackException;
+            _consumerChannel.CallbackException += OnMessageReceivedException;
 
-            _consumerChannel.BasicConsume(queue: _eventBusOptions.QueueName,
+            _consumerChannel.BasicConsume(queue: _eventBusOptions.SubscriptionName,
                                  autoAck: false,
                                  consumer: consumer);
         }
 
-        private void OnCallBackException(object sender, CallbackExceptionEventArgs e)
+        private void OnMessageReceivedException(object sender, CallbackExceptionEventArgs e)
         {
             CreateConsumerChannel();
 
@@ -203,7 +203,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             //_consumerChannel = CreateConsumerChannel();
         }
 
-        private async void OnEventReceived(object sender, BasicDeliverEventArgs e)
+        private async void OnMessageReceived(object sender, BasicDeliverEventArgs e)
         {
             var eventName = e.RoutingKey;
             var eventMessage = Encoding.UTF8.GetString(e.Body);
@@ -214,22 +214,29 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             _consumerChannel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
         }
 
-         private void AddBrokerSubscriptions()
+        private void AddBrokerSubscriptions()
         {
             foreach (var eventName in _subscriptionManager.Events)
             {
-                CreateBinding(_consumerChannel, eventName);
+                AddBrokerSubscription(eventName);
+                //CreateBinding(_consumerChannel, eventName);
             }
         }
 
         private void AddBrokerSubscription(string eventName)
         {
-            CheckConnection();
+            _consumerChannel.QueueBind(queue: _eventBusOptions.SubscriptionName,
+                                 exchange: _eventBusOptions.BrokerName,
+                                routingKey: eventName);
 
-            using (var channel = _persistentConnection.CreateModel())
-            {
-                CreateBinding(channel, eventName);
-            }
+            //CreateBinding(eventName);
+
+            //CheckConnection();
+
+            //using (var channel = _persistentConnection.CreateModel())
+            //{
+            //    CreateBinding(channel, eventName);
+            //}
 
             //var containsKey = _subscriptionManager.HasSubscriptionsForEvent(eventName);
 
@@ -244,11 +251,11 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             //}
         }
 
-        private void CreateBinding(IModel channel, string eventName)
-        {
-            channel.QueueBind(queue: _eventBusOptions.QueueName,
-                              exchange: _eventBusOptions.Exchange,
-                              routingKey: eventName);
-        }
+        //private void CreateBinding(string eventName)
+        //{
+        //    _consumerChannel.QueueBind(queue: _eventBusOptions.SubscriptionName,
+        //                         exchange: _eventBusOptions.BrokerName,
+        //                        routingKey: eventName);
+        //}
     }
 }

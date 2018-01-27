@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
@@ -195,7 +196,7 @@ namespace Axerrio.BB.DDD.Application.IntegrationEvents
             //}
         }
 
-        public async Task DispatchEventAsync(string eventName, string eventMessage)
+        public async Task DispatchEventAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (HasSubscriptionsForEvent(eventName))
             {

@@ -9,6 +9,7 @@ using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,22 +57,27 @@ namespace Axerrio.BB.DDD
             //services.AddTransient<PaymentMethodCreatedIntegrationEventHandlerSecond>();
             //services.AddTransient<IIntegrationEventHandler<PaymentMethodCreatedIntegrationEvent>, PaymentMethodCreatedIntegrationEventHandler>();
 
-            services.Configure<RabbitMQEventBusOptions>(options => 
-            {
-                options.ConnectRetryAttempts = 3;
+            services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
+            services.AddSingleton<FileEventBus>();
 
-                options.Exchange = "AFO-Test-Exchange";
-                options.QueueName = "AFO-Test-Queue";
+            #region RabbitMQ
 
-                options.PublishRetryAttempts = 2;
+            //services.Configure<EventBusOptions>(options => 
+            //{
+            //    options.ConnectRetryAttempts = 3;
 
-                //"amqp://user:pass@hostName:port/vhost"
-                options.ConnectionString = @"amqp://user:password@localhost:8081//";
-            });
+            //    options.BrokerName = "AFO-Test-Exchange";
+            //    options.SubscriptionName = "AFO-Test-Queue";
+
+            //    options.PublishRetryAttempts = 2;
+
+            //    //"amqp://user:pass@hostName:port/vhost"
+            //    options.ConnectionString = @"amqp://user:password@localhost:8081//";
+            //});
 
             services.AddSingleton<IRabbitMQPersistentConnection>(p =>
             {
-                var options = p.GetRequiredService<IOptions<RabbitMQEventBusOptions>>().Value;
+                var options = p.GetRequiredService<IOptions<EventBusOptions>>().Value;
 
                 var factory = new ConnectionFactory()
                 {
@@ -83,15 +89,52 @@ namespace Axerrio.BB.DDD
                 return new DefaultRabbitMQPersistentConnection(factory, logger, options.ConnectRetryAttempts);
             });
 
-            services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-
             services.AddSingleton<RabbitMQEventBus>();
+            
+            //services.AddSingleton<IEventBus>(provider =>
+            //{
+            //    return provider.GetRequiredService<RabbitMQEventBus>();
+            //});
 
-            services.AddSingleton<FileEventBus>();
+            #endregion
+
+            #region AzureServiceBus
+
+            services.Configure<EventBusOptions>(options =>
+            {
+                options.ConnectRetryAttempts = 3;
+
+                options.BrokerName = "sts-topictest";
+                options.SubscriptionName = "sts-ordering";
+
+                options.PublishRetryAttempts = 2;
+
+                options.ConnectionString = "Endpoint = sb://sts-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=okAS5ZUVaWkRQaoF8u6e8m7ulHZ+cZgu7nB0suhVh+M=";
+            });
+
+            services.AddSingleton<IAzureServiceBusPersistentConnection, DefaultAzureServiceBusPersistentConnection>();
+
+            //services.AddSingleton<IAzureServiceBusPersistentConnection>(p =>
+            //{
+            //    var optionsAccessor = p.GetRequiredService<IOptions<EventBusOptions>>();
+            //    var options = optionsAccessor.Value;
+
+            //    var factory = new ServiceBusConnectionStringBuilder(options.ConnectionString);
+
+            //    var logger = p.GetRequiredService<ILogger<DefaultAzureServiceBusPersistentConnection>>();
+
+            //    return new DefaultAzureServiceBusPersistentConnection(logger, factory, optionsAccessor);
+            //});
+
+            services.AddSingleton<AzureServiceBusEventBus>();
+
             services.AddSingleton<IEventBus>(provider =>
             {
-                return provider.GetRequiredService<RabbitMQEventBus>();
+                return provider.GetRequiredService<AzureServiceBusEventBus>();
             });
+
+
+            #endregion
 
             //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
             services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext>(connectionString, Configuration);

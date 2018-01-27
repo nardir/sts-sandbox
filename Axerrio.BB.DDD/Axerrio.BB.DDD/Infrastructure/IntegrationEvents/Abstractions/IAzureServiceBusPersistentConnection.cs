@@ -8,7 +8,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions
 {
     public interface IAzureServiceBusPersistentConnection
     {
-        ITopicClient CreateTopicClient();
-        ISubscriptionClient CreateSubscriptionClient(); //SubscriptionClient
+        ITopicClient CreatePublishClient();
+        ISubscriptionClient CreateConsumerClient(); //SubscriptionClient
     }
 }
