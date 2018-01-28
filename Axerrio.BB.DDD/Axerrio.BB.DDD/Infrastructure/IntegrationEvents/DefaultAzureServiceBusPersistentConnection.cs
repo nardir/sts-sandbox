@@ -35,20 +35,39 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
             _eventBusOptions = EnsureArg.IsNotNull(eventBusOptionsAccessor, nameof(eventBusOptionsAccessor)).Value;
 
+            var cs = "Endpoint=sb://sts-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=okAS5ZUVaWkRQaoF8u6e8m7ulHZ+cZgu7nB0suhVh+M=";
+
             _serviceBusConnectionStringBuilder = new ServiceBusConnectionStringBuilder(_eventBusOptions.ConnectionString);
+            //_serviceBusConnectionStringBuilder = new ServiceBusConnectionStringBuilder(cs);
             _serviceBusConnectionStringBuilder.EntityPath = _eventBusOptions.BrokerName;
         }
 
         public ISubscriptionClient CreateConsumerClient()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var client = new SubscriptionClient(_serviceBusConnectionStringBuilder, _eventBusOptions.SubscriptionName);
+
+                return client;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public ITopicClient CreatePublishClient()
         {
             if (_topicClient == null || _topicClient.IsClosedOrClosing)
             {
-                _topicClient = new TopicClient(_serviceBusConnectionStringBuilder, RetryPolicy.Default);
+                try
+                {
+                    _topicClient = new TopicClient(_serviceBusConnectionStringBuilder, RetryPolicy.Default);
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
 
             return _topicClient;

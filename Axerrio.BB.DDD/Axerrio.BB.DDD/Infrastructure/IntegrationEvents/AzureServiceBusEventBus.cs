@@ -68,7 +68,11 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
         private async Task CreateConsumer()
         {
-            await _subscriptionClient?.CloseAsync();
+            if (_subscriptionClient != null)
+            {
+                if (!_subscriptionClient.IsClosedOrClosing)
+                    await _subscriptionClient?.CloseAsync();
+            }
 
             _subscriptionClient = _persistentConnection.CreateConsumerClient();
 

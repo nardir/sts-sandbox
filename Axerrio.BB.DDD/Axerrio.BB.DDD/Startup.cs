@@ -109,7 +109,7 @@ namespace Axerrio.BB.DDD
 
                 options.PublishRetryAttempts = 2;
 
-                options.ConnectionString = "Endpoint = sb://sts-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=okAS5ZUVaWkRQaoF8u6e8m7ulHZ+cZgu7nB0suhVh+M=";
+                options.ConnectionString = "Endpoint=sb://sts-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=okAS5ZUVaWkRQaoF8u6e8m7ulHZ+cZgu7nB0suhVh+M=";
             });
 
             services.AddSingleton<IAzureServiceBusPersistentConnection, DefaultAzureServiceBusPersistentConnection>();

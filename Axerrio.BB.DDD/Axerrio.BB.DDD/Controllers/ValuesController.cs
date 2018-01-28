@@ -97,7 +97,8 @@ namespace Axerrio.BB.DDD.Controllers
                 CustomerCode = "HOL"
             };
 
-            var eventBus = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+            //var eventBus = eventBusPublishOnlyFactory.Create<RabbitMQEventBus>();
+            var eventBus = eventBusPublishOnlyFactory.Create<AzureServiceBusEventBus>();
 
             await eventBus.PublishAsync(ie);
 
