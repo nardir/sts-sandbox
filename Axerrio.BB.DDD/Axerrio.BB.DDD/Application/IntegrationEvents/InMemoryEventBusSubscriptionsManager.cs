@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.Extensions.Logging;
 using System;

@@ -1,43 +1,42 @@
-﻿using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions
+namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions
 {
-    public interface IEventBusSubscriptionsManager
+    public interface IEventBusSubscriptionsService
     {
         bool IsEmpty { get; }
+        void Clear();
 
         event EventHandler<string> EventRemoved;
         event EventHandler<string> EventAdded;
 
+        Type GetEventTypeByName(string eventName);
+
+        IEnumerable<string> GetEvents();
+
         void AddSubscription<TIntegrationEventHandler>(string eventName)
-           where TIntegrationEventHandler : IDynamicIntegrationEventHandler;
+            where TIntegrationEventHandler : IIntegrationEventHandler;
+
         void AddSubscription<TIntegrationEvent, TIntegrationEventHandler>()
            where TIntegrationEvent : IntegrationEvent
            where TIntegrationEventHandler : IIntegrationEventHandler<TIntegrationEvent>;
 
         void RemoveSubscription<TIntegrationEventHandler>(string eventName)
-            where TIntegrationEventHandler : IDynamicIntegrationEventHandler;
+            where TIntegrationEventHandler : IIntegrationEventHandler;
+
         void RemoveSubscription<TIntegrationEvent, TIntegrationEventHandler>()
              where TIntegrationEventHandler : IIntegrationEventHandler<TIntegrationEvent>
              where TIntegrationEvent : IntegrationEvent;
 
+        IEnumerable<EventBusSubscription> GetHandlersForEvent<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
+        IEnumerable<EventBusSubscription> GetHandlersForEvent(string eventName);
+
         bool HasSubscriptionsForEvent<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
         bool HasSubscriptionsForEvent(string eventName);
-
-        Type GetEventTypeByName(string eventName);
-        string GetEventName<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
-
-        IEnumerable<string> Events { get; }
-
-        void Clear();
-
-        IEnumerable<IntegrationEventsSubscription> GetHandlersForEvent<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent;
-        IEnumerable<IntegrationEventsSubscription> GetHandlersForEvent(string eventName);
 
         Task DispatchEventAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken));
     }

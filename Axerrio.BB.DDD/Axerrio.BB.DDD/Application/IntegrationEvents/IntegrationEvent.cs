@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Application.IntegrationEvents
 {
-    public class IntegrationEvent
-    {
-        public IntegrationEvent()
-        {
-            Id = Guid.NewGuid();
-            CreationTimestamp = DateTime.UtcNow;
-        }
+    //public class IntegrationEvent
+    //{
+    //    public IntegrationEvent()
+    //    {
+    //        Id = Guid.NewGuid();
+    //        CreationTimestamp = DateTime.UtcNow;
+    //    }
 
-        public Guid Id { get; }
-        public DateTime CreationTimestamp { get; }
-    }
+    //    public Guid Id { get; }
+    //    public DateTime CreationTimestamp { get; }
+    //}
 }
