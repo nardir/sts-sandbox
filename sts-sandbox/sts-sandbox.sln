@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD.IE", "..\Axe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD.IE.API", "Axerrio.BB.DDD.IE.API\Axerrio.BB.DDD.IE.API.csproj", "{28BFEC45-4DF3-4BB1-ACEE-CD4B6CB00C87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD.IE.EntityFrameworkCore", "Axerrio.BB.DDD.IE.EntityFrameworkCore\Axerrio.BB.DDD.IE.EntityFrameworkCore.csproj", "{6FF5EFC1-D676-4AE8-B736-D6D85158DB21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -231,6 +233,10 @@ Global
 		{28BFEC45-4DF3-4BB1-ACEE-CD4B6CB00C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28BFEC45-4DF3-4BB1-ACEE-CD4B6CB00C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28BFEC45-4DF3-4BB1-ACEE-CD4B6CB00C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FF5EFC1-D676-4AE8-B736-D6D85158DB21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FF5EFC1-D676-4AE8-B736-D6D85158DB21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FF5EFC1-D676-4AE8-B736-D6D85158DB21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FF5EFC1-D676-4AE8-B736-D6D85158DB21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +281,7 @@ Global
 		{D84BD4C6-A928-41AC-8DA6-B7EF93FA221E} = {DC066705-901F-4CC0-AE3E-1C32A3518654}
 		{CCBE5677-3F36-4C67-9210-F010E4EC7177} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
 		{28BFEC45-4DF3-4BB1-ACEE-CD4B6CB00C87} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
+		{6FF5EFC1-D676-4AE8-B736-D6D85158DB21} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}

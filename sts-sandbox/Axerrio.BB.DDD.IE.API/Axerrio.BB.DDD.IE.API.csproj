@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Axerrio.BB.DDD.IE\Axerrio.BB.DDD.IE.csproj" />
+    <ProjectReference Include="..\Axerrio.BB.DDD.IE.EntityFrameworkCore\Axerrio.BB.DDD.IE.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Autofac;
+using Axerrio.BB.DDD.IE.API.Application;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,15 +28,42 @@ namespace Axerrio.BB.DDD.IE.API
 
         public IConfiguration Configuration { get; }
 
+        public IContainer ApplicationContainer { get; private set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            //http://autofaccn.readthedocs.io/en/latest/integration/aspnetcore.html
+            var builder = new ContainerBuilder();
+
+            builder.Populate(services);
+
+            builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
+
+            builder.RegisterType<IntegrationEventsService<EFCoreStoreAndForwardEventBus<OrderingDbContext>>>()
+                .As<IIntegrationEventsService>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<InMemoryEventBusSubscriptionsService>()
+                .As<IEventBusSubscriptionsService>()
+                .SingleInstance();
+               
+
+            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
+
+            ApplicationContainer = builder.Build();
+
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
+            appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
