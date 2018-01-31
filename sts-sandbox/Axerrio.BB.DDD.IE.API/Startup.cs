@@ -78,6 +78,7 @@ namespace Axerrio.BB.DDD.IE.API
             builder.RegisterType<RabbitMQEventBus>()
                 .UsingConstructor(typeof(IEventBusSubscriptionsService), typeof(IOptions<EventBusOptions>), typeof(ILogger<RabbitMQEventBus>))
                 .As<IEventBusPublisher>()
+                .As<IEventBusConsumer>()
                 .SingleInstance();
 
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)

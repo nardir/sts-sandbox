@@ -14,15 +14,18 @@ namespace Axerrio.BB.DDD.IE.API.Controllers
     {
         private readonly IIntegrationEventsService _integrationEventsService;
         private readonly OrderingDbContext _context;
-        private readonly IEventBusPublisher _eventBus;
+        private readonly IEventBusPublisher _eventBusPublisher;
+        private readonly IEventBusConsumer _eventBusConsumer;
 
         public ValuesController(IIntegrationEventsService integrationEventsService
             , OrderingDbContext context
-            , IEventBusPublisher eventBus)
+            , IEventBusPublisher eventBusPublisher
+            , IEventBusConsumer eventBusConsumer)
         {
             _integrationEventsService = EnsureArg.IsNotNull(integrationEventsService, nameof(integrationEventsService));
             _context = EnsureArg.IsNotNull(context, nameof(context));
-            _eventBus = EnsureArg.IsNotNull(eventBus, nameof(eventBus));
+            _eventBusPublisher = EnsureArg.IsNotNull(eventBusPublisher, nameof(eventBusPublisher));
+            _eventBusConsumer = EnsureArg.IsNotNull(eventBusConsumer, nameof(eventBusConsumer));
         }
 
         [HttpGet("createorder1/{id:int}")]
@@ -42,7 +45,23 @@ namespace Axerrio.BB.DDD.IE.API.Controllers
         {
             var orderCreatedIntegrationEvent = new OrderCreatedIntegrationEvent { OrderNumber = id.ToString(), CustomerCode = id.ToString() };
 
-            await _eventBus.PublishAsync(orderCreatedIntegrationEvent);
+            await _eventBusPublisher.PublishAsync(orderCreatedIntegrationEvent);
+
+            return Ok();
+        }
+
+        [HttpGet("startconsume")]
+        public async Task<IActionResult> StartConsume()
+        {
+            await _eventBusConsumer.StartConsumeAsync();
+
+            return Ok();
+        }
+
+        [HttpGet("stopconsume")]
+        public async Task<IActionResult> StopConsume()
+        {
+            await _eventBusConsumer.StopConsumeAsync();
 
             return Ok();
         }

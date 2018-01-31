@@ -117,6 +117,8 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
             try
             {
+                _consumerChannel?.Dispose();
+
                 _connection?.Dispose();
             }
             catch (IOException ex)
