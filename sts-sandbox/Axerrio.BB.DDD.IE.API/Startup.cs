@@ -20,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure;
+using Microsoft.Extensions.Hosting;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -83,6 +84,10 @@ namespace Axerrio.BB.DDD.IE.API
 
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
+
+            builder.RegisterType<EventBusConsumeHostedService>()
+                .As<IHostedService>()
+                .SingleInstance();
 
             ApplicationContainer = builder.Build();
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Axerrio.BB.AspNetCore.Infrastructure.Hosting.HostedServices.Abstractions
+namespace Axerrio.BB.DDD.Infrastructure.Hosting.HostedServices.Abstractions
 {
     public abstract class BackgroundService : IHostedService, IDisposable
     {

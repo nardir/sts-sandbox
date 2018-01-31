@@ -19,7 +19,10 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         public Task StartConsumeAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            StopConsumeAsync().GetAwaiter().GetResult();
+            if (cancellationToken.IsCancellationRequested)
+                return Task.CompletedTask;
+
+            StopConsumeAsync(cancellationToken).GetAwaiter().GetResult();
 
             _consumerChannel = CreateModel();
 
@@ -51,6 +54,9 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         public Task StopConsumeAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (cancellationToken.IsCancellationRequested)
+                return Task.CompletedTask;
+
             _eventBusSubscriptionsService.EventRemoved -= OnEventRemoved;
             _eventBusSubscriptionsService.EventAdded -= OnEventAdded;
 

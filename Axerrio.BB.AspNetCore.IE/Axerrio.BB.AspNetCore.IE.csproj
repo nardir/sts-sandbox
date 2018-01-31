@@ -9,4 +9,8 @@
     <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.2.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\Hosting\Abstractions\" />
+  </ItemGroup>
+
 </Project>
