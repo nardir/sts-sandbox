@@ -12,7 +12,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             TableName = "EventQueueItem";
         }
 
-        //public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; }
         public string Schema { get; set; }
         public string TableName { get; set; }
     }

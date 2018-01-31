@@ -43,6 +43,11 @@ namespace Axerrio.BB.DDD.IE.API
             services.AddOptions();
 
             services.Configure<EFCoreIntegrationEventsDatabaseOptions>(configuration: Configuration, key: "IntegrationEventsDatabaseOptions");
+            services.Configure<EFCoreIntegrationEventsDatabaseOptions>(options => 
+            {
+                options.ConnectionString = connectionString;
+            });
+
             services.Configure<EventBusOptions>(configuration: Configuration, key: "RabbitMQEventBus");
 
             services.AddEntityFrameworkSqlServer()
@@ -65,10 +70,10 @@ namespace Axerrio.BB.DDD.IE.API
 
             //builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
 
-            builder.RegisterType<EFCoreStoreAndForwardEventBus<OrderingDbContext>>()
+            builder.RegisterType<EFCoreStoreAndForwardPublisherEventBus<OrderingDbContext>>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<IntegrationEventsService<EFCoreStoreAndForwardEventBus<OrderingDbContext>>>()
+            builder.RegisterType<IntegrationEventsService<EFCoreStoreAndForwardPublisherEventBus<OrderingDbContext>>>()
                 .As<IIntegrationEventsService>()
                 .InstancePerLifetimeScope();
 
@@ -80,6 +85,9 @@ namespace Axerrio.BB.DDD.IE.API
                 .UsingConstructor(typeof(IEventBusSubscriptionsService), typeof(IOptions<EventBusOptions>), typeof(ILogger<RabbitMQEventBus>))
                 .As<IEventBusPublisher>()
                 .As<IEventBusConsumer>()
+                .SingleInstance();
+
+            builder.RegisterType<EFCoreStoreAndForwardConsumerEventBus>()
                 .SingleInstance();
 
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
