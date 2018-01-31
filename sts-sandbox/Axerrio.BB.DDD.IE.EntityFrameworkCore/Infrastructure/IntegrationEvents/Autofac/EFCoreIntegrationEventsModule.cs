@@ -12,16 +12,16 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Au
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EFCoreStoreAndForwardEventBusFactory<TContext>>()
-                .InstancePerLifetimeScope();
+            //builder.RegisterType<EFCoreStoreAndForwardEventBusFactory<TContext>>()
+            //    .InstancePerLifetimeScope();
 
-            builder.Register(context => 
-                {
-                    var factory = context.Resolve<EFCoreStoreAndForwardEventBusFactory<TContext>>();
+            //builder.Register(context => 
+            //    {
+            //        var factory = context.Resolve<EFCoreStoreAndForwardEventBusFactory<TContext>>();
 
-                    return factory.Create();
-                })
-            .SingleInstance();
+            //        return factory.Create();
+            //    })
+            //.SingleInstance();
         }
     }
 }

@@ -6,16 +6,20 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Autofac;
 using Axerrio.BB.DDD.IE.API.Application;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
+using Axerrio.BB.AspNetCore.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -33,6 +37,24 @@ namespace Axerrio.BB.DDD.IE.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration.GetValue<string>("ConnectionString");
+
+            services.AddOptions();
+
+            services.Configure<EFCoreIntegrationEventsDatabaseOptions>(configuration: Configuration, key: "IntegrationEventsDatabaseOptions");
+            services.Configure<EventBusOptions>(configuration: Configuration, key: "RabbitMQEventBus");
+
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<OrderingDbContext>(options =>
+                {
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(OrderingDbContext).GetTypeInfo().Assembly.GetName().Name);
+                    });
+                });
+
+            //services.AddTransient<EFCoreStoreAndForwardEventBus<OrderingDbContext>>();
+
             services.AddMvc();
 
             //http://autofaccn.readthedocs.io/en/latest/integration/aspnetcore.html
@@ -40,7 +62,10 @@ namespace Axerrio.BB.DDD.IE.API
 
             builder.Populate(services);
 
-            builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
+            //builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
+
+            builder.RegisterType<EFCoreStoreAndForwardEventBus<OrderingDbContext>>()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<IntegrationEventsService<EFCoreStoreAndForwardEventBus<OrderingDbContext>>>()
                 .As<IIntegrationEventsService>()
@@ -49,7 +74,11 @@ namespace Axerrio.BB.DDD.IE.API
             builder.RegisterType<InMemoryEventBusSubscriptionsService>()
                 .As<IEventBusSubscriptionsService>()
                 .SingleInstance();
-               
+
+            builder.RegisterType<RabbitMQEventBus>()
+                .UsingConstructor(typeof(IEventBusSubscriptionsService), typeof(IOptions<EventBusOptions>), typeof(ILogger<RabbitMQEventBus>))
+                .As<IEventBusPublisher>()
+                .SingleInstance();
 
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
@@ -68,6 +97,10 @@ namespace Axerrio.BB.DDD.IE.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            var subscriptionsService = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsService>();
+
+            subscriptionsService.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
             app.UseMvc();
         }

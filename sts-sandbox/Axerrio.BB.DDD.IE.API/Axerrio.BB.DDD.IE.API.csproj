@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
+    <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.2.0.5" />
     <PackageReference Include="Axerrio.BB.DDD" Version="18.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
   </ItemGroup>
@@ -19,8 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Axerrio.BB.AspNetCore.IE\Axerrio.BB.AspNetCore.IE.csproj" />
     <ProjectReference Include="..\..\Axerrio.BB.DDD.IE\Axerrio.BB.DDD.IE.csproj" />
     <ProjectReference Include="..\Axerrio.BB.DDD.IE.EntityFrameworkCore\Axerrio.BB.DDD.IE.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Axerrio.BB.DDD.IE.RabbitMQ\Axerrio.BB.DDD.IE.RabbitMQ.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Abstractions;
+﻿using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
 using Microsoft.EntityFrameworkCore;
@@ -26,9 +27,23 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            EnsureArg.IsNotNull(@event, nameof(@event));
+
+            var eventQueueItem = new IntegrationEventsQueueItem(@event);
+
+            _logger.LogDebug($"Enqueueing integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId}");
+
+            EnsureArg.IsNotNull(eventQueueItem, nameof(eventQueueItem));
+
+            eventQueueItem.EnqueuedTimestamp = DateTime.UtcNow;
+
+            await _context.IntegrationEventsQueueItems.AddAsync(eventQueueItem); //Async because we have a sql sequence
+
+            _logger.LogDebug($"Enqueued integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId}");
+
+            _logger.LogTrace($"Enqueued integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId} type: {eventQueueItem.EventTypeName} content: {eventQueueItem.EventContent}");
         }
     }
 }
