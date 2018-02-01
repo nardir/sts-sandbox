@@ -53,7 +53,7 @@ namespace Axerrio.BB.DDD.IE.API.Controllers
         [HttpGet("startconsume")]
         public async Task<IActionResult> StartConsume()
         {
-            await _eventBusConsumer.StartConsumeAsync();
+            await _eventBusConsumer.StartConsumerAsync();
 
             return Ok();
         }
@@ -61,7 +61,7 @@ namespace Axerrio.BB.DDD.IE.API.Controllers
         [HttpGet("stopconsume")]
         public async Task<IActionResult> StopConsume()
         {
-            await _eventBusConsumer.StopConsumeAsync();
+            await _eventBusConsumer.StopConsumerAsync();
 
             return Ok();
         }

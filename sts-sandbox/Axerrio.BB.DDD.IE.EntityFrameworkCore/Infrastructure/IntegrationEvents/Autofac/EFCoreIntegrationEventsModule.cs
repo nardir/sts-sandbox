@@ -8,7 +8,7 @@ using System.Text;
 namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Autofac
 {
     public class EFCoreIntegrationEventsModule<TContext>: Module
-        where TContext : DbContext, IIntegrationEventsDbContext
+        where TContext : DbContext, IStoreAndForwardEventBusDbContext
     {
         protected override void Load(ContainerBuilder builder)
         {

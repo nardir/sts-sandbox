@@ -17,7 +17,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
         private readonly ModelBuilder _modelBuilder;
 
-        public IntegrationEventsQueueItemConfiguration(ModelBuilder modelBuilder, EFCoreIntegrationEventsDatabaseOptions integrationEventsDatabaseOptions)
+        public IntegrationEventsQueueItemConfiguration(ModelBuilder modelBuilder, StoreAndForwardEventBusDatabaseOptions integrationEventsDatabaseOptions)
         {
             _modelBuilder = EnsureArg.IsNotNull(modelBuilder, nameof(modelBuilder));
 

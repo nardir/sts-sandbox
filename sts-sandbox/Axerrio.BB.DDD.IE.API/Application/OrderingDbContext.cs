@@ -10,23 +10,23 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.IE.API.Application
 {
-    public class OrderingDbContext : DbContext, IIntegrationEventsDbContext
+    public class OrderingDbContext : DbContext, IStoreAndForwardEventBusDbContext
     {
-        private readonly EFCoreIntegrationEventsDatabaseOptions _integrationEventsDatabaseOptions;
+        private readonly StoreAndForwardEventBusDatabaseOptions _storeAndForwardEventBusDatabaseOptions;
 
         public DbSet<IntegrationEventsQueueItem> IntegrationEventsQueueItems { get; set; }
 
-        public EFCoreIntegrationEventsDatabaseOptions IntegrationEventsDatabaseOptions => _integrationEventsDatabaseOptions;
+        public StoreAndForwardEventBusDatabaseOptions StoreAndForwardEventBusDatabaseOptions => _storeAndForwardEventBusDatabaseOptions;
 
-        public OrderingDbContext(DbContextOptions<OrderingDbContext> options, IOptions<EFCoreIntegrationEventsDatabaseOptions> integrationEventsDatabaseOptionsAccessor)
+        public OrderingDbContext(DbContextOptions<OrderingDbContext> options, IOptions<StoreAndForwardEventBusDatabaseOptions> storeAndForwardEventBusDatabaseOptionsAccessor)
             : base(options)
         {
-            _integrationEventsDatabaseOptions = EnsureArg.IsNotNull(integrationEventsDatabaseOptionsAccessor, nameof(integrationEventsDatabaseOptionsAccessor)).Value;
+            _storeAndForwardEventBusDatabaseOptions = EnsureArg.IsNotNull(storeAndForwardEventBusDatabaseOptionsAccessor, nameof(storeAndForwardEventBusDatabaseOptionsAccessor)).Value;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new IntegrationEventsQueueItemConfiguration(modelBuilder, _integrationEventsDatabaseOptions));
+            modelBuilder.ApplyConfiguration(new IntegrationEventsQueueItemConfiguration(modelBuilder, _storeAndForwardEventBusDatabaseOptions));
         }
     }
 }

@@ -12,16 +12,16 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
     public class IntegrationEventsService<TEventBusPublisher> : IIntegrationEventsService
         where TEventBusPublisher: IEventBusPublisher
     {
-        private readonly IEventBusPublisher _eventBus;
+        private readonly IEventBusPublisher _eventBusPublisher;
 
         public IntegrationEventsService(TEventBusPublisher eventBus)
         {
-            _eventBus = EnsureArg.IsNotNull(eventBus, nameof(eventBus));
+            _eventBusPublisher = EnsureArg.IsNotNull(eventBus, nameof(eventBus));
         }
 
         public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _eventBus.PublishAsync(@event, cancellationToken);
+            return _eventBusPublisher.PublishAsync(@event, cancellationToken);
         }
     }
 }

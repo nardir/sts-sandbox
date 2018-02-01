@@ -24,7 +24,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             EventId = @event.Id;
             EventCreationTimestamp = @event.CreationTimestamp;
-            EventTypeName = @event.GetType().FullName;
+            //EventTypeName = @event.GetType().FullName;
+            EventTypeName = @event.GetType().AssemblyQualifiedName;
             EventContent = JsonConvert.SerializeObject(@event);
         }
 

@@ -12,15 +12,15 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure
 {
-    public class EFCoreStoreAndForwardPublisherEventBus<TContext> : IEventBusPublisher
-        where TContext : DbContext, IIntegrationEventsDbContext
+    public class StoreAndForwardEventBusPublisher<TContext> : IEventBusPublisher
+        where TContext : DbContext, IStoreAndForwardEventBusDbContext
     {
         private readonly TContext _context;
-        private readonly ILogger<EFCoreStoreAndForwardPublisherEventBus<TContext>> _logger;
+        private readonly ILogger<StoreAndForwardEventBusPublisher<TContext>> _logger;
 
-        public delegate EFCoreStoreAndForwardPublisherEventBus<TContext> Factory();
+        public delegate StoreAndForwardEventBusPublisher<TContext> Factory();
 
-        public EFCoreStoreAndForwardPublisherEventBus(ILogger<EFCoreStoreAndForwardPublisherEventBus<TContext>> logger
+        public StoreAndForwardEventBusPublisher(ILogger<StoreAndForwardEventBusPublisher<TContext>> logger
             , TContext context)
         {
             _context = EnsureArg.IsNotNull(context, nameof(context));

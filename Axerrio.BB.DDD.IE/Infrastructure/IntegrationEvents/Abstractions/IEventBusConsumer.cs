@@ -8,7 +8,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions
 {
     public interface IEventBusConsumer
     {
-        Task StartConsumeAsync(CancellationToken cancellationToken = default(CancellationToken));
-        Task StopConsumeAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task StartConsumerAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task StopConsumerAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

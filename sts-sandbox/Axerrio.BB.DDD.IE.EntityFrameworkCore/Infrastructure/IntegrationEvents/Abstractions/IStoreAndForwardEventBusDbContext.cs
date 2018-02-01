@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Abstractions
 {
-    public interface IIntegrationEventsDbContext
+    public interface IStoreAndForwardEventBusDbContext
     {
-        EFCoreIntegrationEventsDatabaseOptions IntegrationEventsDatabaseOptions { get; }
+        StoreAndForwardEventBusDatabaseOptions StoreAndForwardEventBusDatabaseOptions { get; }
         DbSet<IntegrationEventsQueueItem> IntegrationEventsQueueItems { get; set; }
     }
 }

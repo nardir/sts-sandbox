@@ -17,12 +17,12 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         #region IEventBusConsumer
 
-        public Task StartConsumeAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task StartConsumerAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
                 return Task.CompletedTask;
 
-            StopConsumeAsync(cancellationToken).GetAwaiter().GetResult();
+            StopConsumerAsync(cancellationToken).GetAwaiter().GetResult();
 
             _consumerChannel = CreateModel();
 
@@ -52,7 +52,7 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
             return Task.CompletedTask;
         }
 
-        public Task StopConsumeAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task StopConsumerAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (cancellationToken.IsCancellationRequested)
                 return Task.CompletedTask;
@@ -69,7 +69,7 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         private void OnMessageReceivedException(object sender, CallbackExceptionEventArgs e)
         {
-            StartConsumeAsync().GetAwaiter().GetResult();
+            StartConsumerAsync().GetAwaiter().GetResult();
         }
 
         private void OnMessageReceived(object sender, BasicDeliverEventArgs e)
@@ -97,7 +97,7 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
                 if (_eventBusSubscriptionsService.IsEmpty)
                 {
-                    StopConsumeAsync().GetAwaiter().GetResult();
+                    StopConsumerAsync().GetAwaiter().GetResult();
                 }
             }
         }
