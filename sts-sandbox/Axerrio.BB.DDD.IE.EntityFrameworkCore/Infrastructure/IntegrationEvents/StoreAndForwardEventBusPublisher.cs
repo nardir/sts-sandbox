@@ -27,12 +27,28 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
             EnsureArg.IsNotNull(@event, nameof(@event));
 
-            var eventQueueItem = new IntegrationEventsQueueItem(@event);
+            //var eventQueueItem = new IntegrationEventsQueueItem(@event);
+            var eventQueueItem = IntegrationEventsQueueItem.Create(@event);
 
+            return PublishAsync(eventQueueItem, cancellationToken);
+        }
+
+        public Task PublishAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            EnsureArg.IsNotNullOrWhiteSpace(eventName, nameof(eventName));
+            EnsureArg.IsNotNullOrWhiteSpace(eventMessage, nameof(eventMessage));
+
+            var eventQueueItem = IntegrationEventsQueueItem.Create(eventName, eventMessage);
+
+            return PublishAsync(eventQueueItem, cancellationToken);
+        }
+
+        private async Task PublishAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
+        {
             _logger.LogDebug($"Enqueueing integration event, queue item: {eventQueueItem.EventQueueItemId} event: {eventQueueItem.EventId}");
 
             EnsureArg.IsNotNull(eventQueueItem, nameof(eventQueueItem));

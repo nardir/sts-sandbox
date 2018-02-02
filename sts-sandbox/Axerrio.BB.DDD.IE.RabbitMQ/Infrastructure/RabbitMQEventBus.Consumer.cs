@@ -116,5 +116,7 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
                                  exchange: _eventBusOptions.BrokerName,
                                  routingKey: eventName);
         }
+
+
     }
 }

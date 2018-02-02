@@ -16,13 +16,15 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 {
     public partial class StoreAndForwardEventBusForwarder : IEventBusForwarder
     {
+        private readonly IEventBusSubscriptionsService _eventBusSubscriptionsService;
         private readonly ILogger<StoreAndForwardEventBusForwarder> _logger;
         private readonly StoreAndForwardEventBusDatabaseOptions _databaseOptions;
         private readonly StoreAndForwardEventBusForwardOptions _forwardOptions;
         private readonly IEventBusPublisher _eventBusPublisher;
         private readonly Policy _retryPolicy;
 
-        public StoreAndForwardEventBusForwarder(IEventBusPublisher eventBusPublisher
+        public StoreAndForwardEventBusForwarder(IEventBusSubscriptionsService eventBusSubscriptionsService
+            , IEventBusPublisher eventBusPublisher
             , ILogger<StoreAndForwardEventBusForwarder> logger
             , IOptions<StoreAndForwardEventBusDatabaseOptions> databaseOptionsAccessor
             , IOptions<StoreAndForwardEventBusForwardOptions> forwardOptionsAccessor)
@@ -31,6 +33,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _databaseOptions = EnsureArg.IsNotNull(databaseOptionsAccessor, nameof(databaseOptionsAccessor)).Value;
             _forwardOptions = EnsureArg.IsNotNull(forwardOptionsAccessor, nameof(forwardOptionsAccessor)).Value;
             _eventBusPublisher = EnsureArg.IsNotNull(eventBusPublisher, nameof(eventBusPublisher));
+            _eventBusSubscriptionsService = EnsureArg.IsNotNull(eventBusSubscriptionsService, nameof(eventBusSubscriptionsService));
 
             _retryPolicy = CreatePolicy(_databaseOptions.RetryAttempts);
         }
@@ -60,7 +63,9 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
                         _logger.LogDebug($"Forwarding integration event for queue item {eventQueueItem.EventQueueItemId}");
 
-                        await _eventBusPublisher.PublishAsync(eventQueueItem.IntegrationEvent);
+                        //await _eventBusPublisher.PublishAsync(eventQueueItem.IntegrationEvent);
+                        //await _eventBusPublisher.PublishAsync(eventQueueItem.EventName, eventQueueItem.EventContent);
+                        await _eventBusSubscriptionsService.DispatchEventAsync(eventQueueItem.EventName, eventQueueItem.EventContent);
 
                         await PublishEventAsync(eventQueueItem);
 

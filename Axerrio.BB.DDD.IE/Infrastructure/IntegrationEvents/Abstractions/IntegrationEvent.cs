@@ -9,7 +9,18 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions
     {
         public static string GetEventName<TIntegrationEvent>() where TIntegrationEvent : IntegrationEvent
         {
-            return typeof(TIntegrationEvent).Name;
+            //return typeof(TIntegrationEvent).Name;
+            return GetEventName(typeof(TIntegrationEvent));
+        }
+
+        public static string GetEventName(Type integrationEventType)
+        {
+            return integrationEventType.Name;
+        }
+
+        public string GetEventName()
+        {
+            return GetEventName(GetType());
         }
 
         public IntegrationEvent()

@@ -34,7 +34,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             entityTypeBuilder.ToTable(_tableName, _schema);
 
-            entityTypeBuilder.Ignore(eqi => eqi.IntegrationEvent);
+            //entityTypeBuilder.Ignore(eqi => eqi.IntegrationEvent);
 
             //Queue properties
             //PK
@@ -85,6 +85,9 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 .IsRequired();
 
             entityTypeBuilder.Property(e => e.EventTypeName)
+                .IsRequired();
+
+            entityTypeBuilder.Property(e => e.EventName)
                 .IsRequired();
         }
     }

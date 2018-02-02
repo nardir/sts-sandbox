@@ -91,6 +91,8 @@ namespace Axerrio.BB.DDD.IE.API
             builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
 
+            builder.RegisterType<ForwardIntegrationEventHandler>();
+
             #endregion
 
             #region StoreAndForwardEventBusPublisher
@@ -107,13 +109,14 @@ namespace Axerrio.BB.DDD.IE.API
             #region RabbitMQEventBus
 
             builder.RegisterType<InMemoryEventBusSubscriptionsService>()
-                .As<IEventBusSubscriptionsService>()
-                .SingleInstance();
+                .As<IEventBusSubscriptionsService>();
+                //.SingleInstance();
 
             builder.RegisterType<RabbitMQEventBus>()
                 .UsingConstructor(typeof(IEventBusSubscriptionsService), typeof(IOptions<EventBusOptions>), typeof(ILogger<RabbitMQEventBus>))
                 .As<IEventBusPublisher>()
                 .As<IEventBusConsumer>()
+                //.As<IEventBusSubscriber>()
                 .AsSelf()
                 .SingleInstance();
 
@@ -127,6 +130,7 @@ namespace Axerrio.BB.DDD.IE.API
 
             builder.RegisterType<StoreAndForwardEventBusForwarder>()
                 .As<IEventBusForwarder>()
+                .AsSelf()
                 .SingleInstance();
 
             builder.RegisterType<StoreAndForwardEventBusConsumerTriggerFactory>()
@@ -163,9 +167,17 @@ namespace Axerrio.BB.DDD.IE.API
                 app.UseDeveloperExceptionPage();
             }
 
-            var subscriptionsService = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsService>();
+            //var subscriptionsService = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsService>();
 
-            subscriptionsService.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+            //subscriptionsService.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+
+            IEventBusSubscriber eventBus = ApplicationContainer.Resolve<RabbitMQEventBus>();
+
+            eventBus.Subscribe<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+
+            IEventBusSubscriber storeAndForwardEventBus = ApplicationContainer.Resolve<StoreAndForwardEventBusForwarder>();
+
+            storeAndForwardEventBus.Subscribe<ForwardIntegrationEventHandler>(nameof(OrderCreatedIntegrationEvent));
 
             app.UseMvc();
         }

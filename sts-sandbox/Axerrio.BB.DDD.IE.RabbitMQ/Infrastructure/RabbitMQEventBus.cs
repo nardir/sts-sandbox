@@ -46,6 +46,15 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
+            //var eventName = IntegrationEvent.GetEventName(@event.GetType());
+            var eventName = @event.GetEventName();
+            var eventMessage = JsonConvert.SerializeObject(@event);
+
+            return PublishAsync(eventName, eventMessage);
+        }
+
+        public Task PublishAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
+        {
             var policy = Policy.Handle<BrokerUnreachableException>()
                 .Or<SocketException>()
                 .WaitAndRetry(_eventBusOptions.PublishRetryAttempts, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
@@ -55,9 +64,9 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
             using (var channel = CreateModel())
             {
-                var eventName = @event.GetType().Name;
+                //var eventName = @event.GetType().Name;
 
-                var eventMessage = JsonConvert.SerializeObject(@event);
+                //var eventMessage = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(eventMessage);
 
                 CreateExchange(channel);

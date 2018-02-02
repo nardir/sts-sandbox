@@ -77,7 +77,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
 
                             dynamic @event = JObject.Parse(eventMessage);
 
-                            await eventHandler.HandleAsync(@event);
+                            await eventHandler.HandleAsync(eventName, @event, cancellationToken);
                         }
                         else
                         {
@@ -88,7 +88,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
                             var eventHandler = scope.ResolveOptional(subscription.HandlerType);
                             var closedEventHandlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
-                            await(Task) closedEventHandlerType.GetMethod("HandleAsync").Invoke(eventHandler, new object[] { @event });
+                            await(Task) closedEventHandlerType.GetMethod("HandleAsync").Invoke(eventHandler, new object[] { @event, cancellationToken });
                         }
                     }
                 }
