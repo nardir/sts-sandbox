@@ -37,7 +37,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure
             return PublishAsync(eventQueueItem, cancellationToken);
         }
 
-        public Task PublishAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
+        public Task PublishAsync(string eventName, Guid eventId, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
         {
             EnsureArg.IsNotNullOrWhiteSpace(eventName, nameof(eventName));
             EnsureArg.IsNotNullOrWhiteSpace(eventMessage, nameof(eventMessage));

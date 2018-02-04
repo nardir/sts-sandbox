@@ -22,25 +22,18 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
         private readonly ILogger<RabbitMQEventBus> _logger;
 
         public RabbitMQEventBus(IEventBusSubscriptionsService eventBusSubscriptionsService, IOptions<EventBusOptions> eventBusOptionsAccessor, ILogger<RabbitMQEventBus> logger)
+            : this(null, eventBusSubscriptionsService, eventBusOptionsAccessor, logger)
+        {
+        }
+
+        public RabbitMQEventBus(IConnectionFactory connectionFactory, IEventBusSubscriptionsService eventBusSubscriptionsService, IOptions<EventBusOptions> eventBusOptionsAccessor, ILogger<RabbitMQEventBus> logger)
         {
             _eventBusOptions = EnsureArg.IsNotNull(eventBusOptionsAccessor, nameof(eventBusOptionsAccessor)).Value;
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
 
             _eventBusSubscriptionsService = EnsureArg.IsNotNull(eventBusSubscriptionsService, nameof(eventBusSubscriptionsService));
 
-            if (_connectionFactory == null)
-            {
-                _connectionFactory = new ConnectionFactory
-                {
-                    Uri = new Uri(_eventBusOptions.ConnectionString),
-                };
-            }
-        }
-
-        public RabbitMQEventBus(IConnectionFactory connectionFactory, IEventBusSubscriptionsService eventBusSubscriptionsService, IOptions<EventBusOptions> eventBusOptionsAccessor, ILogger<RabbitMQEventBus> logger)
-            : this(eventBusSubscriptionsService, eventBusOptionsAccessor, logger)
-        {
-            _connectionFactory = EnsureArg.IsNotNull(connectionFactory, nameof(connectionFactory));
+            _connectionFactory = connectionFactory ?? new ConnectionFactory { Uri = new Uri(_eventBusOptions.ConnectionString) };
 
         }
 
@@ -50,10 +43,10 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
             var eventName = @event.GetEventName();
             var eventMessage = JsonConvert.SerializeObject(@event);
 
-            return PublishAsync(eventName, eventMessage);
+            return PublishAsync(eventName, @event.Id, eventMessage);
         }
 
-        public Task PublishAsync(string eventName, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
+        public Task PublishAsync(string eventName, Guid eventId, string eventMessage, CancellationToken cancellationToken = default(CancellationToken))
         {
             var policy = Policy.Handle<BrokerUnreachableException>()
                 .Or<SocketException>()

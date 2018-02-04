@@ -18,7 +18,7 @@ namespace Axerrio.BB.DDD.IE.API.Application
             _logger = EnsureArg.IsNotNull(logger, nameof(logger));
         }
 
-        public Task HandleAsync(OrderCreatedIntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
+        public Task HandleAsync(string eventName, OrderCreatedIntegrationEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
             _logger.LogInformation($"OrderCreated {@event.OrderNumber}");
 

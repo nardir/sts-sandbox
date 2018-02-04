@@ -88,7 +88,7 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents
                             var eventHandler = scope.ResolveOptional(subscription.HandlerType);
                             var closedEventHandlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
-                            await(Task) closedEventHandlerType.GetMethod("HandleAsync").Invoke(eventHandler, new object[] { @event, cancellationToken });
+                            await(Task) closedEventHandlerType.GetMethod("HandleAsync").Invoke(eventHandler, new object[] { eventName, @event, cancellationToken });
                         }
                     }
                 }

@@ -11,8 +11,6 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 {
     public partial class RabbitMQEventBus : IEventBusConsumer
     {
-        private readonly IEventBusSubscriptionsService _eventBusSubscriptionsService;
-
         private IModel _consumerChannel;
 
         #region IEventBusConsumer
@@ -54,9 +52,6 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
 
         public Task StopConsumerAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (cancellationToken.IsCancellationRequested)
-                return Task.CompletedTask;
-
             _eventBusSubscriptionsService.EventRemoved -= OnEventRemoved;
             _eventBusSubscriptionsService.EventAdded -= OnEventAdded;
 
@@ -116,7 +111,5 @@ namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
                                  exchange: _eventBusOptions.BrokerName,
                                  routingKey: eventName);
         }
-
-
     }
 }

@@ -23,8 +23,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Infrastructure\Abstractions\" />
-  </ItemGroup>
-
 </Project>

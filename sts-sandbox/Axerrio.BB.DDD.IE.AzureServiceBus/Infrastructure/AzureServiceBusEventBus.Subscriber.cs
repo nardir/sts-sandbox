@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure
+namespace Axerrio.BB.DDD.AzureServiceBus.Infrastructure
 {
-    public partial class RabbitMQEventBus: IEventBusSubscriber
+    public partial class AzureServiceBusEventBus: IEventBusSubscriber
     {
         private readonly IEventBusSubscriptionsService _eventBusSubscriptionsService;
 

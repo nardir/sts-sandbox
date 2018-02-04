@@ -24,7 +24,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             var eventMessage = JsonConvert.SerializeObject(@event);
 
-            return _eventBusPublisher.PublishAsync(eventName, eventMessage, cancellationToken);
+            return _eventBusPublisher.PublishAsync(eventName, @event.Id, eventMessage, cancellationToken);
         }
     }
 }

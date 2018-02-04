@@ -64,7 +64,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                         _logger.LogDebug($"Forwarding integration event for queue item {eventQueueItem.EventQueueItemId}");
 
                         //await _eventBusPublisher.PublishAsync(eventQueueItem.IntegrationEvent);
-                        //await _eventBusPublisher.PublishAsync(eventQueueItem.EventName, eventQueueItem.EventContent);
+                        //await _eventBusPublisher.PublishAsync(eventQueueItem.EventName, eventQueueItem.EventId, eventQueueItem.EventContent);
                         await _eventBusSubscriptionsService.DispatchEventAsync(eventQueueItem.EventName, eventQueueItem.EventContent);
 
                         await PublishEventAsync(eventQueueItem);
