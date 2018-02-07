@@ -18,7 +18,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure
         private readonly TContext _context;
         private readonly ILogger<StoreAndForwardEventBusPublisher<TContext>> _logger;
 
-        public delegate StoreAndForwardEventBusPublisher<TContext> Factory();
+        //public delegate StoreAndForwardEventBusPublisher<TContext> Factory();
 
         public StoreAndForwardEventBusPublisher(ILogger<StoreAndForwardEventBusPublisher<TContext>> logger
             , TContext context)

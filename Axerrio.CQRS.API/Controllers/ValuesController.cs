@@ -23,6 +23,7 @@ namespace Axerrio.CQRS.API.Controllers
         [HttpGet("salesorders")]
         public async Task<IActionResult> GetSalesOrders(ODataOptions<SalesOrder> options)
         {
+            //http://localhost:5000/api/values/salesorders?$filter=customer/name+eq+%27Holex%27 -> exception
             //http://localhost:5000/api/values/salesorders?$orderby=orderdate&$top=5&$skip=20
             var validationSettings = new ValidationSettings();
 
@@ -37,6 +38,7 @@ namespace Axerrio.CQRS.API.Controllers
 
             //var orderBy = OrderByClause.Build(options);
             var orderBy = OrderByClause.Build(options, p => "o.[" + p.Name + "]");
+            
 
             var offsetClause = new OffsetClause(options);
             var offset = offsetClause.Build();
@@ -44,6 +46,18 @@ namespace Axerrio.CQRS.API.Controllers
             var selectClause = new SelectClause(options);
             selectClause.ResolveColumn = p => "o.[" + p.Name + "]";
             var select = selectClause.Build();
+
+            //http://localhost:5000/api/values/salesorders?$filter=orderdate+eq+2018-02-06
+            //http://localhost:5000/api/values/salesorders?$filter=orderdate+eq+2018-02-06+and+orderid+eq+200
+
+            IList<object> arguments = new List<object>();
+
+            var whereclause = new WhereClause("where", arguments, options);
+            //var whereclause = new WhereClause("having", arguments, options);
+            var where = whereclause.Build();
+
+            var arg0 = arguments[0];
+            var arg1 = arguments[1];
 
             var salesOrders = await _salesQueries.SalesOrders();
 

@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Axerrio.CQRS.API.Application.Query;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
+using Microsoft.AspNet.OData.Routing.Conventions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Axerrio.CQRS.API
 {
@@ -35,12 +40,21 @@ namespace Axerrio.CQRS.API
                 return new SalesQueries(connectionString);
             });
 
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<WorldWideImportersContext>(options => 
+                {
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
+                    });
+                });
+
             //Moon
             //services.AddMvc()
-            //    .AddOData(isCaseSensitive:false);
+            //    .AddOData(isCaseSensitive: false);
 
+            //Microsoft.AspNetCore.OData
             services.AddMvc();
-
             services.AddOData();
         }
 
@@ -55,9 +69,13 @@ namespace Axerrio.CQRS.API
             // you can add all the entities you need
             var builder = new ODataConventionModelBuilder(services);
 
-            
             builder.EntitySet<SalesOrder>("SalesOrders");
-            builder.EntityType<SalesOrder>().HasKey(so => so.OrderId); // the call to HasKey is mandatory
+            builder.EntityType<SalesOrder>()
+                .HasKey(so => so.OrderID); // the call to HasKey is mandatory
+
+            builder.EntitySet<Customer>("Customers");
+            builder.EntityType<Customer>()
+                .HasKey(c => c.CustomerID);
 
             return builder;
         }
@@ -74,17 +92,36 @@ namespace Axerrio.CQRS.API
 
             var edmBuilder = BuildEdmModel(app.ApplicationServices);
 
-            //app.UseMvc();
-            app.UseMvc(routeBuilder => 
+            //app.UseMvc(); //Moon
+
+            //Microsoft.AspNetCore.OData
+            app.UseMvc(routeBuilder =>
             {
                 routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
-                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel());
+                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel());
+
+                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
+                {
+                    //builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(IEdmModel), sp => edmBuilder.GetEdmModel());
+                    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, sp => edmBuilder.GetEdmModel());
+                    //builder.AddService<IEnumerable<IODataRoutingConvention>>(Microsoft.OData.ServiceLifetime.Singleton, sp =>
+                    //    ODataRoutingConventions.CreateDefaultWithAttributeRouting("odata", routeBuilder));
+                    builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver());
+                });
 
                 // Work-around for #1175
                 routeBuilder.EnableDependencyInjection();
             });
+        }
+    }
+
+    public class CaseInsensitiveResolver : ODataUriResolver
+    {
+         public override bool EnableCaseInsensitive
+        {
+            get { return true; }
         }
     }
 }

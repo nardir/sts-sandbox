@@ -11,6 +11,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             Schema = "integrationevents";
             TableName = "EventQueueItem";
             MaxEventsToDequeue = 10;
+            RetryAttempts = 3;
         }
 
         public string ConnectionString { get; set; }
