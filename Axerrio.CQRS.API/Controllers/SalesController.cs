@@ -2,6 +2,7 @@
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,12 +41,25 @@ namespace Axerrio.CQRS.API.Controllers
             _salesOrders.Add(new SalesOrder { OrderID = 3, CustomerID = 300, OrderDate = DateTime.Now });
         }
 
+        //http://localhost:5000/odata/salesorders?$expand=Customer($filter=Name eq 'Anna van Zant')&$top=10
+        //http://localhost:5000/odata/salesorders?$select=OrderID,Customer&$expand=Customer($select=Name)&$top=10
+        //http://localhost:5000/odata/salesorders?$select=OrderID,Customer&$expand=Customer&$top=10&$skip=200&$orderby=OrderID+desc
+
         [HttpGet("odata/salesorders")]
-        public IActionResult GetSalesOrders(ODataQueryOptions<SalesOrder> options)
+        public async Task<IActionResult> GetSalesOrders(ODataQueryOptions<SalesOrder> options)
         {
-            var salesOrders = options.ApplyTo(_salesOrders.AsQueryable());
-            
+            //var salesOrders = options.ApplyTo(_salesOrders.AsQueryable());
+            //var salesOrders = await options.ApplyTo(_context.SalesOrders).Cast<dynamic>().ToListAsync();
+            var salesOrdersQuery = options.ApplyTo(_context.SalesOrders).Cast<dynamic>();
+            var salesOrders = await salesOrdersQuery.ToListAsync();
+
             return Ok(salesOrders);
+        }
+
+        [HttpGet("odata/salesorders2")]
+        public IEnumerable<SalesOrder> GetSalesOrders2()
+        {
+            return _context.SalesOrders;
         }
 
         [HttpGet("odata/salesorders/{id}")]
@@ -61,11 +75,23 @@ namespace Axerrio.CQRS.API.Controllers
 
         [HttpGet("odata/customers")]
         [EnableQuery()]
-        public List<Customer> GetCustomers()
+        public IEnumerable<Customer> GetCustomers()
         {
-            var customers = _context.Customers.ToList();
+            var customers = _context.Customers;
 
             return customers;
         }
+
+        [HttpGet("odata/customers2")]
+        public async Task<IActionResult> GetCustomers2(ODataQueryOptions<Customer> options)
+        {
+            //var customers =  options.ApplyTo(_context.Customers).Cast<dynamic>().ToList();
+            //var customers = await options.ApplyTo(_context.Customers).Cast<dynamic>().ToListAsync();
+            var customersQuery = options.ApplyTo(_context.Customers).Cast<dynamic>();
+            var customers = await customersQuery.ToListAsync(); //Hier wordt de query uitgevoerd
+
+            return Ok(customers);
+        }
+
     }
 }

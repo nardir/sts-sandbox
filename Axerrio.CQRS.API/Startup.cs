@@ -71,7 +71,11 @@ namespace Axerrio.CQRS.API
 
             builder.EntitySet<SalesOrder>("SalesOrders");
             builder.EntityType<SalesOrder>()
-                .HasKey(so => so.OrderID); // the call to HasKey is mandatory
+                .HasKey(so => so.OrderID)
+                .HasRequired<Customer>(so => so.Customer);
+
+            //.HasRequired(so => so.Customer);
+
 
             builder.EntitySet<Customer>("Customers");
             builder.EntityType<Customer>()
@@ -100,16 +104,16 @@ namespace Axerrio.CQRS.API
                 routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
-                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel());
+                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel());
 
-                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
-                {
-                    //builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(IEdmModel), sp => edmBuilder.GetEdmModel());
-                    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, sp => edmBuilder.GetEdmModel());
-                    //builder.AddService<IEnumerable<IODataRoutingConvention>>(Microsoft.OData.ServiceLifetime.Singleton, sp =>
-                    //    ODataRoutingConventions.CreateDefaultWithAttributeRouting("odata", routeBuilder));
-                    builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver());
-                });
+                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
+                //{
+                //    //builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(IEdmModel), sp => edmBuilder.GetEdmModel());
+                //    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, sp => edmBuilder.GetEdmModel());
+                //    //builder.AddService<IEnumerable<IODataRoutingConvention>>(Microsoft.OData.ServiceLifetime.Singleton, sp =>
+                //    //    ODataRoutingConventions.CreateDefaultWithAttributeRouting("odata", routeBuilder));
+                //    builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver());
+                //});
 
                 // Work-around for #1175
                 routeBuilder.EnableDependencyInjection();
