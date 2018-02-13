@@ -94,17 +94,17 @@ namespace Axerrio.CQRS.API
 
             //https://github.com/OData/WebApi/issues/1179
 
-            var edmBuilder = BuildEdmModel(app.ApplicationServices);
+            //var edmBuilder = BuildEdmModel(app.ApplicationServices); //Dit is niet nodig voor ODataQueryOptions
 
             //app.UseMvc(); //Moon
 
-            //Microsoft.AspNetCore.OData
+            ////Microsoft.AspNetCore.OData
             app.UseMvc(routeBuilder =>
             {
-                routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
+                //routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
-                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel());
+                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
 
                 //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
                 //{
@@ -116,7 +116,7 @@ namespace Axerrio.CQRS.API
                 //});
 
                 // Work-around for #1175
-                routeBuilder.EnableDependencyInjection();
+                routeBuilder.EnableDependencyInjection(); //Dit is WEL nodig voor ODataQueryOptions
             });
         }
     }

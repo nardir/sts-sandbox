@@ -25,14 +25,16 @@ namespace Axerrio.CQRS.API.Controllers
     //http://services.odata.org/V4/(S(kmsvgtl11oefkmu4x1ru2bmj))/TripPinServiceRW/Airports('KLAX')/Location/Address/$value
     //http://services.odata.org/V4/(S(kmsvgtl11oefkmu4x1ru2bmj))/TripPinServiceRW/People?$select=LastName&$expand=Friends($select=FirstName)
 
-    public class SalesController: ODataController
+    public class SalesController: Controller //ODataController
     {
         private List<SalesOrder> _salesOrders;
         private readonly WorldWideImportersContext _context;
+        private readonly ISalesQueries _salesQueries;
 
-        public SalesController(WorldWideImportersContext context)
+        public SalesController(WorldWideImportersContext context, ISalesQueries salesQueries)
         {
             _context = context;
+            _salesQueries = salesQueries;
 
             _salesOrders = new List<SalesOrder>();
 
@@ -57,6 +59,7 @@ namespace Axerrio.CQRS.API.Controllers
         }
 
         [HttpGet("odata/salesorders2")]
+        [EnableQuery]
         public IEnumerable<SalesOrder> GetSalesOrders2()
         {
             return _context.SalesOrders;
@@ -65,9 +68,13 @@ namespace Axerrio.CQRS.API.Controllers
         [HttpGet("odata/salesorders/{id}")]
         public IActionResult GetSalesOrder(int Id, ODataQueryOptions<SalesOrder> options)
         {
-            var salesOrder = _salesOrders.Where(so => so.OrderID == Id).SingleOrDefault();
+            var salesOrder = _context.SalesOrders.Where(so => so.OrderID == Id).SingleOrDefault();
             //var salesOrder = options.ApplyTo(_salesOrders.Where(so => so.OrderId == Id).AsQueryable());
 
+            if (salesOrder == null)
+                return NotFound();
+
+            //var result = (dynamic) options.SelectExpand.ApplyTo(salesOrder, new ODataQuerySettings());
             var result = options.SelectExpand.ApplyTo(salesOrder, new ODataQuerySettings());
 
             return Ok(result);
@@ -93,5 +100,13 @@ namespace Axerrio.CQRS.API.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("odata/salesorders3")]
+        public async Task<IActionResult> GetSalesOrders3()
+        {
+            var salesOrders = await _salesQueries.SalesOrdersAsync();
+
+            return Ok(salesOrders);
+            
+        }
     }
 }

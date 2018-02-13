@@ -8,5 +8,7 @@ namespace Axerrio.CQRS.API.Application.Query
     public interface ISalesQueries
     {
         Task<IEnumerable<SalesOrder>> SalesOrders();
+        //Task<IEnumerable<dynamic>> SalesOrdersAsync();
+        Task<dynamic> SalesOrdersAsync();
     }
 }
