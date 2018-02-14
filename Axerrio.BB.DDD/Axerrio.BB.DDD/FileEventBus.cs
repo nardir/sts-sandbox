@@ -1,5 +1,6 @@
 ﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

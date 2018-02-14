@@ -25,8 +25,9 @@ namespace Axerrio.DDD.EB.ASB.ConsoleTest
             csb.EntityPath = TopicName;
 
             topicClient = new TopicClient(csb, RetryPolicy.Default);
+            //topicClient = new TopicClient(ServiceBusConnectionString, TopicName, RetryPolicy.Default);
             //topicClient = new TopicClient(ServiceBusConnectionString, TopicName);
-
+            
             subscriptionClient = new SubscriptionClient(ServiceBusConnectionString, TopicName, SubscriptionName);
 
             Console.WriteLine("======================================================");

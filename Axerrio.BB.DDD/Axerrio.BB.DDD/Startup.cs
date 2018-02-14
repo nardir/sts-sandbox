@@ -1,17 +1,24 @@
-﻿using Axerrio.BB.DDD.Application.IntegrationEvents;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Axerrio.BB.DDD.Application.IntegrationEvents;
 using Axerrio.BB.DDD.Application.IntegrationEvents.Abstractions;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Hosting;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz.Spi;
+using RabbitMQ.Client;
 using System;
 using System.Reflection;
 
@@ -26,8 +33,12 @@ namespace Axerrio.BB.DDD
 
         public IConfiguration Configuration { get; }
 
+        public IContainer ApplicationContainer { get; private set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+
+        ///public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetValue<string>("ConnectionString");
 
@@ -42,14 +53,93 @@ namespace Axerrio.BB.DDD
                 });
             });
 
-            services.AddSingleton<RabbitMQEventBus>();
+            //services.AddTransient<PaymentMethodCreatedIntegrationEventHandler>();
+            //services.AddTransient<PaymentMethodCreatedIntegrationEventHandlerSecond>();
+            //services.AddTransient<IIntegrationEventHandler<PaymentMethodCreatedIntegrationEvent>, PaymentMethodCreatedIntegrationEventHandler>();
+
+            services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
             services.AddSingleton<FileEventBus>();
-            services.AddSingleton<IEventBus>(provider =>
+
+            #region RabbitMQ
+
+            //services.Configure<EventBusOptions>(options => 
+            //{
+            //    options.ConnectRetryAttempts = 3;
+
+            //    options.BrokerName = "AFO-Test-Exchange";
+            //    options.SubscriptionName = "AFO-Test-Queue";
+
+            //    options.PublishRetryAttempts = 2;
+
+            //    //"amqp://user:pass@hostName:port/vhost"
+            //    options.ConnectionString = @"amqp://user:password@localhost:8081//";
+            //});
+
+            services.AddSingleton<IRabbitMQPersistentConnection>(p =>
             {
-                return provider.GetRequiredService<RabbitMQEventBus>();
+                var options = p.GetRequiredService<IOptions<EventBusOptions>>().Value;
+
+                var factory = new ConnectionFactory()
+                {
+                    Uri = new Uri(options.ConnectionString),
+                };
+
+                var logger = p.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+
+                return new DefaultRabbitMQPersistentConnection(factory, logger, options.ConnectRetryAttempts);
             });
 
-            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+            services.AddSingleton<RabbitMQEventBus>();
+            
+            //services.AddSingleton<IEventBus>(provider =>
+            //{
+            //    return provider.GetRequiredService<RabbitMQEventBus>();
+            //});
+
+            #endregion
+
+            #region AzureServiceBus
+
+            services.Configure<EventBusOptions>(options =>
+            {
+                options.ConnectRetryAttempts = 3;
+
+                options.BrokerName = "sts-topictest";
+                options.SubscriptionName = "sts-ordering";
+
+                options.PublishRetryAttempts = 2;
+
+                options.ConnectionString = "Endpoint=sb://sts-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=okAS5ZUVaWkRQaoF8u6e8m7ulHZ+cZgu7nB0suhVh+M=";
+            });
+
+            services.AddSingleton<IAzureServiceBusPersistentConnection, DefaultAzureServiceBusPersistentConnection>();
+
+            //services.AddSingleton<IAzureServiceBusPersistentConnection>(p =>
+            //{
+            //    var optionsAccessor = p.GetRequiredService<IOptions<EventBusOptions>>();
+            //    var options = optionsAccessor.Value;
+
+            //    var factory = new ServiceBusConnectionStringBuilder(options.ConnectionString);
+
+            //    var logger = p.GetRequiredService<ILogger<DefaultAzureServiceBusPersistentConnection>>();
+
+            //    return new DefaultAzureServiceBusPersistentConnection(logger, factory, optionsAccessor);
+            //});
+
+            services.AddSingleton<AzureServiceBusEventBus>();
+
+            services.AddSingleton<IEventBus>(provider =>
+            {
+                return provider.GetRequiredService<AzureServiceBusEventBus>();
+            });
+
+
+            #endregion
+
+            //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, FileEventBus>(connectionString, Configuration);
+            services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext>(connectionString, Configuration);
+            //services.AddEFCoreStoreAndForwardIntegrationEventsServices<OrderingDbContext, RabbitMQEventBus>(connectionString, Configuration);
+
 
             //services.AddSingleton<IHostedService, TestHostedService>();
             //services.AddSingleton<IHostedService, TestHostedService>(p =>
@@ -60,6 +150,17 @@ namespace Axerrio.BB.DDD
             //        var logger = p.GetService<ILogger<TestHostedService>>();
 
             //        return new TestHostedService(logger, context);
+            //    }
+            //});
+
+            //services.AddTransient<TestHostedServiceFactory>();
+            //services.AddSingleton<IHostedService, TestHostedService>(p =>
+            //{
+            //    using (var scope = p.CreateScope())
+            //    {
+            //        var factory = scope.ServiceProvider.GetRequiredService<TestHostedServiceFactory>();
+
+            //        return factory.Create();
             //    }
             //});
 
@@ -77,11 +178,70 @@ namespace Axerrio.BB.DDD
             //var queueItem = new IntegrationEventsQueueItem(ierestored);
             //var iefromQueueItem = queueItem.IntegrationEvent;
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddControllersAsServices();
+
+            //http://autofaccn.readthedocs.io/en/latest/integration/aspnetcore.html
+            var builder = new ContainerBuilder();
+
+            builder.Populate(services);
+            //builder.RegisterType<MyType>().As<IMyType>();
+            //builder.RegisterType<FileEventBus>().As<IEventBusPublishOnly>().UsingConstructor();
+
+            //builder.RegisterType<TestHostedServiceFactory>();
+            ////NR: Onderstaand is uiteindelijk de beste oplossing
+            //builder.RegisterType<TestHostedService>().InstancePerLifetimeScope();
+            //builder.Register<TestHostedService>(context =>
+            //    {
+            //        var factory = context.Resolve<TestHostedService.Factory>();
+
+            //        //return factory.Invoke();
+            //        return factory();
+
+            //        //var factory = context.Resolve<TestHostedServiceFactory>();
+
+            //        //return factory.Create();
+
+            //        //return new TestHostedService(context.Resolve<ILogger<TestHostedService>>(), context.Resolve<OrderingDbContext>());
+            //    })
+            //    .As<IHostedService>()
+            //    .SingleInstance();
+
+            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+                       .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
+
+            builder.RegisterType<OrderCreatedIntegrationEventHandlerDynamic>();
+
+            ApplicationContainer = builder.Build();
+
+            //var scope = ApplicationContainer.BeginLifetimeScope("testhostedservice", b => 
+            //{
+            //    b.RegisterType<TestHostedService>();
+            //    b.Register<TestHostedService>(context =>
+            //    {
+            //        var factory = context.Resolve<TestHostedService.Factory>();
+
+            //        //return factory.Invoke();
+            //        return factory();
+
+            //        //var factory = context.Resolve<TestHostedServiceFactory>();
+
+            //        //return factory.Create();
+
+            //        //return new TestHostedService(context.Resolve<ILogger<TestHostedService>>(), context.Resolve<OrderingDbContext>());
+            //    })
+            //        .As<IHostedService>()
+            //        .SingleInstance();
+            //});
+
+            // Create the IServiceProvider based on the container.
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app
+            , IHostingEnvironment env
+            , IApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -89,6 +249,20 @@ namespace Axerrio.BB.DDD
             }
 
             app.UseMvc();
+
+            appLifetime.ApplicationStopped.Register(() => ApplicationContainer.Dispose());
+
+            var subscriptionsManager = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsManager>();
+
+            subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
+            subscriptionsManager.AddSubscription<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
+            subscriptionsManager.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
+            subscriptionsManager.AddSubscription<OrderCreatedIntegrationEventHandlerDynamic>(nameof(OrderCreatedIntegrationEvent));
+
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+
+            //eventBus.Subscribe<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandler>();
+            //eventBus.Subscribe<PaymentMethodCreatedIntegrationEvent, PaymentMethodCreatedIntegrationEventHandlerSecond>();
         }
     }
 }
