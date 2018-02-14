@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using MenuAggr = Axerrio.DDD.Menu.Domain.AggregatesModel.MenuAggregate;
 using Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Axerrio.DDD.Menu.Infrastructure
 {
@@ -25,7 +26,7 @@ namespace Axerrio.DDD.Menu.Infrastructure
         public DbSet<Artist> Artist { get; set; }
         public MenuContext(DbContextOptions<MenuContext> options) : base (options) { }
 
-        public MenuContext(DbContextOptions<MenuContext> options, IMediator mediator): base(options, mediator)
+        public MenuContext(DbContextOptions<MenuContext> options, IMediator mediator, ILogger<MenuContext> logger) : base(options, mediator, logger)
         {
    //         MenuStatus.AsNoTracking();
         }

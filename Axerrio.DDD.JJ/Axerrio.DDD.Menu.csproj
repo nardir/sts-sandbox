@@ -14,10 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.2.0.4" />
+    <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.2.0.5" />
     <PackageReference Include="Axerrio.BB.AspNetCore.EntityFrameworkCore" Version="18.2.0.5" />
     <PackageReference Include="Axerrio.BB.DDD" Version="18.2.0" />
-    <PackageReference Include="Axerrio.BB.DDD.EntityFrameworkCore" Version="18.2.0" />
+    <PackageReference Include="Axerrio.BB.DDD.EntityFrameworkCore" Version="18.2.0.3" />
     <PackageReference Include="Axerrio.BB.DDD.FluentValidation" Version="18.2.0" />
     <PackageReference Include="Dapper" Version="1.50.4" />
     <PackageReference Include="Ensure.That" Version="7.2.1" />

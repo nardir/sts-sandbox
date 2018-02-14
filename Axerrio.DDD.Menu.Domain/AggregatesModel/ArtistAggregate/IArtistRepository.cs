@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.DDD.Menu.Domain.AggregatesModel.ArtistAggregate
 {
-    public  interface IArtistRepository : IRepository<Artist>
+    public interface IArtistRepository : IRepository<Artist>
     {
         void Add(Artist artist); //todo, canncelationtoken!
         Task<List<Artist>> GetActiveArtistsAsync(CancellationToken cancellationToken = default(CancellationToken));
