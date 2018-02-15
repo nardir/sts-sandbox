@@ -11,6 +11,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         private string _dequeueSql;
         private string _markEventAsPublishedFailedSql;
         private string _markEventAsPublishedSql;
+        private string _requeuePendingPublishingEventsSql;
 
         private string RequeueForBatchSql
         {
@@ -84,7 +85,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             }
         }
 
-        
+
 
         private string MarkEventAsPublishedSql
         {
@@ -99,6 +100,29 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                 }
 
                 return _markEventAsPublishedSql;
+            }
+        }
+
+        private string RequeuePendingPublishingEventsSql
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_requeuePendingPublishingEventsSql))
+                {
+                    _requeuePendingPublishingEventsSql = $@"with eqi as
+                                    (
+                                        select q.*
+                                        from {_databaseOptions.Schema}.{_databaseOptions.TableName} as q with (readuncommitted)
+                                        where q.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
+                                        and q.LatestDequeuedTimestamp //TODO JJ: verschil introduceren hier!
+                                    )
+                                    update eqi set eqi.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}
+                                         , eqi.PublishAttempts = eqi.PublishAttempts + 1
+                                         , eqi.PublishBatchId = null
+                                    output inserted.*";
+                }
+
+                return _requeuePendingPublishingEventsSql;
             }
         }
     }
