@@ -175,9 +175,9 @@ namespace Axerrio.BB.DDD.IE.API
 
             eventBus.Subscribe<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
-            IEventBusSubscriber storeAndForwardEventBus = ApplicationContainer.Resolve<StoreAndForwardEventBusForwarder>();
+            //IEventBusSubscriber storeAndForwardEventBus = ApplicationContainer.Resolve<StoreAndForwardEventBusForwarder>();
 
-            storeAndForwardEventBus.Subscribe<ForwardIntegrationEventHandler>(nameof(OrderCreatedIntegrationEvent));
+            //storeAndForwardEventBus.Subscribe<ForwardIntegrationEventHandler>(nameof(OrderCreatedIntegrationEvent));
 
             app.UseMvc();
         }
