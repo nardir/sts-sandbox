@@ -13,5 +13,6 @@ namespace Axerrio.CQRS.API.Application.Query
         public decimal UnitPrice { get; set; }
 
         public SalesOrder SalesOrder { get; set; }
+
     }
 }

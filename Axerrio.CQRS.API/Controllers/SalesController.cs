@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Controllers
@@ -107,6 +108,22 @@ namespace Axerrio.CQRS.API.Controllers
 
             return Ok(salesOrders);
             
+        }
+
+        [HttpGet("odata/salesorders4")]
+        public IActionResult GetSalesOrders4()
+        {
+            Expression<Func<SalesOrder, bool>> customerPredicate = so => so.CustomerID == 1018;
+            Expression<Func<SalesOrder, bool>> unitPricePredicate = so => so.SalesOrderLines.Any(l => l.UnitPrice < 10M);
+
+            var salesOrderQuery = _context.SalesOrders.Where(customerPredicate)
+                .Where(unitPricePredicate);
+
+            var salesOrders = salesOrderQuery.ToList();
+
+            //    .Where(so => so.SalesOrderLines.Any(l => l.UnitPrice == 2));
+
+            return Ok(salesOrders);
         }
     }
 }

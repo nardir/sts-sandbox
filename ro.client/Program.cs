@@ -25,6 +25,7 @@ namespace ro.client
             //var tokenClient = new TokenClient("http://localhost:5000/connect/token", "ro.client", "secret");
             var tokenClient = new TokenClient("https://localhost:50000/connect/token", "ro.client", "secret");
 
+            //https://github.com/IdentityServer/IdentityServer4/issues/322
             var tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("nardir@axerrio.com", "wrong", "api1");
             if (tokenResponse.IsError)
             {

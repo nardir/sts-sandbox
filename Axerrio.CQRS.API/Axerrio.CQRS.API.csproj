@@ -10,10 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.4" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.13" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.0.0-beta1" />
     <PackageReference Include="Moon.AspNetCore.OData" Version="3.2.0" />
     <PackageReference Include="Moon.OData.Sql" Version="3.2.0" />
+    <PackageReference Include="SQLinq3" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>

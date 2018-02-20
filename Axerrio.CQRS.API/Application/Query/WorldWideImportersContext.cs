@@ -46,6 +46,23 @@ namespace Axerrio.CQRS.API.Application.Query
                 .HasOne(so => so.Customer)
                 .WithMany()
                 .HasForeignKey(so => so.CustomerID);
+
+            modelBuilder.Entity<SalesOrder>()
+                .HasMany(so => so.SalesOrderLines)
+                .WithOne(l => l.SalesOrder)
+                .HasForeignKey(l => l.OrderID);
+
+            modelBuilder.Entity<SalesOrderLine>()
+                .ToTable("OrderLines", "Sales");
+
+            modelBuilder.Entity<SalesOrderLine>()
+                .Property(l => l.OrderLineID)
+                .IsRequired(true);
+
+            modelBuilder.Entity<SalesOrderLine>()
+                .HasKey(l => l.OrderLineID);
+
+
         }
     }
 }

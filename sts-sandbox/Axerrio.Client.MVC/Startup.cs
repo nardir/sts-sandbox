@@ -77,6 +77,7 @@ namespace Axerrio.Client.MVC
                 options.Scope.Add("api2");
 
                 //https://github.com/IdentityServer/IdentityServer4/issues/909
+                //https://github.com/IdentityServer/IdentityServer4/issues/322
                 //http://www.jerriepelser.com/blog/adding-parameters-to-openid-connect-authorization-url/
                 options.Events = new OpenIdConnectEvents
                 {
