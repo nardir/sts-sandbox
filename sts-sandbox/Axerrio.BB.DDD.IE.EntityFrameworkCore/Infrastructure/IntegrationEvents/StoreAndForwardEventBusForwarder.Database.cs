@@ -11,7 +11,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         private string _dequeueSql;
         private string _markEventAsPublishedFailedSql;
         private string _markEventAsPublishedSql;
-        private string _requeuePendingPublishingEventsSql;
+        private string _requeuePendingEventsSql;
 
         private string RequeueForBatchSql
         {
@@ -103,26 +103,53 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             }
         }
 
-        private string RequeuePendingPublishingEventsSql
+        private string RequeuePendingEventsSql
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_requeuePendingPublishingEventsSql))
+                //JJ: Updates meteen in sql, want anders moet je ook weer een status introduceren zodat niet 2 MicroServices pendings gaan requeuen. 
+                //Maar op die status kan iets ook weer blijven hangen .. etc etc ... beetje visieuse cirkel anders.
+
+                if (string.IsNullOrWhiteSpace(_requeuePendingEventsSql))
                 {
-                    _requeuePendingPublishingEventsSql = $@"with eqi as
+                    _requeuePendingEventsSql = $@"with eqi as
                                     (
                                         select q.*
-                                        from {_databaseOptions.Schema}.{_databaseOptions.TableName} as q with (readuncommitted)
+                                        from {_databaseOptions.Schema}.{_databaseOptions.TableName} as q with (rowlock, readpast)
                                         where q.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
-                                        and q.LatestDequeuedTimestamp //TODO JJ: verschil introduceren hier!
+                                        and datediff(minute, q.LatestDequeuedTimestamp, @Timestamp) >= {_databaseOptions.RequeuePendingEventsPeriodInMinutes}
+                                        and q.PublishAttempts < {_forwardOptions.MaxPublishAttempts} 
                                     )
-                                    update eqi set eqi.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}
-                                         , eqi.PublishAttempts = eqi.PublishAttempts + 1
+                                    update eqi set eqi.[State] = {(int)IntegrationEventsQueueItemState.NotPublished}                                         
                                          , eqi.PublishBatchId = null
+                                         , eqi.RequeuedTimestamp = @Timestamp
                                     output inserted.*";
                 }
 
-                return _requeuePendingPublishingEventsSql;
+                return _requeuePendingEventsSql;
+            }
+        }
+
+        private string MarkPendingEventsAsPublishedFailedSql
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_requeuePendingEventsSql))
+                {
+                    _requeuePendingEventsSql = $@"with eqi as
+                                    (
+                                        select q.*
+                                        from {_databaseOptions.Schema}.{_databaseOptions.TableName} as q with (rowlock, readpast)
+                                        where q.[State] = {(int)IntegrationEventsQueueItemState.Publishing}
+                                        and datediff(minute, q.LatestDequeuedTimestamp, @Timestamp) >= {_databaseOptions.RequeuePendingEventsPeriodInMinutes}
+                                        and q.PublishAttempts >= {_forwardOptions.MaxPublishAttempts} 
+                                    )
+                                    update eqi set eqi.[State] = {(int)IntegrationEventsQueueItemState.PublishedFailed}  
+                                         , eqi.PublishedFailedTimestamp = @Timestamp                                        
+                                    output inserted.*";
+                }
+
+                return _requeuePendingEventsSql;
             }
         }
     }

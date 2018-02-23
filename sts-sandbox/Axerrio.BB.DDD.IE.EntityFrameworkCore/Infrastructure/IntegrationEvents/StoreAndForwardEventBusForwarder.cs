@@ -38,6 +38,9 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _retryPolicy = CreatePolicy(_databaseOptions.RetryAttempts);
         }
 
+
+
+
         public async Task ForwardAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             bool cancel = false;
@@ -96,6 +99,36 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             }
         }
 
+        public async Task RequeueOrMarkAsPublishedFailedPendingEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug($"Requeueing or failing pending integration events cancelled.");
+                return;
+            }
+
+            try
+            {
+                var requeuedItems = await RequeuePendingEventsAsync(cancellationToken);
+                var failedItems = await MarkPendingEventsAsPublishedFailedAsync(cancellationToken);
+
+                foreach (var eventQueueItem in requeuedItems)
+                {
+                    _logger.LogDebug($"Requeued integration event as {IntegrationEventsQueueItemState.NotPublished} on attempt {eventQueueItem.PublishAttempts} for queue item {eventQueueItem.EventQueueItemId}");
+                }
+
+                foreach (var eventQueueItem in failedItems)
+                {
+                    _logger.LogDebug($"Marked integration event as {IntegrationEventsQueueItemState.PublishedFailed} on attempt {eventQueueItem.PublishAttempts} for queue item {eventQueueItem.EventQueueItemId}");
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, $"Exception {exception.GetType().Name} with message ${exception.Message} detected while requeuing or failing pending integration events");
+            }
+        }
+
+
         private Policy CreatePolicy(int retryAttempts = 3)
         {
             return Policy.Handle<SqlException>().
@@ -137,6 +170,68 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 
             })).Result;
         }
+
+
+
+
+        private async Task<IEnumerable<IntegrationEventsQueueItem>> RequeuePendingEventsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug($"Requeueing pending integration events cancelled.");
+
+                return Enumerable.Empty<IntegrationEventsQueueItem>();
+            }
+
+            var queryParams = new { Timestamp = DateTime.UtcNow };           
+            IntegrationEventsQueueItemState state = IntegrationEventsQueueItemState.NotPublished;
+
+            return (await _retryPolicy.ExecuteAndCaptureAsync(async () =>
+            {
+                _logger.LogDebug($"Requeueing pending integration events as {state}");
+
+                using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    var eventQueueItems = await connection.QueryAsync<IntegrationEventsQueueItem>(RequeuePendingEventsSql, queryParams);
+
+                    _logger.LogDebug($"Requeueing pending integration events. #queue items: {eventQueueItems.Count()}");                    
+
+                    return eventQueueItems;                   
+                }
+            })).Result;
+        }
+
+        private async Task<IEnumerable<IntegrationEventsQueueItem>> MarkPendingEventsAsPublishedFailedAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug($"Marking pending integration events as failed cancelled.");
+
+                return Enumerable.Empty<IntegrationEventsQueueItem>();
+            }
+
+            var queryParams = new { Timestamp = DateTime.UtcNow };
+            IntegrationEventsQueueItemState state = IntegrationEventsQueueItemState.PublishedFailed;
+
+            return (await _retryPolicy.ExecuteAndCaptureAsync(async () =>
+            {
+                _logger.LogDebug($"Marking pending integration events as {state}");
+
+                using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    var eventQueueItems = await connection.QueryAsync<IntegrationEventsQueueItem>(MarkPendingEventsAsPublishedFailedSql, queryParams);
+
+                    _logger.LogDebug($"Pending integration events marked as {state}. #queue items: {eventQueueItems.Count()}");
+
+                    return eventQueueItems;
+                }
+            })).Result;
+        }
+
 
         private Task RequeueOrFailEventAsync(IntegrationEventsQueueItem eventQueueItem, CancellationToken cancellationToken = default(CancellationToken))
         {

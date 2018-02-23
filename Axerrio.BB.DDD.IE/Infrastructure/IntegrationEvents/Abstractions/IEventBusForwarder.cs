@@ -9,5 +9,6 @@ namespace Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions
     public interface IEventBusForwarder
     {
         Task ForwardAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task RequeueOrMarkAsPublishedFailedPendingEventsAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }
