@@ -24,6 +24,7 @@ using Microsoft.Extensions.Hosting;
 using Axerrio.BB.DDD.Infrastructure.Scheduling;
 using Quartz.Spi;
 using Axerrio.BB.DDD.IE.API.Infrastructure.AutofacModules;
+using Axerrio.BB.DDD.IE.EntityFrameworkCore.Infrastructure.AutofacModules;
 
 namespace Axerrio.BB.DDD.IE.API
 {
