@@ -23,6 +23,7 @@ using Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure;
 using Microsoft.Extensions.Hosting;
 using Axerrio.BB.DDD.Infrastructure.Scheduling;
 using Quartz.Spi;
+using Axerrio.BB.DDD.IE.API.Infrastructure.AutofacModules;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -86,72 +87,11 @@ namespace Axerrio.BB.DDD.IE.API
 
             //builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
 
-            #region IntegrationEventHandlers
-
-            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
-                .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
-
-            builder.RegisterType<ForwardIntegrationEventHandler>();
-
-            #endregion
-
-            #region StoreAndForwardEventBusPublisher
-
-            builder.RegisterType<StoreAndForwardEventBusPublisher<OrderingDbContext>>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<IntegrationEventsService<StoreAndForwardEventBusPublisher<OrderingDbContext>>>()
-                .As<IIntegrationEventsService>()
-                .InstancePerLifetimeScope();
-
-            #endregion
-
-            #region RabbitMQEventBus
-
-            builder.RegisterType<InMemoryEventBusSubscriptionsService>()
-                .As<IEventBusSubscriptionsService>();
-                //.SingleInstance();
-
-            builder.RegisterType<RabbitMQEventBus>()
-                .UsingConstructor(typeof(IEventBusSubscriptionsService), typeof(IOptions<EventBusOptions>), typeof(ILogger<RabbitMQEventBus>))
-                .As<IEventBusPublisher>()
-                .As<IEventBusConsumer>()
-                //.As<IEventBusSubscriber>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<EventBusConsumerHostedService<RabbitMQEventBus>>()
-                .As<IHostedService>()
-                .SingleInstance();
-
-            #endregion
-
-            #region StoreAndForwardEventBusConsumer
-
-            builder.RegisterType<StoreAndForwardEventBusForwarder>()
-                .As<IEventBusForwarder>()
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterType<StoreAndForwardEventBusConsumerTriggerFactory>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<JobFactory>()
-                .As<IJobFactory>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<StoreAndForwardEventBusConsumerJob>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<StoreAndForwardEventBusConsumer<StoreAndForwardEventBusConsumerTriggerFactory, StoreAndForwardEventBusConsumerJob>>()
-                .SingleInstance();
-
-            builder.RegisterType<EventBusConsumerHostedService<StoreAndForwardEventBusConsumer<StoreAndForwardEventBusConsumerTriggerFactory, StoreAndForwardEventBusConsumerJob>>>()
-                .As<IHostedService>()
-                .SingleInstance();
-
-            #endregion
-
+            builder.RegisterModule(new IntegrationEventModule());
+            builder.RegisterModule(new StoreAndForwardEventBusPublisherModule<OrderingDbContext>());
+            builder.RegisterModule(new StoreAndForwardEventBusConsumerModule());
+            builder.RegisterModule(new EventBusModule<RabbitMQEventBus>());
+            
             ApplicationContainer = builder.Build();
 
             return new AutofacServiceProvider(ApplicationContainer);
