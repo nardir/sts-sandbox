@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.IE.API.Infrastructure.AutofacModules
 {
-    public class IntegrationEventModule<TAssembly> : Autofac.Module
+    public class IntegrationEventHandlerModule<TAssembly> : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
