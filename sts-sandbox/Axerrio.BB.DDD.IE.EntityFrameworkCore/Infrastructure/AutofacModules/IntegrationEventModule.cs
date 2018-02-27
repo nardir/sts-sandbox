@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.IE.API.Infrastructure.AutofacModules
 {
-    public class IntegrationEventModule : Autofac.Module
+    public class IntegrationEventModule<TAssembly> : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterAssemblyTypes(typeof(Startup).GetTypeInfo().Assembly)
+            builder.RegisterAssemblyTypes(typeof(TAssembly).GetTypeInfo().Assembly)
                 .AsClosedTypesOf(typeof(IIntegrationEventHandler<>));
 
             builder.RegisterType<ForwardIntegrationEventHandler>();

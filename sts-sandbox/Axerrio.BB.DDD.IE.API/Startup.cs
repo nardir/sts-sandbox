@@ -88,7 +88,7 @@ namespace Axerrio.BB.DDD.IE.API
 
             //builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
 
-            builder.RegisterModule(new IntegrationEventModule());
+            builder.RegisterModule(new IntegrationEventModule<Startup>());
             builder.RegisterModule(new StoreAndForwardEventBusPublisherModule<OrderingDbContext>());
             builder.RegisterModule(new StoreAndForwardEventBusConsumerModule());
             builder.RegisterModule(new EventBusModule<RabbitMQEventBus>());

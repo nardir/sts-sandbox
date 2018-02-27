@@ -13,7 +13,6 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             MaxEventsToDequeue = 10;
             RetryAttempts = 3;
             RequeuePendingEventsPeriodInMinutes = 15;
-            MaxPublishAttempts = 10;
         }
 
         public string ConnectionString { get; set; }
@@ -22,6 +21,5 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public int MaxEventsToDequeue { get; set; }
         public int RetryAttempts { get; set; }
         public int RequeuePendingEventsPeriodInMinutes { get; set; }
-        public int MaxPublishAttempts { get; set; }
     }
 }
