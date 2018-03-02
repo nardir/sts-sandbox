@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
+using Axerrio.DDD.BuildingBlocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

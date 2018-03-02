@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
-using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents;
-using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents.Autofac;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.AutofacModules;
 using Axerrio.BB.DDD.IE.API.Application;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
@@ -17,14 +16,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure;
-using Microsoft.Extensions.Hosting;
-using Axerrio.BB.DDD.Infrastructure.Scheduling;
-using Quartz.Spi;
-using Axerrio.BB.DDD.IE.API.Infrastructure.AutofacModules;
-using Axerrio.BB.DDD.IE.EntityFrameworkCore.Infrastructure.AutofacModules;
+using Axerrio.BB.DDD.Infrastructure.AutofacModules;
+using Axerrio.BB.DDD.Infrastructure.Options;
+using Axerrio.BB.DDD.Dapper.Infrastructure.AutofacModules;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -51,29 +46,31 @@ namespace Axerrio.BB.DDD.IE.API
             {
                 options.ConnectionString = connectionString;
                 options.MaxEventsToDequeue = 5;
-                options.RetryAttempts = 3;
+                options.RetryAttempts = 3;               
             });
 
             services.Configure<StoreAndForwardEventBusConsumerOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwarderOptions");
             services.Configure<StoreAndForwardEventBusConsumerOptions>(options => 
             {
                 options.TriggerIntervalInMilliseconds = 500;
+                options.TriggerRequeingCronExpression = "0 0/30 * * * ?";
             });
 
             services.Configure<StoreAndForwardEventBusForwardOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwardOptions");
             services.Configure<StoreAndForwardEventBusForwardOptions>(options => 
             {
                 options.MaxPublishAttempts = 3;
+                options.RequeuePendingEventsPeriodInMinutes = 15;
             });
 
             services.Configure<EventBusOptions>(configuration: Configuration, key: "RabbitMQEventBus");
 
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<OrderingDbContext>(options =>
+                .AddDbContext<IntegrationEventsDbContext>(options =>
                 {
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
-                        sqlOptions.MigrationsAssembly(typeof(OrderingDbContext).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.MigrationsAssembly(typeof(IntegrationEventsDbContext).GetTypeInfo().Assembly.GetName().Name);
                     });
                 });
 
@@ -89,7 +86,8 @@ namespace Axerrio.BB.DDD.IE.API
             //builder.RegisterModule(new EFCoreIntegrationEventsModule<OrderingDbContext>());
 
             builder.RegisterModule(new IntegrationEventHandlerModule<Startup>());
-            builder.RegisterModule(new StoreAndForwardEventBusPublisherModule<OrderingDbContext>());
+            builder.RegisterModule(new StoreAndForwardEventBusPublisherModule<IntegrationEventsDbContext>());
+            builder.RegisterModule(new StoreAndForwardEventBusForwarderModule());
             builder.RegisterModule(new StoreAndForwardEventBusConsumerModule());
             builder.RegisterModule(new EventBusModule<RabbitMQEventBus>());
             
