@@ -52,7 +52,7 @@ namespace Axerrio.BB.DDD.IE.API
             services.Configure<StoreAndForwardEventBusConsumerOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwarderOptions");
             services.Configure<StoreAndForwardEventBusConsumerOptions>(options => 
             {
-                options.TriggerIntervalInMilliseconds = 500;
+                options.TriggerIntervalInMilliseconds = 10000;
                 options.TriggerRequeingCronExpression = "0 0/30 * * * ?";
             });
 
@@ -71,8 +71,10 @@ namespace Axerrio.BB.DDD.IE.API
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly(typeof(IntegrationEventsDbContext).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
                 });
+            
 
             //services.AddTransient<EFCoreStoreAndForwardEventBus<OrderingDbContext>>();
 
@@ -111,7 +113,6 @@ namespace Axerrio.BB.DDD.IE.API
             //subscriptionsService.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
             IEventBusSubscriber eventBus = ApplicationContainer.Resolve<RabbitMQEventBus>();
-
             eventBus.Subscribe<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
             //IEventBusSubscriber storeAndForwardEventBus = ApplicationContainer.Resolve<StoreAndForwardEventBusForwarder>();
