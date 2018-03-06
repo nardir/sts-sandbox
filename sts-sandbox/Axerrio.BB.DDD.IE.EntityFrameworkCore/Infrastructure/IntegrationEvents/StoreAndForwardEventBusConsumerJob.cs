@@ -20,9 +20,12 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             _eventBusForwarder = EnsureArg.IsNotNull(eventBusForwarder, nameof(eventBusForwarder));
         }
 
-        public override Task ExecuteAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task ExecuteAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _eventBusForwarder.ForwardAsync(cancellationToken);
+            await _eventBusForwarder.ForwardAsync(cancellationToken);
+            
+            //JJ: Dit terugdraaien en in aparte hosted service, met aparte job?
+            await _eventBusForwarder.RequeueOrMarkAsPublishedFailedPendingEventsAsync(cancellationToken);            
         }
     }
 }

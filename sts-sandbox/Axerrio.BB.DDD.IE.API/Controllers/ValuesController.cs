@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
 using Axerrio.BB.DDD.IE.API.Application;
 using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using EnsureThat;
@@ -13,12 +14,12 @@ namespace Axerrio.BB.DDD.IE.API.Controllers
     public class ValuesController : Controller
     {
         private readonly IIntegrationEventsService _integrationEventsService;
-        private readonly OrderingDbContext _context;
+        private readonly IntegrationEventsDbContext _context;
         private readonly IEventBusPublisher _eventBusPublisher;
         private readonly IEventBusConsumer _eventBusConsumer;
 
         public ValuesController(IIntegrationEventsService integrationEventsService
-            , OrderingDbContext context
+            , IntegrationEventsDbContext context
             , IEventBusPublisher eventBusPublisher
             , IEventBusConsumer eventBusConsumer)
         {

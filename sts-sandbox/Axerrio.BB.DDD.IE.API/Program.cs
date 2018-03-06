@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Axerrio.BB.AspNetCore.EntityFrameworkCore.Extensions.Hosting;
+using Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure;
 using Axerrio.BB.DDD.IE.API.Application;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -19,17 +21,13 @@ namespace Axerrio.BB.DDD.IE.API
         {
             //BuildWebHost(args).Run();
 
-            var webHost = BuildWebHost(args);
+            //var webHost = BuildWebHost(args);
 
-            var provider = webHost.Services;
-            using (var scope = provider.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
-
-                context.Database.Migrate();
-            }
-
-            webHost.Run();
+            BuildWebHost(args)
+               .MigrateDbContext<IntegrationEventsDbContext>()
+               .Run();
+            
+          //  webHost.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

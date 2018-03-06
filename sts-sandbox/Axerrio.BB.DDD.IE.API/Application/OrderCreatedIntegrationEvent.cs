@@ -1,4 +1,5 @@
-﻿using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
+﻿using Axerrio.BB.DDD.Domain.IntegrationEvents.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.IntegrationEvents.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -12,6 +12,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
             TableName = "EventQueueItem";
             MaxEventsToDequeue = 10;
             RetryAttempts = 3;
+            RequeuePendingEventsPeriodInMinutes = 15;
         }
 
         public string ConnectionString { get; set; }
@@ -19,5 +20,6 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
         public string TableName { get; set; }
         public int MaxEventsToDequeue { get; set; }
         public int RetryAttempts { get; set; }
+        public int RequeuePendingEventsPeriodInMinutes { get; set; }
     }
 }
