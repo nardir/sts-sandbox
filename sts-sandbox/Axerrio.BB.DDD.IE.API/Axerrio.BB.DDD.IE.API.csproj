@@ -11,11 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.1" />
     <PackageReference Include="Axerrio.BB.AspNetCore" Version="18.3.0" />
-    <PackageReference Include="Axerrio.BB.DDD" Version="18.3.0" />
+    <PackageReference Include="Axerrio.BB.DDD" Version="18.3.0.1" />
     <PackageReference Include="Axerrio.BB.AspNetCore.Quartz" Version="18.3.0" />
     <PackageReference Include="Axerrio.BB.AspNetCore.EntityFrameworkCore" Version="18.3.0" />
-    <PackageReference Include="Axerrio.BB.DDD.Dapper" Version="18.3.0.1" />   
-    <PackageReference Include="Axerrio.BB.DDD.EntityFrameworkCore" Version="18.3.0" />
+    <PackageReference Include="Axerrio.BB.DDD.Dapper" Version="18.3.0.3" />   
+    <PackageReference Include="Axerrio.BB.DDD.EntityFrameworkCore" Version="18.3.0.1" />
     <PackageReference Include="Axerrio.BB.DDD.IE.AzureServiceBus" Version="18.3.0" />
     <PackageReference Include="Axerrio.BB.DDD.IE.RabbitMq" Version="18.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />

@@ -46,7 +46,7 @@ namespace Axerrio.BB.DDD.IE.API
             {
                 options.ConnectionString = connectionString;
                 options.MaxEventsToDequeue = 5;
-                options.RetryAttempts = 3;               
+                options.RetryAttempts = 3;
             });
 
             services.Configure<StoreAndForwardEventBusConsumerOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwarderOptions");
