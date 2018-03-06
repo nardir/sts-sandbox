@@ -21,13 +21,13 @@ namespace Axerrio.BB.DDD.IE.API
 
             var webHost = BuildWebHost(args);
 
-            //var provider = webHost.Services;
-            //using (var scope = provider.CreateScope())
-            //{
-            //    var context = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
+            var provider = webHost.Services;
+            using (var scope = provider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
 
-            //    context.Database.Migrate();
-            //}
+                context.Database.Migrate();
+            }
 
             webHost.Run();
         }

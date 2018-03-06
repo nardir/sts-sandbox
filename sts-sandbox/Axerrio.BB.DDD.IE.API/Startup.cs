@@ -55,7 +55,7 @@ namespace Axerrio.BB.DDD.IE.API
             services.Configure<StoreAndForwardEventBusConsumerOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwarderOptions");
             services.Configure<StoreAndForwardEventBusConsumerOptions>(options => 
             {
-                options.TriggerIntervalInMilliseconds = 500;
+                options.TriggerIntervalInMilliseconds = 5000;
             });
 
             services.Configure<StoreAndForwardEventBusForwardOptions>(configuration: Configuration, key: "StoreAndForwardEventBusForwardOptions");
