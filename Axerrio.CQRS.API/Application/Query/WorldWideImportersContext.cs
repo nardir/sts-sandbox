@@ -11,6 +11,8 @@ namespace Axerrio.CQRS.API.Application.Query
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
 
+        //public DbQuery<WebCustomer> WebCustomers { get; set; }
+
         public WorldWideImportersContext(DbContextOptions<WorldWideImportersContext> options)
             : base(options)
         {
@@ -18,6 +20,9 @@ namespace Axerrio.CQRS.API.Application.Query
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.Query<WebCustomer>()
+            //    .ToTable("Customers", "Website");
+
             modelBuilder.Entity<Customer>()
                 .ToTable("Customers", "Sales");
 

@@ -32,6 +32,8 @@ namespace ro.client
             }
 
             tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("nardir@axerrio.com", "rens", "api1");
+            
+
 
             if (tokenResponse.IsError)
             {

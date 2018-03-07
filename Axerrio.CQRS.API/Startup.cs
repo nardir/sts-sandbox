@@ -41,13 +41,21 @@ namespace Axerrio.CQRS.API
             });
 
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<WorldWideImportersContext>(options => 
+                .AddDbContext<WorldWideImportersContext>(options =>
+                {
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
+                    });
+                })
+                .AddDbContextPool<WorldWideImportersQueryContext>(options =>
                 {
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
                     });
                 });
+
 
             //Moon
             //services.AddMvc()
