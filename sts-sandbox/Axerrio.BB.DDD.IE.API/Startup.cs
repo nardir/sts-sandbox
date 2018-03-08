@@ -20,6 +20,7 @@ using Axerrio.BB.DDD.IE.RabbitMQ.Infrastructure;
 using Axerrio.BB.DDD.Infrastructure.AutofacModules;
 using Axerrio.BB.DDD.Infrastructure.Options;
 using Axerrio.BB.DDD.Dapper.Infrastructure.AutofacModules;
+using Axerrio.BB.DDD.AzureServiceBus.Infrastructure;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -63,8 +64,9 @@ namespace Axerrio.BB.DDD.IE.API
                 options.RequeuePendingEventsPeriodInMinutes = 15;
             });
 
-            services.Configure<EventBusOptions>(configuration: Configuration, key: "RabbitMQEventBus");
-
+            //  services.Configure<EventBusOptions>(configuration: Configuration, key: "RabbitMQEventBus");
+            services.Configure<EventBusOptions>(configuration: Configuration, key: "AzureServiceBusEventBus");
+            
             services.AddEntityFrameworkSqlServer()
                 .AddDbContext<IntegrationEventsDbContext>(options =>
                 {
@@ -91,7 +93,8 @@ namespace Axerrio.BB.DDD.IE.API
             builder.RegisterModule(new StoreAndForwardEventBusPublisherModule<IntegrationEventsDbContext>());
             builder.RegisterModule(new StoreAndForwardEventBusForwarderModule());
             builder.RegisterModule(new StoreAndForwardEventBusConsumerModule());
-            builder.RegisterModule(new EventBusModule<RabbitMQEventBus>());
+            //builder.RegisterModule(new EventBusModule<RabbitMQEventBus>());
+            builder.RegisterModule(new EventBusModule<AzureServiceBusEventBus>());
             
             ApplicationContainer = builder.Build();
 
@@ -109,14 +112,13 @@ namespace Axerrio.BB.DDD.IE.API
             }
 
             //var subscriptionsService = app.ApplicationServices.GetRequiredService<IEventBusSubscriptionsService>();
-
             //subscriptionsService.AddSubscription<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
-            IEventBusSubscriber eventBus = ApplicationContainer.Resolve<RabbitMQEventBus>();
+            //  IEventBusSubscriber eventBus = ApplicationContainer.Resolve<RabbitMQEventBus>();
+            IEventBusSubscriber eventBus = ApplicationContainer.Resolve<AzureServiceBusEventBus>();
             eventBus.Subscribe<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
             //IEventBusSubscriber storeAndForwardEventBus = ApplicationContainer.Resolve<StoreAndForwardEventBusForwarder>();
-
             //storeAndForwardEventBus.Subscribe<ForwardIntegrationEventHandler>(nameof(OrderCreatedIntegrationEvent));
 
             app.UseMvc();
