@@ -149,6 +149,23 @@ namespace Axerrio.CQRS.API.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("testserdes")]
+        public IActionResult TestSerDes()
+        {
+            Expression<Func<WebCustomer, bool>> lambda = c => c.CustomerName.StartsWith("Tail");
+
+            var serializedLambda = JsonNetAdapter.Serialize(lambda);
+
+            var deserializedLambda = JsonNetAdapter.Deserialize<Expression<Func<WebCustomer, bool>>>(serializedLambda);
+
+            var customers = _queryContext.WebCustomers.Where(deserializedLambda)
+                .Select(c => c.CustomerName)
+                .ToList();
+
+            
+            return Ok(customers);
+        }
+
         private static MethodInfo GenericMethodOf(Expression expression)
         {
             LambdaExpression lambdaExpression = expression as LambdaExpression;
