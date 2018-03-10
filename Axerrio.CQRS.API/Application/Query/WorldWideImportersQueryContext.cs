@@ -9,6 +9,7 @@ namespace Axerrio.CQRS.API.Application.Query
     public class WorldWideImportersQueryContext: DbContext
     {
         public DbQuery<WebCustomer> WebCustomers { get; set; }
+        //public DbSet<OrderLine> OrderLines { get; set; }
 
         public WorldWideImportersQueryContext(DbContextOptions<WorldWideImportersQueryContext> options)
             : base(options)
@@ -19,6 +20,11 @@ namespace Axerrio.CQRS.API.Application.Query
         {
             modelBuilder.Query<WebCustomer>()
                 .ToTable("Customers", "Website");
+
+            //modelBuilder.Entity<OrderLine>()
+            //    .ToTable("OrderLine", "Sales")
+            //    .HasKey(l => l.OrderLineID);
+                
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Axerrio.CQRS.API.Application.Query;
+using Axerrio.CQRS.API.Application.Specification;
 using LinqKit;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,74 @@ namespace Axerrio.CQRS.API.Controllers
         {
             _context = context;
             _queryContext = queryContext;
+        }
+
+        [HttpGet("spec")]
+        public IActionResult TestSpec()
+        {
+            Expression<Func<WebCustomer, bool>> predicate = c => c.CustomerID > 100;
+
+            var specification = new Specification<WebCustomer>(predicate);
+
+            specification.AddSelector(c => new { c.CustomerID, c.CustomerName, c.PrimaryContact });
+
+            var selector = specification.Selector;
+
+            IQueryable<WebCustomer> customerQuery = _queryContext.WebCustomers;
+
+            customerQuery = customerQuery
+                .Where(specification.Predicate)
+                .OrderBy(c => c.CustomerName)
+                .Take(10);
+
+            var selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(WebCustomer), typeof(string));
+            Expression<Func<WebCustomer, string>> selectLambda = c => c.CustomerName;
+            var mce = Expression.Call(selectMethod, _queryContext.WebCustomers.AsQueryable().Expression, Expression.Quote(selectLambda));
+
+            var spec2 = new Specification<WebCustomer>()
+                .AddSelector(mce);
+
+            var selector2 = spec2.Selector;
+
+            var pq2 = selector2.Method.Invoke(null, new object[] { _queryContext.WebCustomers, selector2.LambdaExpression }) as IQueryable;
+
+            var customers2 = pq2.Cast<dynamic>().ToList();
+
+            var projectedQuery = selector.Method.Invoke(null, new object[] { customerQuery, selector.LambdaExpression }) as IQueryable;
+
+            var customers = projectedQuery.Cast<dynamic>().ToList();
+
+            return Ok(customers);
+        }
+
+        [HttpGet("orderlines")]
+        public IActionResult GetOrderLines()
+        {
+
+            var predicate = PredicateBuilder.New<SalesOrderLine>(false);
+
+            predicate = predicate.And(l => l.StockItemID == 151);
+            predicate = predicate.And(l => l.Quantity == 10);
+
+            var linesQuery = _context.SalesOrderLines.Where(predicate);
+
+            var lines = linesQuery.ToList();
+
+            return Ok(lines);
+        }
+
+        [HttpGet("orders")]
+        public IActionResult GetOrders()
+        {
+            Expression<Func<SalesOrderLine, bool>> predicate = l => l.Quantity == 9;
+            Expression<Func<SalesOrder, bool>> orderpredicate = so => so.SalesOrderLines.Any(l => l.Quantity == 100);
+
+            //var ordersQuery = _context.SalesOrders.AsExpandable().Where(o => o.SalesOrderLines.Any(predicate.Compile()));
+            var ordersQuery = _context.SalesOrders.Where(orderpredicate);
+
+            var orders = ordersQuery.ToList();
+
+            return Ok(orders);
         }
 
         [HttpGet("customers")]
@@ -50,10 +120,38 @@ namespace Axerrio.CQRS.API.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("webcustomers2")]
+        public IActionResult GetWebCustomers2()
+        {
+            Expression<Func<WebCustomer, bool>> predicate = c => c.CustomerID == 20;
+
+            IQueryable<WebCustomer> query = _queryContext.WebCustomers;
+
+            //var queryableWhereMethod = GenericMethodOf(_ => Queryable.Where<int>(default(IQueryable<int>), default(Expression<Func<int, bool>>)));
+            var queryableWhereMethod = ExpressionHelperMethods.QueryableWhereGeneric;
+
+            MethodInfo whereMethod = queryableWhereMethod.MakeGenericMethod(typeof(WebCustomer));
+
+            MethodCallExpression whereCallExpression = Expression.Call(whereMethod, query.Expression, Expression.Quote(predicate));
+
+            /////////////////////////////////////////////
+
+
+            var customersQuery = whereCallExpression.Method.Invoke(null, new object[] { query, predicate }) as IQueryable<WebCustomer>;
+
+            var customers = customersQuery.ToList();
+
+            return Ok(customers);
+        }
+
         [HttpGet("webcustomers")]
         public IActionResult GetWebCustomers(ODataQueryOptions<WebCustomer> options)
         {
+            ODataQuerySettings settings = new ODataQuerySettings();
+            
+
             IQueryable<WebCustomer> baseQuery = Enumerable.Empty<WebCustomer>().AsQueryable();
+
             var provider = new ODataQueryProvider();
             IQueryable<WebCustomer> baseQuery2 = new Query<WebCustomer>(provider);
 
@@ -136,14 +234,14 @@ namespace Axerrio.CQRS.API.Controllers
             UnaryExpression filterQuote = (UnaryExpression)filterMethodCall.Arguments[1];
             //LambdaExpression filterLambda = (LambdaExpression)filterQuote.Operand;
 
-            var extractor = new LambdaExtractor();
-            LambdaExpression filterLambda = extractor.Extract(filterMethodCall);
+            //var extractor = new LambdaExtractor();
+            LambdaExpression filterLambda = LambdaExtractor.Extract(filterMethodCall);
 
             //Expression<Func<WebCustomer, bool>> filterPredicate = (Expression<Func<WebCustomer, bool>>)filterLambda;
             //var customers = filterMethodCall.Method.Invoke(null, new object[] { query, filterLambda }) as IQueryable;
             var customers = filterMethodCall.Method.Invoke(null, new object[] { query, filterLambda }) as IQueryable;
 
-            LambdaExpression selectorLambda = extractor.Extract(selectorExpression);
+            LambdaExpression selectorLambda = LambdaExtractor.Extract(selectorExpression);
             customers = selectorExpression.Method.Invoke(null, new object[] { customers, selectorLambda }) as IQueryable;
 
             return Ok(customers);

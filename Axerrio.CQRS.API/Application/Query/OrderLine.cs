@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Application.Query
 {
-    public class SalesOrderLine
+    public class OrderLine
     {
         public int OrderLineID { get; set; }
         public int OrderID { get; set; }
         public string Description { get; set; }
-        public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
-        public int StockItemID { get; set; }
-
-        //public SalesOrder SalesOrder { get; set; }
+        public decimal UnitPrice { get; set; }
     }
 }

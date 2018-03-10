@@ -10,6 +10,7 @@ namespace Axerrio.CQRS.API.Application.Query
     {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
+        public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
 
         //public DbQuery<WebCustomer> WebCustomers { get; set; }
 
@@ -51,6 +52,17 @@ namespace Axerrio.CQRS.API.Application.Query
                 .HasOne(so => so.Customer)
                 .WithMany()
                 .HasForeignKey(so => so.CustomerID);
+
+            modelBuilder.Entity<SalesOrder>()
+                .HasMany(so => so.SalesOrderLines)
+                .WithOne()
+                .HasForeignKey(l => l.OrderID);
+
+            modelBuilder.Entity<SalesOrderLine>()
+                .ToTable("OrderLines", "Sales");
+
+            modelBuilder.Entity<SalesOrderLine>()
+                .HasKey(l => l.OrderLineID);
         }
     }
 }

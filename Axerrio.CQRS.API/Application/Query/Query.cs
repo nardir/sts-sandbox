@@ -7,26 +7,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Application.Query
 {
-    public class LambdaExtractor: ExpressionVisitor
-    {
-        private LambdaExpression _expression;
 
-        public LambdaExpression Extract(MethodCallExpression expression)
-        {
-            _expression = null;
-
-            Visit(expression.Arguments[1]);
-
-            return _expression;
-        }
-
-        protected override Expression VisitLambda<T>(Expression<T> node)
-        {
-            _expression = node;
-
-            return node;
-        }
-    }
 
     public interface ISpecification
     {

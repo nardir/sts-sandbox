@@ -10,7 +10,7 @@ namespace Axerrio.CQRS.API.Application.Query
     {
         public SalesOrder()
         {
-            //SalesOrderLines = new List<SalesOrderLine>();
+            SalesOrderLines = new List<SalesOrderLine>();
         }
         public int OrderID { get; set; }
         public int CustomerID { get; set; }
@@ -18,6 +18,6 @@ namespace Axerrio.CQRS.API.Application.Query
 
         public Customer Customer { get; set; }
 
-        //public ICollection<SalesOrderLine> SalesOrderLines { get; set; }
+        public ICollection<SalesOrderLine> SalesOrderLines { get; set; }
     }
 }
