@@ -11,7 +11,6 @@ namespace Axerrio.CQRS.API.Application.Specification
     public class ODataQueryable<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IQueryProvider
     {
         private readonly Expression _expression;
-        private readonly ISpecification<T> _specification;
 
         public ODataQueryable()
             : this(new Specification<T>())
@@ -22,8 +21,10 @@ namespace Axerrio.CQRS.API.Application.Specification
         {
             _expression = Expression.Constant(this);
 
-            _specification = specification;
+            Specification = specification;
         }
+
+        public ISpecification<T> Specification { get; private set; }
 
         #region IQueryable
 
@@ -53,7 +54,7 @@ namespace Axerrio.CQRS.API.Application.Specification
 
         public IQueryable CreateQuery(Expression expression)
         {
-            throw new NotImplementedException();
+            return CreateQuery<T>(expression);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
@@ -63,12 +64,12 @@ namespace Axerrio.CQRS.API.Application.Specification
                 switch (methodCallExpression.Method.Name)
                 {
                     case "Where":
-                        _specification.Predicate = (Expression<Func<T, bool>>)LambdaExtractor.Extract(methodCallExpression);
+                        Specification.Predicate = (Expression<Func<T, bool>>)LambdaExtractor.Extract(methodCallExpression);
 
                         break;
 
                     case "Select":
-                        _specification.AddSelector(methodCallExpression);
+                        Specification.AddSelector(methodCallExpression);
 
                         break;
 
@@ -77,8 +78,21 @@ namespace Axerrio.CQRS.API.Application.Specification
                     case "OrderByDescending":
                     case "ThenByDescending":
 
-                        _specification.AddOrder(methodCallExpression);
+                        Specification.AddOrder(methodCallExpression);
 
+                        break;
+
+                    case "Skip":
+                        var skip = ConstantExtractor.Extract(methodCallExpression);
+
+                        Specification.Skip = (int)skip.Value;
+
+                        break;
+
+                    case "Take":
+                        var take = ConstantExtractor.Extract(methodCallExpression);
+
+                        Specification.Take = (int)take.Value;
                         break;
 
                     default:

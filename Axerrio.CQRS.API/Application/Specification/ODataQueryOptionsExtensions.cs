@@ -11,8 +11,16 @@ namespace Axerrio.CQRS.API.Application.Specification
         public static ISpecification<T> ToSpecification<T>(this ODataQueryOptions options, ODataQuerySettings settings = null)
         {
             //ODataValidationSettings validationSettings; // Not responsibility of this class
+            settings = settings ?? new ODataQuerySettings();
 
-            throw new NotImplementedException();
+            var query = new ODataQueryable<T>();
+
+            options.ApplyTo(query, settings);
+
+            //query.Specification.Skip = options.Skip?.Value;
+            //query.Specification.Take = options.Top?.Value;
+
+            return query.Specification;
         }
 
         public static ISpecification<T> ToSpecification<T>(this ODataQueryOptions options, ISpecification<T> specification, ODataQuerySettings settings = null)
@@ -22,9 +30,15 @@ namespace Axerrio.CQRS.API.Application.Specification
             throw new NotImplementedException();
         }
 
-        public static ISpecification<T> ToSpecification<T>(this FilterQueryOption filterOption, ODataQuerySettings settings = null)
+        public static ISpecification<T> ToSpecification<T>(this FilterQueryOption options, ODataQuerySettings settings = null)
         {
-            throw new NotImplementedException();
+            settings = settings ?? new ODataQuerySettings();
+
+            var query = new ODataQueryable<T>();
+
+            options.ApplyTo(query, settings);
+
+            return query.Specification;
         }
 
     }

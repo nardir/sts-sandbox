@@ -1,4 +1,5 @@
 ﻿using Axerrio.CQRS.API.Application.Query;
+using EnsureThat;
 using LinqKit;
 using System;
 using System.Collections.Generic;
@@ -11,23 +12,30 @@ namespace Axerrio.CQRS.API.Application.Specification
 {
     public interface ISpecification<T>
     {
+        bool HasPredicate { get;  }
         Expression<Func<T, bool>> Predicate { get; set; }
         ISpecification<T> And(Expression<Func<T, bool>> predicate);
         ISpecification<T> Or(Expression<Func<T, bool>> predicate);
 
+        bool HasSelector { get; }
         ISpecification<T> AddSelector<TResult>(Expression<Func<T, TResult>> selector);
         ISpecification<T> AddSelector(MethodCallExpression selector);
         (MethodInfo Method, LambdaExpression LambdaExpression) Selector { get; }
 
+        bool HasOrder { get; }
         IReadOnlyList<(MethodInfo Method, LambdaExpression Lambda)> Order { get; }
         ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector);
         ISpecification<T> AddOrder(MethodCallExpression keySelector);
+
+        bool HasTake { get; }
+        int? Take { get; set; }
+        bool HasSkip { get; }
+        int? Skip { get; set; }
     }
 
     public class Specification<T> : ISpecification<T>
     {
         private ExpressionStarter<T> _predicate;
-
 
         #region ctor
 
@@ -52,6 +60,8 @@ namespace Axerrio.CQRS.API.Application.Specification
         #endregion
 
         #region Predicate
+
+        public bool HasPredicate => _predicate.IsStarted;
 
         public Expression<Func<T, bool>> Predicate
         {
@@ -110,6 +120,8 @@ namespace Axerrio.CQRS.API.Application.Specification
             return this;
         }
 
+        public bool HasSelector => _selectorMethod != null;
+
         public ISpecification<T> AddSelector<TResult>(Expression<Func<T, TResult>> selector)
         { 
             if (selector == null)
@@ -147,6 +159,8 @@ namespace Axerrio.CQRS.API.Application.Specification
 
         private readonly List<(MethodInfo Method, LambdaExpression Lambda)> _order = new List<(MethodInfo Method, LambdaExpression Lambda)>();
 
+        public bool HasOrder => _order.Count > 0;
+
         public IReadOnlyList<(MethodInfo Method, LambdaExpression Lambda)> Order => _order.AsReadOnly();
 
         public ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
@@ -176,6 +190,80 @@ namespace Axerrio.CQRS.API.Application.Specification
         }
 
         #endregion
+
+        #region paging
+
+        private int? _take = null;
+        public int? Take
+        {
+            get => _take;
+
+            set
+            {
+                if (!value.HasValue)
+                {
+                    _take = null;
+                    return;
+                }
+
+                EnsureArg.IsGt(value.Value, 0, nameof(value));
+
+                _take = value;
+            }
+        }
+
+        public bool HasTake => _take.HasValue;
+
+        private int? _skip = null;
+        public int? Skip
+        {
+            get => _skip;
+
+            set
+            {
+                if (!value.HasValue)
+                {
+                    _skip = null;
+                    return;
+                }
+
+                EnsureArg.IsGte(value.Value, 0, nameof(value));
+
+                _skip = value;
+            }
+        }
+
+        public bool HasSkip => _take.HasValue;
+
+        #endregion
+    }
+
+    public class ConstantExtractor: System.Linq.Expressions.ExpressionVisitor
+    {
+        private ConstantExpression _expression;
+
+        protected ConstantExtractor()
+        {
+            _expression = null;
+        }
+
+        public static ConstantExpression Extract(MethodCallExpression expression)
+        {
+            var extractor = new ConstantExtractor();
+
+            extractor.Visit(expression.Arguments[1]);
+
+            return extractor.Expression;
+        }
+
+        protected ConstantExpression Expression => _expression;
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            _expression = node;
+
+            return node;
+        }
     }
 
     public class LambdaExtractor : System.Linq.Expressions.ExpressionVisitor

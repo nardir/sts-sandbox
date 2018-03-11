@@ -26,6 +26,22 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("spec2")]
+        public IActionResult TestSpec2()
+        {
+            var p1 = PredicateBuilder.New<WebCustomer>(true);
+
+            var started = p1.IsStarted;
+            p1 = p1.Start(c => c.CustomerID == 22);
+            started = p1.IsStarted;
+
+            var p2 = PredicateBuilder.New<WebCustomer>(true);
+            p2 = p2.And(c => c.CustomerName.Contains("Tail"));
+            started = p2.IsStarted;
+
+            return Ok();
+        }
+
         [HttpGet("spec")]
         public IActionResult TestSpec()
         {
@@ -154,6 +170,8 @@ namespace Axerrio.CQRS.API.Controllers
 
             var provider = new ODataQueryProvider();
             IQueryable<WebCustomer> baseQuery2 = new Query<WebCustomer>(provider);
+
+            var p = options.Skip.ApplyTo(baseQuery2, new ODataQuerySettings());
 
             #region filter
             var f = options.Filter.ApplyTo(baseQuery2, new ODataQuerySettings());
