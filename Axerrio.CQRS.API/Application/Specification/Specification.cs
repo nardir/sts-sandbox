@@ -20,11 +20,14 @@ namespace Axerrio.CQRS.API.Application.Specification
         bool HasSelector { get; }
         ISpecification<T> AddSelector<TResult>(Expression<Func<T, TResult>> selector);
         ISpecification<T> AddSelector(MethodCallExpression selector);
-        (MethodInfo Method, LambdaExpression LambdaExpression) Selector { get; }
+        (MethodInfo Method, LambdaExpression Lambda) Selector { get; }
 
         bool HasOrder { get; }
         IReadOnlyList<(MethodInfo Method, LambdaExpression Lambda)> Order { get; }
         ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector);
+        ISpecification<T> OrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector);
+        ISpecification<T> ThenBy<TKey>(Expression<Func<T, TKey>> keySelector);
+        ISpecification<T> ThenByDescending<TKey>(Expression<Func<T, TKey>> keySelector);
         ISpecification<T> AddOrder(MethodCallExpression keySelector);
 
         bool HasTake { get; }
@@ -53,6 +56,8 @@ namespace Axerrio.CQRS.API.Application.Specification
         public Specification(Expression<Func<T, bool>> predicate, MethodCallExpression selector)
         {
             Predicate = predicate;
+
+            _order = new List<(MethodInfo Method, LambdaExpression Lambda)>();
 
             AddSelector(selector);
         }
@@ -151,13 +156,13 @@ namespace Axerrio.CQRS.API.Application.Specification
         }
 
         //https://blogs.msdn.microsoft.com/mazhou/2017/05/26/c-7-series-part-1-value-tuples/
-        public (MethodInfo Method, LambdaExpression LambdaExpression) Selector => (Method: _selectorMethod, LambdaExpression: _selectorLambda);
+        public (MethodInfo Method, LambdaExpression Lambda) Selector => (Method: _selectorMethod, Lambda: _selectorLambda);
 
         #endregion
 
         #region orderby
 
-        private readonly List<(MethodInfo Method, LambdaExpression Lambda)> _order = new List<(MethodInfo Method, LambdaExpression Lambda)>();
+        private readonly List<(MethodInfo Method, LambdaExpression Lambda)> _order;
 
         public bool HasOrder => _order.Count > 0;
 
@@ -165,17 +170,40 @@ namespace Axerrio.CQRS.API.Application.Specification
 
         public ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
-            //check null
-
             var orderMethod = ExpressionHelperMethods.QueryableOrderByGeneric.MakeGenericMethod(typeof(T), typeof(TKey));
+
+            return AddOrder(orderMethod, keySelector);
+        }
+
+        public ISpecification<T> OrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector)
+        {
+            var orderMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(typeof(T), typeof(TKey));
+
+            return AddOrder(orderMethod, keySelector);
+        }
+
+        public ISpecification<T> ThenBy<TKey>(Expression<Func<T, TKey>> keySelector)
+        {
+            var orderMethod = ExpressionHelperMethods.QueryableThenByGeneric.MakeGenericMethod(typeof(T), typeof(TKey));
+
+            return AddOrder(orderMethod, keySelector);
+        }
+
+        public ISpecification<T> ThenByDescending<TKey>(Expression<Func<T, TKey>> keySelector)
+        {
+            var orderMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(typeof(T), typeof(TKey));
 
             return AddOrder(orderMethod, keySelector);
         }
 
         public ISpecification<T> AddOrder(MethodCallExpression keySelector)
         {
-            //check null
-            //Check allowed methods
+            EnsureArg.IsNotNull(keySelector, nameof(keySelector));
+
+            string[] allowedMethods = new string[] { "OrderBy", "ThenBy", "OrderByDescending", "ThenByDescending" };
+
+            if (!allowedMethods.Any(m => m == keySelector.Method.Name))
+                throw new InvalidOperationException();
 
             var keySelectorLambda = LambdaExtractor.Extract(keySelector);
 
@@ -184,6 +212,9 @@ namespace Axerrio.CQRS.API.Application.Specification
 
         protected ISpecification<T> AddOrder(MethodInfo orderMethod, LambdaExpression keySelector)
         {
+            EnsureArg.IsNotNull(keySelector, nameof(keySelector));
+            EnsureArg.IsNotNull(orderMethod, nameof(orderMethod));
+
             _order.Add((Method: orderMethod, Lambda: keySelector));
 
             return this;
@@ -233,36 +264,71 @@ namespace Axerrio.CQRS.API.Application.Specification
             }
         }
 
-        public bool HasSkip => _take.HasValue;
+        public bool HasSkip => _skip.HasValue;
 
         #endregion
     }
 
-    public class ConstantExtractor: System.Linq.Expressions.ExpressionVisitor
+    public class ConstantValueExtractor: System.Linq.Expressions.ExpressionVisitor
     {
-        private ConstantExpression _expression;
+        private ConstantExpression _constantExpression;
+        private MemberExpression _memberExpression;
 
-        protected ConstantExtractor()
+        protected ConstantValueExtractor()
         {
-            _expression = null;
+            _memberExpression = null;
         }
 
-        public static ConstantExpression Extract(MethodCallExpression expression)
+        //public static ConstantExpression Extract(MethodCallExpression expression)
+        public static T Extract<T>(MethodCallExpression expression)
         {
-            var extractor = new ConstantExtractor();
+            var extractor = new ConstantValueExtractor();
 
             extractor.Visit(expression.Arguments[1]);
 
-            return extractor.Expression;
+            return extractor.GetValue<T>();
         }
 
-        protected ConstantExpression Expression => _expression;
+        //protected ConstantExpression Expression => _expression;
+        protected MemberExpression MemberExpression => _memberExpression;
+        protected ConstantExpression ConstantExpression => _constantExpression;
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            _memberExpression = node;
+
+            return base.VisitMember(node);
+        }
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            _expression = node;
+            _constantExpression = node;
 
             return node;
+        }
+
+        protected T GetValue<T>()
+        {
+            var value = _constantExpression.Value;
+
+            var t = _constantExpression.Type;
+            var fieldName = _memberExpression.Member.Name;
+
+            var fieldInfo = t.GetField(fieldName) ?? t.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fieldInfo != null)
+            {
+                value = fieldInfo.GetValue(value);
+            }
+            else
+            {
+                PropertyInfo propInfo = t.GetProperty(fieldName) ?? t.GetProperty(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+                if (propInfo != null)
+                {
+                    value = propInfo.GetValue(value, null);
+                }
+            }
+
+            return (T)value;
         }
     }
 

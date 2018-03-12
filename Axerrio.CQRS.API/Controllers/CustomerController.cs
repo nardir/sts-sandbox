@@ -26,6 +26,24 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("webcustomerstest")]
+        public IActionResult GetWebCustomersTest(ODataQueryOptions<WebCustomer> options)
+        {
+            //Validate options
+            var settings = new ODataQuerySettings();
+            settings.EnsureStableOrdering = false;
+
+            var specification = options.ToSpecification<WebCustomer>(settings);
+
+            ///////////////////////
+
+            var query = _queryContext.WebCustomers.ApplySpecification<WebCustomer, dynamic>(specification);
+
+            var customers = query.ToList();
+
+            return Ok(customers);
+        }
+
         [HttpGet("spec2")]
         public IActionResult TestSpec2()
         {
@@ -69,11 +87,11 @@ namespace Axerrio.CQRS.API.Controllers
 
             var selector2 = spec2.Selector;
 
-            var pq2 = selector2.Method.Invoke(null, new object[] { _queryContext.WebCustomers, selector2.LambdaExpression }) as IQueryable;
+            var pq2 = selector2.Method.Invoke(null, new object[] { _queryContext.WebCustomers, selector2.Lambda }) as IQueryable;
 
             var customers2 = pq2.Cast<dynamic>().ToList();
 
-            var projectedQuery = selector.Method.Invoke(null, new object[] { customerQuery, selector.LambdaExpression }) as IQueryable;
+            var projectedQuery = selector.Method.Invoke(null, new object[] { customerQuery, selector.Lambda }) as IQueryable;
 
             var customers = projectedQuery.Cast<dynamic>().ToList();
 

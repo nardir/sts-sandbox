@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Application.Specification
@@ -83,16 +84,13 @@ namespace Axerrio.CQRS.API.Application.Specification
                         break;
 
                     case "Skip":
-                        var skip = ConstantExtractor.Extract(methodCallExpression);
-
-                        Specification.Skip = (int)skip.Value;
+                        Specification.Skip = ConstantValueExtractor.Extract<int>(methodCallExpression);
 
                         break;
 
                     case "Take":
-                        var take = ConstantExtractor.Extract(methodCallExpression);
+                        Specification.Take = ConstantValueExtractor.Extract<int>(methodCallExpression);
 
-                        Specification.Take = (int)take.Value;
                         break;
 
                     default:

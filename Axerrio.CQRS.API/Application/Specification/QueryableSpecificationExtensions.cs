@@ -21,7 +21,7 @@ namespace Axerrio.CQRS.API.Application.Specification
 
             var selector = specification.Selector;
 
-            var projection = selector.Method.Invoke(null, new object[] { source, selector.LambdaExpression }) as IQueryable;
+            var projection = selector.Method.Invoke(null, new object[] { source, selector.Lambda }) as IQueryable;
 
             return projection;
         }
