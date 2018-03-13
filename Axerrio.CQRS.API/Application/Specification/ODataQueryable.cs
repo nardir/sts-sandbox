@@ -1,4 +1,5 @@
 ﻿using Axerrio.CQRS.API.Application.Query;
+using EnsureThat;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,17 +10,24 @@ using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Application.Specification
 {
-    public class ODataQueryable<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IQueryProvider
+    public interface ISpecificationQueryable<T>: IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable
+    {
+        ISpecification<T> Specification { get; }
+    }
+
+    public class ODataQueryable<T> : IQueryProvider, ISpecificationQueryable<T>
     {
         private readonly Expression _expression;
 
-        public ODataQueryable()
-            : this(new Specification<T>())
-        {
-        }
+        //public ODataQueryable()
+        //    : this(new Specification<T>())
+        //{
+        //}
 
         public ODataQueryable(ISpecification<T> specification)
         {
+            EnsureArg.IsNotNull(specification, nameof(specification));
+
             _expression = Expression.Constant(this);
 
             Specification = specification;

@@ -32,8 +32,10 @@ namespace Axerrio.CQRS.API.Controllers
             //Validate options
             var settings = new ODataQuerySettings();
             settings.EnsureStableOrdering = false;
+            var specification = new Specification<WebCustomer>();
+            var specificationQuery = new ODataQueryable<WebCustomer>(specification);
 
-            var specification = options.ToSpecification<WebCustomer>(settings);
+            options.ToSpecification(specificationQuery, settings);
 
             ///////////////////////
 
