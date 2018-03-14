@@ -30,16 +30,21 @@ namespace Axerrio.JJ.Sandbox
             FilterCondition fc6 = new FilterCondition("Party.Color", "@filterProperty = @0", "RED");
 
             var expParser = new DynamicExpressionFilter<PriceListRow>(null);
+
+            //FilterConditions
             var expName1 = expParser.ParseCondition(fc1);
             var expStems1 = expParser.ParseCondition(fc4);
+
             var expName2 = expParser.ParseCondition(fc2);
             var expStems2 = expParser.ParseCondition(fc5);
 
             var expColor = expParser.ParseCondition(fc6);
 
+            //FilterRows (AND van meerdere Conditions)
             var expFilterRow1 = expParser.ParseExpressions(AndOr.AND, expName1, expStems1);
             var expFilterRow2 = expParser.ParseExpressions(AndOr.AND, expName2, expStems2);
 
+            //Filter (OR van meerdere rows)
             var expFilter = expParser.ParseExpressions(AndOr.OR, expFilterRow1, expFilterRow2, expColor);
 
 
