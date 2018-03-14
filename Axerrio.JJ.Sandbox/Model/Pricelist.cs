@@ -38,7 +38,12 @@ namespace Axerrio.JJ.Sandbox.Model
                     ArticleName = "ROSA RED",
                     Price = 0.12M,
                     PriceListRowKey = 1,
-                    Stems = 40
+                    Stems = 40,
+                    Party = new Party()
+                    {
+                        PartyKey = 2,
+                        Color = "RED"
+                    }
                 },
                 new PriceListRow()
                 {
@@ -46,16 +51,39 @@ namespace Axerrio.JJ.Sandbox.Model
                     ArticleName = "ROSA MAXIMA",
                     Price = 0.24M,
                     PriceListRowKey = 2,
-                    Stems = 120
+                    Stems = 120,
+                    Party = new Party()
+                    {
+                        PartyKey = 2,
+                        Color = "PURPLE"
+                    }
                 }
                 ,
                 new PriceListRow()
                 {
-                    ArticleKey = 2,
+                    ArticleKey = 3,
                     ArticleName = "ROSA Purple",
                     Price = 0.24M,
-                    PriceListRowKey = 2,
-                    Stems = 5
+                    PriceListRowKey = 3,
+                    Stems = 5,
+                    Party = new Party()
+                    {
+                        PartyKey = 2,
+                        Color = "BLUE"
+                    }
+                },
+                new PriceListRow()
+                {
+                    ArticleKey = 3,
+                    ArticleName = "ROSA Purple",
+                    Price = 1.24M,
+                    PriceListRowKey = 4,
+                    Stems = 150,
+                    Party = new Party()
+                    {
+                        PartyKey = 1,
+                        Color = "RED"
+                    }
                 }
             };
 

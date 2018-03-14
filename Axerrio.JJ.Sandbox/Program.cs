@@ -13,22 +13,59 @@ namespace Axerrio.JJ.Sandbox
     {
         static void Main(string[] args)
         {
+            Test1();
+            Test2();
+        }
+
+        public static void Test2()
+        {
+            Pricelist pl = new Pricelist();
+            var plrContext = pl.PricelistRows.AsQueryable();
+
+            FilterCondition fc1 = new FilterCondition("ArticleName", "@filterProperty.Contains(@0)", "RED");
+            FilterCondition fc2 = new FilterCondition("ArticleName", "@filterProperty.Contains(@0)", "PURPLE");
+            FilterCondition fc3 = new FilterCondition("ArticleName", "@filterProperty.Contains(@0)", "BLUE");
+            FilterCondition fc4 = new FilterCondition("Stems", "@filterProperty > @0", 10);
+            FilterCondition fc5 = new FilterCondition("Stems", "@filterProperty > @0", 40);
+            FilterCondition fc6 = new FilterCondition("Party.Color", "@filterProperty = @0", "RED");
+
+            var expParser = new DynamicExpressionFilter<PriceListRow>(null);
+            var expName1 = expParser.ParseCondition(fc1);
+            var expStems1 = expParser.ParseCondition(fc4);
+            var expName2 = expParser.ParseCondition(fc2);
+            var expStems2 = expParser.ParseCondition(fc5);
+
+            var expColor = expParser.ParseCondition(fc6);
+
+            var expFilterRow1 = expParser.ParseExpressions(AndOr.AND, expName1, expStems1);
+            var expFilterRow2 = expParser.ParseExpressions(AndOr.AND, expName2, expStems2);
+
+            var expFilter = expParser.ParseExpressions(AndOr.OR, expFilterRow1, expFilterRow2, expColor);
+
+
+            var results = plrContext.Where(expFilter).ToDynamicList<PriceListRow>();
+        }
+
+        public static void Test1()
+        {
 
             Pricelist pl = new Pricelist();
             var pricelistRowsContext = pl.PricelistRows.AsQueryable();
 
 
 
-            var exp1 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "ArticleName.Contains(@0)", "RED");
-            var exp2 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "ArticleName == @0", "ROSA Purple");
-            var exp3 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "Stems > @0", 4);
+            var expCondition1 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "ArticleName.Contains(@0)", "RED");
+            var expCondition2 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "ArticleName == @0", "ROSA Purple");
+            var expCondition3 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "Stems > @0", 4);
+            var expCondition4 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "Stems > @0", 40);
 
-            IQueryable<PriceListRow> query1 = pricelistRowsContext.Where("@0(it) AND @1(it)", exp1, exp3);
-            IQueryable<PriceListRow> query2 = pricelistRowsContext.Where("( @0(it) OR @1(it) ) and @2(it)", exp1, exp2, exp3);
+            var expFilterRow1 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "@0(it) AND @1(it)", expCondition1, expCondition3);
+            var expFilterRow2 = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "@0(it) AND @1(it)", expCondition2, expCondition4);
 
+            var expFilter = DynamicExpressionParser.ParseLambda(typeof(PriceListRow), typeof(bool), "@0(it) OR @1(it)", expFilterRow1, expFilterRow2);
 
-            var results1 = query1.ToDynamicList<PriceListRow>();
-            var results2 = query2.ToDynamicList<PriceListRow>();
+            var results1 = pricelistRowsContext.Where(expFilter).ToDynamicList<PriceListRow>();
+            var results2 = pricelistRowsContext.Where(expFilterRow1).ToDynamicList<PriceListRow>();
 
             //Operator Metadata opslaan: Expression 
             //bv:--> '@propertyName.Contains(@0)'
@@ -68,7 +105,7 @@ namespace Axerrio.JJ.Sandbox
 
             dePLR.TestFilterRows(AndOr.OR, f1, f2, f3);
 
-            Console.ReadKey();
+            //Console.ReadKey();
 
            
         }

@@ -24,9 +24,60 @@ namespace Axerrio.JJ.Sandbox
             _context = context;
         }
 
-        private LambdaExpression ParseFilterLamda(string expression, params object[] values)        
+        public LambdaExpression ParseFilterLamda(string expression, params object[] values)        
         {
             return DynamicExpressionParser.ParseLambda(typeof(TContext), typeof(bool), expression, values);
+        }
+
+        public LambdaExpression ParseExpressions(AndOr AndOrOperator, params LambdaExpression[] expressions)
+        {
+            if (expressions.Any())
+            {               
+                var expression = BuildOperandString(expressions.Length, AndOrOperator.ToString()); //"or"
+
+                LambdaExpression e = ParseFilterLamda(expression, expressions);
+                return e;                
+            }
+
+            return null;
+        }
+
+        public LambdaExpression ParseCondition(FilterCondition fc)
+        {
+            var expression = fc.Operator.Replace("@filterProperty", fc.PropertyName); //Check nog:  substitution values         
+            LambdaExpression e = ParseFilterLamda(expression, fc.FilterValues);
+
+            return e;
+        }
+         
+
+        public LambdaExpression ParseConditions(AndOr AndOrOperator, params FilterCondition[] conditions)
+        {
+            List<LambdaExpression> expressions = new List<LambdaExpression>();           
+
+            foreach (FilterCondition fc in conditions)
+            {
+                var expression = fc.Operator.Replace("@filterProperty", fc.PropertyName); //Check nog:  substitution values         
+                LambdaExpression e = ParseFilterLamda(expression, fc.FilterValues);
+
+                expressions.Add(e);
+            }
+
+            if (expressions.Any())
+            {
+                if (expressions.Count == 1)
+                    return expressions.First();
+
+                else
+                {
+                    var expression = BuildOperandString(expressions.Count, AndOrOperator.ToString()); //"or"
+
+                    LambdaExpression e = ParseFilterLamda(expression, expressions.ToArray());
+                    return e;
+                }
+            }
+
+            return null;
         }
 
 

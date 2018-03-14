@@ -22,6 +22,6 @@ namespace Axerrio.JJ.Sandbox.Model
         public string ArticleName { get; set; }
         public decimal Price { get; set; }
         public int Stems { get; set; }
-        
+        public Party Party { get; set; }
     }
 }
