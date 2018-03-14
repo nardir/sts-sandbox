@@ -21,6 +21,7 @@ using Axerrio.BB.DDD.Infrastructure.AutofacModules;
 using Axerrio.BB.DDD.Infrastructure.Options;
 using Axerrio.BB.DDD.Dapper.Infrastructure.AutofacModules;
 using Axerrio.BB.DDD.AzureServiceBus.Infrastructure;
+using Microsoft.Extensions.HealthChecks;
 
 namespace Axerrio.BB.DDD.IE.API
 {
@@ -76,7 +77,10 @@ namespace Axerrio.BB.DDD.IE.API
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
                 });
-            
+
+
+
+            //services.AddHealthChecks();
 
             //services.AddTransient<EFCoreStoreAndForwardEventBus<OrderingDbContext>>();
 
