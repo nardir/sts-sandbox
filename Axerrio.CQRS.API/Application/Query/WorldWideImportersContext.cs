@@ -10,14 +10,21 @@ namespace Axerrio.CQRS.API.Application.Query
     {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
+        public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
+
+        //public DbQuery<WebCustomer> WebCustomers { get; set; }
 
         public WorldWideImportersContext(DbContextOptions<WorldWideImportersContext> options)
             : base(options)
         {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.Query<WebCustomer>()
+            //    .ToTable("Customers", "Website");
+
             modelBuilder.Entity<Customer>()
                 .ToTable("Customers", "Sales");
 
@@ -49,20 +56,14 @@ namespace Axerrio.CQRS.API.Application.Query
 
             modelBuilder.Entity<SalesOrder>()
                 .HasMany(so => so.SalesOrderLines)
-                .WithOne(l => l.SalesOrder)
+                .WithOne()
                 .HasForeignKey(l => l.OrderID);
 
             modelBuilder.Entity<SalesOrderLine>()
                 .ToTable("OrderLines", "Sales");
 
             modelBuilder.Entity<SalesOrderLine>()
-                .Property(l => l.OrderLineID)
-                .IsRequired(true);
-
-            modelBuilder.Entity<SalesOrderLine>()
                 .HasKey(l => l.OrderLineID);
-
-
         }
     }
 }

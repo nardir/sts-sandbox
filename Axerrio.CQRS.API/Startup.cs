@@ -41,13 +41,21 @@ namespace Axerrio.CQRS.API
             });
 
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<WorldWideImportersContext>(options => 
+                .AddDbContext<WorldWideImportersContext>(options =>
+                {
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
+                    });
+                })
+                .AddDbContextPool<WorldWideImportersQueryContext>(options =>
                 {
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
                     });
                 });
+
 
             //Moon
             //services.AddMvc()
@@ -101,7 +109,7 @@ namespace Axerrio.CQRS.API
             ////Microsoft.AspNetCore.OData
             app.UseMvc(routeBuilder =>
             {
-                //routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
+                routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
                 //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
