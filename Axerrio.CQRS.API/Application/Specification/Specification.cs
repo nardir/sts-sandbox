@@ -134,7 +134,8 @@ namespace Axerrio.CQRS.API.Application.Specification
                 return AddSelector(null, null);
             }
 
-            var selectorMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(T), selector.Body.Type);
+            //var selectorMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(T), selector.Body.Type);
+            var selectorMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(T), typeof(TResult));
 
             return AddSelector(selector, selectorMethod);
         }

@@ -17,6 +17,7 @@ namespace Axerrio.CQRS.API.Application.Query
         public WorldWideImportersContext(DbContextOptions<WorldWideImportersContext> options)
             : base(options)
         {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

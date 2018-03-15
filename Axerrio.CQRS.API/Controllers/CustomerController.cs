@@ -5,10 +5,13 @@ using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.DynamicLinq;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -26,22 +29,132 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("orders3")]
+        public IActionResult GetOrders3()
+        {
+            //var lambda = DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "CustomerID == 507");
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>) DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "CustomerID == @0", 507);
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Customer.Name.Contains(@0)", "Taj");
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Customer.Name.StartsWith(@0)", "Tail");
+
+
+            //Expression<Func<SalesOrder, string, bool>> likeLambda = (so, s) => EF.Functions.Like(so.Customer.Name, s);
+            Expression<Func<string, string, bool>> likeLambda = (n, s) => EF.Functions.Like(n, s);
+
+
+            var p = new Dictionary<string, object>();
+            p.Add("@like", likeLambda);
+            //p.Add("@search", "%Taj%");
+            p.Add("@search", "Taj");
+
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "@0(it, @1)", likeLambda, "Tail%");
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "@like(Customer.Name, @search)", p);
+            Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Customer.Name.StartsWith(@search)", p);
+            //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Microsoft.EntityFrameworkCore.EF.Functions.Like(o.Customer.Name, @0)", "Tail");
+
+            //Expression<Func<SalesOrder, object>> orderby = (Expression<Func<SalesOrder, object>>) DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(object), "Customer.Name");
+
+            //var query = _context.SalesOrders.Where("CustomerID == @0", 507);
+            //var query = _context.SalesOrders.Where(lambda).Cast<SalesOrder>();
+            //var query = _context.SalesOrders.Where(lambda);
+            IQueryable<SalesOrder> query = _context.SalesOrders;
+            query = query.Where(lambda);
+            //query = query.Where(o => EF.Functions.Like(o.Customer.Name, "%Taj%"));
+            //query = query.Where(o => o.Customer.Name.Contains("Taj"));
+            
+            //query = query.Where(o => DynamicFunctions.Like(o.Customer.Name, "%Taj"));
+            //query = query.Where(o => o.Customer.Name.StartsWith("Tail"));
+
+            //var test = query.Select(o => new { o.OrderID, o.Customer.Name });
+            query = query.OrderBy("Customer.Name desc");
+
+            LambdaExpression selector =  DynamicExpressionParser.ParseLambda(typeof(SalesOrder), null , "new ( OrderID, Customer.Name as CustomerName)");
+            var selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(SalesOrder), selector.Body.Type);
+
+            //var projection = query.Select("new ( OrderID, Customer.Name as CustomerName)")
+            //    .Cast<dynamic>();
+            var projection = selectMethod.Invoke(null, new object[] { query, selector }) as IQueryable;
+
+            var orders = projection.Cast<dynamic>().ToList();
+
+            return Ok(orders);
+        }
+
+        [HttpGet("orders2")]
+        public IActionResult GetOrders2(ODataQueryOptions<SalesOrder> options)
+        {
+            //http://localhost:5000/orders2?$select=OrderID,Customer&$expand=Customer($select=Name)
+            //http://localhost:5000/orders2?$select=OrderID&$filter=CustomerID+eq+507&$expand=Customer($select=Name)
+            //http://localhost:5000/orders2?$filter=contains(Customer/Name, 'Baran')&$select=OrderID,Customer&$expand=Customer
+            //http://localhost:5000/orders2?$filter=SalesOrderLines/any()
+            //http://localhost:5000/orders2?$filter=SalesOrderLines/any(l:l/Quantity+gt+100)
+            //http://localhost:5000/orders2?$filter=OrderID+eq+706&$select=OrderID,SalesOrderLines&$expand=SalesOrderLines
+            var specification = new Specification<SalesOrder>();
+            var specificationQuery = new ODataQueryable<SalesOrder>(specification);
+
+            options.ToSpecification(specificationQuery);
+
+            //var count = _context.SalesOrders.Where(specification.Predicate).Count();
+
+            var query = _context.SalesOrders.ApplySpecification<SalesOrder, dynamic>(specification);
+
+            var orders = query.ToList();
+
+            return Ok(orders);
+        }
+
         [HttpGet("webcustomerstest")]
         public IActionResult GetWebCustomersTest(ODataQueryOptions<WebCustomer> options)
         {
+            //http://www.odata.org/documentation/odata-version-2-0/uri-conventions/
+
             //Validate options
             var settings = new ODataQuerySettings();
             settings.EnsureStableOrdering = false;
+
             var specification = new Specification<WebCustomer>();
             var specificationQuery = new ODataQueryable<WebCustomer>(specification);
 
             options.ToSpecification(specificationQuery, settings);
 
+            
+            //if (options.SelectExpand != null)
+            //{
+
+            //    var fields = options.SelectExpand.RawSelect.Split(',');
+
+            //    specification.AddSelector(null);
+            //    specification.AddSelector<dynamic>(ToDynamic<WebCustomer>(fields.ToHashSet()));
+            //}
+
             ///////////////////////
+            if (!specification.HasSelector)
+            {
+                specification.AddSelector(c => new { c.CustomerName, c.PrimaryContact });
+            }
+            
+            if (!specification.HasTake)
+            {
+                specification.OrderBy(c => c.CustomerID);
+                specification.Take = 10;
+                specification.Skip = 100;
+            }
 
             var query = _queryContext.WebCustomers.ApplySpecification<WebCustomer, dynamic>(specification);
 
             var customers = query.ToList();
+
+            var spec2 = new Specification<WebCustomer>();
+            spec2.OrderBy(c => c.CustomerName)
+                .AddSelector(c => new { c.CustomerID, c.PrimaryContact });
+                //.AddSelector(c => c.CustomerName);
+
+            spec2.Take = 10;
+            spec2.Skip = 100;
+
+            var customers2 = _queryContext.WebCustomers.ApplySpecification<WebCustomer, dynamic>(spec2).ToList();
+
+
 
             return Ok(customers);
         }
@@ -316,6 +429,26 @@ namespace Axerrio.CQRS.API.Controllers
         static MethodInfo GenericMethodOf<TReturn>(Expression<Func<object, TReturn>> expression)
         {
             return GenericMethodOf(expression as Expression);
+        }
+
+        public static Expression<Func<T, dynamic>> ToDynamic<T>(ISet<string> fields)
+        {
+            //https://gist.github.com/volak/20f453de023ff75edeb8
+            var pocoType = typeof(T);
+
+            var itemParam = Expression.Parameter(pocoType, "x");
+            var members = fields.Select(f => Expression.PropertyOrField(itemParam, f));
+            var addMethod = typeof(IDictionary<string, object>).GetMethod(
+                        "Add", new Type[] { typeof(string), typeof(object) });
+
+
+            var elementInits = members.Select(m => Expression.ElementInit(addMethod, Expression.Constant(m.Member.Name), Expression.Convert(m, typeof(Object))));
+
+            var expando = Expression.New(typeof(ExpandoObject));
+            var body = Expression.ListInit(expando, elementInits);
+            var lambda = Expression.Lambda<Func<T, dynamic>>(Expression.ListInit(expando, elementInits), itemParam);
+
+            return lambda;
         }
     }
 }
