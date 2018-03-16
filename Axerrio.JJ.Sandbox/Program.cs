@@ -1,6 +1,8 @@
 ﻿using Axerrio.JJ.Sandbox.Model;
+
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -13,6 +15,8 @@ namespace Axerrio.JJ.Sandbox
     {
         static void Main(string[] args)
         {
+            var useIdentityServer = bool.Parse(ConfigurationManager.AppSettings["UseIdentityServer"]??"false");
+
             Test1();
             Test2();
         }

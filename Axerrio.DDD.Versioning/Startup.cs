@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.Reflection;
 using System.IO;
+using Axerrio.DDD.Versioning.Model;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
 
 namespace Axerrio.DDD.Versioning
 {
@@ -80,11 +83,86 @@ namespace Axerrio.DDD.Versioning
                 // add a custom operation filter which sets default values
                 options.OperationFilter<SwaggerDefaultValues>();
 
+                options.SchemaFilter<AxeTypeSchemaFilter>();
+                options.DocumentFilter<ApplyDocumentVendorExtensions>();
+                
                 // integrate xml comments
                 options.IncludeXmlComments(XmlCommentsFilePath);
 
                 //o.SwaggerDoc("v1.0", new Info { Title = "My API", Version = "v1.0" });
+                               
             });
+        }
+
+        public class ApplyDocumentVendorExtensions : IDocumentFilter
+        {
+            public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+            {
+                swaggerDoc.Extensions.Add("x-document", "foo");
+            }
+
+        }
+        
+        public class AxeTypeSchemaFilter : ISchemaFilter
+        {
+            public void Apply(Schema schema, SchemaFilterContext context)
+            {
+                var typeInfo = context.SystemType.GetTypeInfo();
+                var list = context.SystemType.CustomAttributes;
+                if(schema.Minimum!= null)
+                {
+
+                }
+              //  context.JsonContract.
+            
+                    //schema.Extensions.Add(
+                    //   "x-axe-domainType",
+                    //   new
+                    //   {
+                    //       name = typeInfo.Name,
+                    //       domain = true
+                    //   });
+
+
+                if (typeInfo.UnderlyingSystemType == typeof(int))
+                {
+                //    schema.Extensions.Add(
+                //        "x-axe-def",
+                //        new
+                //        {
+                //            name = typeInfo.Name,
+                //            domainInt = true
+                //        });
+                }
+
+                if (context.SystemType == typeof(Order))
+                {
+                    schema.Extensions.Add(
+                        "x-axe-def",
+                        new
+                        {
+                            name = typeInfo.Name,
+                            type = "A",
+                            selectValues = true,
+                            valuesUrl = new Uri("http://www.google.nl")
+                        });
+                }
+
+                if (context.SystemType == typeof(Article))
+                {
+                    schema.Extensions.Add(
+                        "x-axe-def",
+                        new
+                        {
+                            name = typeInfo.Name,
+                            type = "A",
+                            selectValues = true,
+                            valuesUrl = new Uri("http://www.google.nl")
+                        });
+                }
+
+               
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
