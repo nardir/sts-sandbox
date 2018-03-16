@@ -107,6 +107,7 @@ namespace Axerrio.DDD.Versioning
         {
             public void Apply(Schema schema, SchemaFilterContext context)
             {
+
                 var typeInfo = context.SystemType.GetTypeInfo();
                 var list = context.SystemType.CustomAttributes;
                 if(schema.Minimum!= null)

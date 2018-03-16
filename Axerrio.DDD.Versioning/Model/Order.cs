@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Axerrio.DDD.Versioning.Startup;
 
+
+
 namespace Axerrio.DDD.Versioning.Model
 {
     public class Order
@@ -18,8 +20,7 @@ namespace Axerrio.DDD.Versioning.Model
             OrderNumber = number;
             SalesArticle = new Article() { Name = article, ArticleKey = articleKey };
         }
-        //   [JsonProperty(]
-      
+    
         public int OrderId { get; set; }
 
         [StringLength(25)]
