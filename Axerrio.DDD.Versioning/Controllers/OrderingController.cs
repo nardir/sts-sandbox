@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Axerrio.DDD.Versioning.Model;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,13 @@ namespace Axerrio.DDD.Versioning.Controllers
         public string Home()
         {
             return "Ordering - Home";
+        }
+
+        [Route("order")]
+        [HttpGet()]
+        public Order Order()
+        {
+            return new Order(1,"a123", "joskes", 1);
         }
     }
 }
