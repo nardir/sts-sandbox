@@ -4,6 +4,7 @@ using LinqKit;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Text.Encodings.Web.Utf8;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.DynamicLinq;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -14,7 +15,10 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Net;
 
 namespace Axerrio.CQRS.API.Controllers
 {
@@ -29,6 +33,199 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("orders4")]
+        public IActionResult GetOrders4([FromQuery] int page, [FromQuery] int size)
+        {
+            //IQueryable<SalesOrderLine> baseQuery = _context.SalesOrderLines;
+
+            //var groupQuery = baseQuery
+            //    .GroupBy(l => l.OrderID)
+            //    .Select(g => new { OrderID = g.Key, TotalAmount = g.Sum(l => l.Quantity * l.UnitPrice) });
+
+            IQueryable<SalesOrder> orderQuery = _context.SalesOrders;
+            IQueryable<SalesOrderLine> orderLineQuery = _context.SalesOrderLines;
+
+            IQueryable<Customer> customerQuery = _context.Customers;
+            IQueryable<CustomerCategory> customerCategoryQuery = _context.CustomerCategories;
+
+            //var query2 = customerCategoryQuery
+            //    .Select(cc => new
+            //    {
+            //        Category = cc,
+            //        Customers = customerQuery.Where(c => c.CustomerCategoryID == cc.CustomerCategoryID)
+            //                                .DefaultIfEmpty() //Changes the query to include categories that have no customers
+            //    })
+            //    .SelectMany(collectionSelector: category => category.Customers,
+            //                resultSelector: (category, customers) => new
+            //                {
+            //                    category.Category.CustomerCategoryName,
+            //                    customers.Name
+            //                });
+
+            //var query2 = customerCategoryQuery
+            //    .SelectMany(collectionSelector: category => customerQuery.Where(c => c.CustomerCategoryID == category.CustomerCategoryID).DefaultIfEmpty(),
+            //                resultSelector: (category, customer) => new { category.CustomerCategoryName, customer.Name });
+
+            //var query2 = customerCategoryQuery
+            //    .GroupJoin
+            //    (
+            //        inner: customerQuery,
+            //        outerKeySelector: cc => cc.CustomerCategoryID,
+            //        innerKeySelector: c => c.CustomerCategoryID,
+            //        resultSelector: (cc, cs) => new
+            //        {
+            //            Category = cc,
+            //            Customers = cs
+            //            //CustomerName = cs.Select(c => c.Name)
+            //        }
+            //    ).SelectMany
+            //    (
+            //        collectionSelector: g => g.Customers, //INNER JOIN
+            //        //collectionSelector: g => g.Customers.DefaultIfEmpty(), //LEFT OUTER JOIN 
+            //        resultSelector: (g, c) => new { Category = g.Category.CustomerCategoryName, Customer = c.Name }
+            //    );
+
+            //var query2 = customerQuery
+            //    .Select(c => new { c.Name, CreditLimitSet = (c.CreditLimit != null) });
+
+            //var query2 = customerQuery.Select(c => new Customer { CustomerID = c.CustomerID, Name = c.Name });
+
+            //var query2 = customerQuery
+            //    .Select(c => new { c.CustomerID, Category = customerCategoryQuery.Where(cc => cc.CustomerCategoryID == c.CustomerCategoryID).Select(cc => cc.CustomerCategoryName) });
+
+            //var query2 = customerQuery.Select(c => new { c.CustomerID, c.CustomerCategory.CustomerCategoryName });
+            var query2 = customerQuery.Select(c => new { c.CustomerID, c.CustomerCategory });
+
+            //var query2 = customerQuery
+            //    .Join
+            //    (
+            //        inner: customerCategoryQuery,
+            //        outerKeySelector: c => c.CustomerCategoryID,
+            //        innerKeySelector: cc => cc.CustomerCategoryID,
+            //        //resultSelector: (c, cc) => new { c.CustomerID, cc.CustomerCategoryName }
+            //        resultSelector: (c, cc) => new { c.CustomerID, Category = cc }
+            //    );
+
+            var query2Results = query2.ToList();
+
+            int i = 4;
+
+            //var customerID = -1;
+            //customerID = 22;
+
+            //customerQuery = customerQuery
+            //    .Where(c => c.CustomerID == customerID)
+            //    .DefaultIfEmpty();
+
+            //var customers = customerQuery.ToList();
+
+            //var groupedCustomersQuery = customerQuery
+            //    .GroupBy(keySelector: c => new { c.CustomerCategoryID },
+            //             resultSelector: (key, group) => new { key.CustomerCategoryID, Count = group.Count() }).Cast<dynamic>();
+
+            //var groupedCustomers = groupedCustomersQuery.ToList();
+
+            //var groupQuery = orderLineQuery
+            //    .Where(l => l.SalesOrder.CustomerID == 507)
+            //    //.OrderBy(l => l.SalesOrder.OrderDate)
+            //    //.Skip(10)
+            //    //.Take(5)
+            //    .GroupBy(l => new { l.OrderID })
+            //    .Select(g => new
+            //    {
+            //        g.Key.OrderID,
+            //        TotalAmount = g.Sum(l => l.Quantity * l.UnitPrice),
+            //        TotalQuantity = g.Sum(l => l.Quantity),
+            //        AvgUnitprice = g.Average(l => l.UnitPrice)
+            //    });
+            //    //.OrderBy(a => a.OrderID).Skip(10).Take(5);
+
+            //var groupQuery = orderQuery
+            //    .Where(o => o.CustomerID == 507)
+            //    .OrderByDescending(o => o.OrderDate)
+            //    .Skip(10)
+            //    .Take(5)
+            //    .Select(o => new
+            //        {
+            //            o.OrderID,
+            //            o.OrderDate,
+            //            CustomerName = o.Customer.Name
+            //        }
+            //    );
+
+            //var groupQuery = orderQuery
+            //    .Where(o => o.CustomerID == 507)
+            //    .OrderByDescending(o => o.OrderDate)
+            //    .Skip(10)
+            //    .Take(5)
+            //    .Join
+            //    (
+            //        orderLineQuery
+            //        , o => o.OrderID
+            //        , l => l.OrderID
+            //        , (o, l) => new
+            //        {
+            //            o.OrderID,
+            //            o.OrderDate,
+            //            CustomerName = o.Customer.Name,
+            //            //l.Description,
+            //            //l.Quantity,
+            //            //l.UnitPrice,
+            //            TotalAmount = o.SalesOrderLines.Sum(sl => sl.Quantity * sl.UnitPrice),
+            //            TotalQuantity = o.SalesOrderLines.Sum(sl => sl.Quantity),
+            //        }
+            //    );
+
+            //var customerID = 507;
+
+            orderQuery = orderQuery.Where(o => EF.Functions.Like(o.Customer.Name, "Tail%"));
+
+            var total = orderQuery.Count();
+            var take = 20;
+            var skip = page * take;
+
+            //EF.Functions.DateDiffDay()
+
+            var groupQuery = orderQuery
+                //.Where(o => o.CustomerID == customerID)
+                //.Where(o => EF.Functions.Like(o.Customer.Name, "Tail%"))
+                .OrderByDescending(o => o.OrderDate)
+                .Skip(skip)
+                .Take(take)
+                .Join
+                (
+                    orderLineQuery
+                    , o => o.OrderID
+                    , l => l.OrderID
+                    , (o, l) => new
+                    {
+                        o.OrderID,
+                        o.OrderDate,
+                        CustomerName = o.Customer.Name,
+                        l.Quantity,
+                        l.UnitPrice
+                    }
+                )
+                .GroupBy(ol => new { ol.OrderID, ol.OrderDate, ol.CustomerName })
+                .Select(g => new { g.Key.OrderID, g.Key.OrderDate, g.Key.CustomerName, TotalAmount = g.Sum(ol => ol.Quantity * ol.UnitPrice), TotalQuantity = g.Sum(ol => ol.Quantity), AvgUnitPrice = g.Average(ol => ol.UnitPrice) });
+
+
+            //var groupQuery = orderQuery.Where(o => o.CustomerID == 507)
+            //    .Select(o => new
+            //    {
+            //        o.OrderID,
+            //        //TotalAmount = o.SalesOrderLines.Sum(l => l.Quantity * l.UnitPrice),
+            //        //TotalQuantity = o.SalesOrderLines.Sum(l => l.Quantity),
+            //        AvgUnitPrice = o.SalesOrderLines.Average(l => l.UnitPrice) //Dit veroozaakt een N + 1 probleem
+            //    });
+
+            var orders = groupQuery.ToList();
+
+            //var result = groupQuery.PageResult((skip / take) + 1, take);
+
+            return Ok(orders);
+        }
+
         [HttpGet("orders3")]
         public IActionResult GetOrders3()
         {
@@ -37,6 +234,11 @@ namespace Axerrio.CQRS.API.Controllers
             //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Customer.Name.Contains(@0)", "Taj");
             //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Customer.Name.StartsWith(@0)", "Tail");
 
+            //https://dotnetcoretutorials.com/2016/12/31/using-url-encode-net-core/
+            //https://stackoverflow.com/questions/44920875/url-encode-and-decode-in-asp-net-core
+            var queryString = "$filter=CustomerID == 507&$select=CustomerID, CustomerName";
+            var urlEncoded = WebUtility.UrlEncode(queryString);
+            var decoded = WebUtility.UrlDecode(urlEncoded);
 
             //Expression<Func<SalesOrder, string, bool>> likeLambda = (so, s) => EF.Functions.Like(so.Customer.Name, s);
             Expression<Func<string, string, bool>> likeLambda = (n, s) => EF.Functions.Like(n, s);
@@ -58,10 +260,13 @@ namespace Axerrio.CQRS.API.Controllers
             //var query = _context.SalesOrders.Where(lambda).Cast<SalesOrder>();
             //var query = _context.SalesOrders.Where(lambda);
             IQueryable<SalesOrder> query = _context.SalesOrders;
-            query = query.Where(lambda);
+            //query = query.Where(lambda);
             //query = query.Where(o => EF.Functions.Like(o.Customer.Name, "%Taj%"));
             //query = query.Where(o => o.Customer.Name.Contains("Taj"));
-            
+
+            //query = query.Where(o => o.SalesOrderLines.Any(l => l.StockItemID == 212));
+            query = query.Where("SalesOrderLines.Any(l => l.StockItemID == @0)", 212);
+
             //query = query.Where(o => DynamicFunctions.Like(o.Customer.Name, "%Taj"));
             //query = query.Where(o => o.Customer.Name.StartsWith("Tail"));
 

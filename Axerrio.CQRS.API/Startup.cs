@@ -54,6 +54,13 @@ namespace Axerrio.CQRS.API
                     {
                         sqlOptions.MigrationsAssembly(typeof(WorldWideImportersContext).GetTypeInfo().Assembly.GetName().Name);
                     });
+                })
+                .AddDbContext<AWContext>(options =>
+                {
+                    options.UseSqlServer(@"Server=MAUI\HALEAKALA;Database=AdventureWorksLT2012;Trusted_Connection=True;", sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(AWContext).GetTypeInfo().Assembly.GetName().Name);
+                    });
                 });
 
 

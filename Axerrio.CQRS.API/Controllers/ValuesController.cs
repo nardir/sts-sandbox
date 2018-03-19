@@ -6,7 +6,7 @@ using Axerrio.CQRS.API.Application.Query;
 using Microsoft.AspNetCore.Mvc;
 using Moon.OData;
 using Moon.OData.Sql;
-using SQLinq;
+//using SQLinq;
 
 namespace Axerrio.CQRS.API.Controllers
 {
@@ -69,26 +69,26 @@ namespace Axerrio.CQRS.API.Controllers
         }
 
         [HttpGet("customers")]
-        public IActionResult TestSQLinq()
-        {
-            //var query = new SQLinq<Customer>().Where(c => c.Name == "Chris");
-            //var query = new SQLinq<SalesOrder>().Where(so => so.SalesOrderLines.Any(l => l.UnitPrice > 5)); //Werkt niet
+        //public IActionResult TestSQLinq()
+        //{
+        //    //var query = new SQLinq<Customer>().Where(c => c.Name == "Chris");
+        //    //var query = new SQLinq<SalesOrder>().Where(so => so.SalesOrderLines.Any(l => l.UnitPrice > 5)); //Werkt niet
 
-            var query = new SQLinq<SalesOrder>()
-                .Where(so => so.CustomerID == 1)
-                .OrderBy(so => so.OrderDate)
-                .Select(so => new
-                {
-                    so.OrderID,
-                    so.OrderDate
-                });
+        //    var query = new SQLinq<SalesOrder>()
+        //        .Where(so => so.CustomerID == 1)
+        //        .OrderBy(so => so.OrderDate)
+        //        .Select(so => new
+        //        {
+        //            so.OrderID,
+        //            so.OrderDate
+        //        });
 
-            var result = (SQLinqSelectResult) query.ToSQL();
+        //    var result = (SQLinqSelectResult) query.ToSQL();
 
-            var sql = result.ToQuery();
+        //    var sql = result.ToQuery();
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
         // GET api/values
         [HttpGet]

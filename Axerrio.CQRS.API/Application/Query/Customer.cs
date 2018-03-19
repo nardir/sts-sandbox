@@ -12,5 +12,13 @@ namespace Axerrio.CQRS.API.Application.Query
         public decimal? CreditLimit { get; set; }
         public DateTime AccountOpenedDate { get; set; }
         public string PhoneNumber { get; set; }
+        public int CustomerCategoryID { get; set; }
+        public CustomerCategory CustomerCategory { get; set; }
+    }
+
+    public class CustomerCategory
+    {
+        public int CustomerCategoryID { get; set; }
+        public string CustomerCategoryName { get; set; }
     }
 }

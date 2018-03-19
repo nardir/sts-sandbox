@@ -14,6 +14,6 @@ namespace Axerrio.CQRS.API.Application.Query
         public int Quantity { get; set; }
         public int StockItemID { get; set; }
 
-        //public SalesOrder SalesOrder { get; set; }
+        public SalesOrder SalesOrder { get; set; }
     }
 }

@@ -12,6 +12,8 @@ namespace Axerrio.CQRS.API.Application.Query
         public DbSet<SalesOrder> SalesOrders { get; set; }
         public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
 
+        public DbSet<CustomerCategory> CustomerCategories { get; set; }
+
         //public DbQuery<WebCustomer> WebCustomers { get; set; }
 
         public WorldWideImportersContext(DbContextOptions<WorldWideImportersContext> options)
@@ -39,6 +41,19 @@ namespace Axerrio.CQRS.API.Application.Query
                 .Property(c => c.Name)
                 .HasColumnName("CustomerName");
 
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.CustomerCategory)
+                .WithMany()
+                .HasForeignKey(c => c.CustomerCategoryID);
+
+            modelBuilder.Entity<CustomerCategory>()
+                .ToTable("CustomerCategories", "Sales");
+
+            modelBuilder.Entity<CustomerCategory>()
+                .HasKey(cc => cc.CustomerCategoryID);
+
+            ///////
+
             modelBuilder.Entity<SalesOrder>()
                 .ToTable("Orders", "Sales");
 
@@ -56,7 +71,7 @@ namespace Axerrio.CQRS.API.Application.Query
 
             modelBuilder.Entity<SalesOrder>()
                 .HasMany(so => so.SalesOrderLines)
-                .WithOne()
+                .WithOne(l => l.SalesOrder)
                 .HasForeignKey(l => l.OrderID);
 
             modelBuilder.Entity<SalesOrderLine>()
