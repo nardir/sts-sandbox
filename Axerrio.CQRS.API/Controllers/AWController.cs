@@ -1,5 +1,7 @@
 ﻿using Axerrio.CQRS.API.Application.Query;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OData.Edm;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +12,23 @@ namespace Axerrio.CQRS.API.Controllers
     public class AWController: Controller
     {
         private readonly AWContext _context;
+        private readonly IEdmModel _model;
 
-        public AWController(AWContext context)
+        public AWController(AWContext context, IEdmModel model)
         {
             _context = context;
+            _model = model;
+        }
+
+        [HttpGet("odata/edmmodel")]
+        public IActionResult GetEdmModel()
+        {
+            var custSet = _model.EntityContainer.FindEntitySet("Customers");
+            var custType = custSet.EntityType();
+
+            var json = JsonConvert.SerializeObject(custType, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+            return Ok(json);
         }
 
         [HttpGet("aw/productpictures")]

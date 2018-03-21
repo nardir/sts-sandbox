@@ -66,6 +66,10 @@ namespace Axerrio.CQRS.API
 
             services.AddTransient<SalesMongoDbContext>();
 
+            var model = BuildEdmModel(null).GetEdmModel();
+
+            services.AddSingleton<IEdmModel>(sp => model);
+
             //Moon
             //services.AddMvc()
             //    .AddOData(isCaseSensitive: false);
@@ -75,7 +79,8 @@ namespace Axerrio.CQRS.API
             services.AddOData();
         }
 
-        private ODataConventionModelBuilder BuildEdmModel(IServiceProvider services)
+        public ODataConventionModelBuilder BuildEdmModel(IServiceProvider services)
+        //private void BuildEdmModel(ODataConventionModelBuilder builder)
         {
             //http://odata.github.io/WebApi/#14-01-netcore-beta1
             //https://github.com/OData/WebApi/tree/feature/netcore/src
@@ -84,7 +89,8 @@ namespace Axerrio.CQRS.API
             //https://www.codeproject.com/Articles/1227943/case-insensitive-filter-in-odata-aspnetcore-webapi
 
             // you can add all the entities you need
-            var builder = new ODataConventionModelBuilder(services);
+            //var builder = new ODataConventionModelBuilder(services);
+            var builder = new ODataConventionModelBuilder();
 
             builder.EntitySet<SalesOrder>("SalesOrders");
             builder.EntityType<SalesOrder>()
@@ -97,9 +103,12 @@ namespace Axerrio.CQRS.API
             //.HasRequired(so => so.Customer);
 
 
-            builder.EntitySet<Customer>("Customers");
+            var customerSet = builder.EntitySet<Customer>("Customers");
+
             builder.EntityType<Customer>()
                 .HasKey(c => c.CustomerID);
+
+            
 
             return builder;
         }
@@ -114,8 +123,10 @@ namespace Axerrio.CQRS.API
 
             //https://github.com/OData/WebApi/issues/1179
 
-            var edmBuilder = BuildEdmModel(app.ApplicationServices); //Dit is niet nodig voor ODataQueryOptions
+            //var edmBuilder = BuildEdmModel(app.ApplicationServices); //Dit is niet nodig voor ODataQueryOptions
             //var model = edmBuilder.GetEdmModel();
+
+            //var custType = model.EntityContainer.FindEntitySet("Customers").EntityType();
 
             //app.UseMvc(); //Moon
 
@@ -125,15 +136,15 @@ namespace Axerrio.CQRS.API
                 routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
-                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
+                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
 
                 //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
                 //{
-                //    //builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(IEdmModel), sp => edmBuilder.GetEdmModel());
-                //    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, sp => edmBuilder.GetEdmModel());
-                //    //builder.AddService<IEnumerable<IODataRoutingConvention>>(Microsoft.OData.ServiceLifetime.Singleton, sp =>
-                //    //    ODataRoutingConventions.CreateDefaultWithAttributeRouting("odata", routeBuilder));
-                //    builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver());
+                //    builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, typeof(IEdmModel), sp => edmBuilder.GetEdmModel());
+                //    //builder.AddService(Microsoft.OData.ServiceLifetime.Singleton, sp => edmBuilder.GetEdmModel());
+                //    builder.AddService<IEnumerable<IODataRoutingConvention>>(Microsoft.OData.ServiceLifetime.Singleton, sp =>
+                //        ODataRoutingConventions.CreateDefaultWithAttributeRouting("odata", routeBuilder));
+                //    //builder.AddService<ODataUriResolver>(Microsoft.OData.ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver());
                 //});
 
                 // Work-around for #1175
