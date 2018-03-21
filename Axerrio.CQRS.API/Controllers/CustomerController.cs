@@ -48,6 +48,17 @@ namespace Axerrio.CQRS.API.Controllers
             IQueryable<Customer> customerQuery = _context.Customers;
             IQueryable<CustomerCategory> customerCategoryQuery = _context.CustomerCategories;
 
+            var query3 = orderLineQuery
+                .GroupBy(l => new { l.OrderID })
+                .Select(g => new { g.Key.OrderID, TotalAmount = g.Sum(l => l.Quantity * l.UnitPrice) });
+
+            //query3 = query3.Where(g => g.TotalAmount < 1000); //Evaluated locally and strips the group by from the query
+
+            var result3 = query3.ToList();
+            result3 = result3.Where(g => g.TotalAmount < 1000).ToList();
+
+            int t = 4;
+
             //var query2 = customerCategoryQuery
             //    .Select(cc => new
             //    {

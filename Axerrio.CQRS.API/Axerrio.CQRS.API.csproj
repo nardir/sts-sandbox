@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0-preview1-final" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.8.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0-preview1-final" />
+    <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
     <PackageReference Include="Moon.AspNetCore.OData" Version="3.2.0" />
     <PackageReference Include="Moon.OData.Sql" Version="3.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />

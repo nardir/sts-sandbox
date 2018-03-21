@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Axerrio.CQRS.API.Application.MongoDB;
 using Axerrio.CQRS.API.Application.Query;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
@@ -63,6 +64,7 @@ namespace Axerrio.CQRS.API
                     });
                 });
 
+            services.AddTransient<SalesMongoDbContext>();
 
             //Moon
             //services.AddMvc()
@@ -89,6 +91,9 @@ namespace Axerrio.CQRS.API
                 .HasKey(so => so.OrderID)
                 .HasRequired<Customer>(so => so.Customer);
 
+            builder.EntityType<SalesOrder>().Property(o => o.OrderDate).NonFilterable = true;
+
+
             //.HasRequired(so => so.Customer);
 
 
@@ -109,7 +114,8 @@ namespace Axerrio.CQRS.API
 
             //https://github.com/OData/WebApi/issues/1179
 
-            //var edmBuilder = BuildEdmModel(app.ApplicationServices); //Dit is niet nodig voor ODataQueryOptions
+            var edmBuilder = BuildEdmModel(app.ApplicationServices); //Dit is niet nodig voor ODataQueryOptions
+            //var model = edmBuilder.GetEdmModel();
 
             //app.UseMvc(); //Moon
 
@@ -119,7 +125,7 @@ namespace Axerrio.CQRS.API
                 routeBuilder.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
                 //https://github.com/OData/WebApi/issues/812
-                //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
+                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", edmBuilder.GetEdmModel()); //Dit is niet nodig voor ODataQueryOptions
 
                 //routeBuilder.MapODataServiceRoute("ODataRoute", "odata", builder =>
                 //{

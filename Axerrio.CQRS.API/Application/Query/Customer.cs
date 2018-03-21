@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +9,9 @@ namespace Axerrio.CQRS.API.Application.Query
 {
     public class Customer
     {
+        //[BsonIgnoreIfDefault]
+        //[BsonRepresentation(BsonType.ObjectId)]
+        [BsonId]
         public int CustomerID { get; set; }
         public string Name { get; set; }
         public decimal? CreditLimit { get; set; }
