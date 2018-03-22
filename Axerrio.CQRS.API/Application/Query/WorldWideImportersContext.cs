@@ -27,6 +27,12 @@ namespace Axerrio.CQRS.API.Application.Query
             //modelBuilder.Query<WebCustomer>()
             //    .ToTable("Customers", "Website");
 
+
+            //https://romiller.com/2017/02/14/ef-core-1-1-read-only-entities-extending-metadata-with-annotations/
+            //https://www.learnentityframeworkcore.com/configuration/data-annotation-attributes
+            modelBuilder.Entity<Customer>()
+                .HasAnnotation("custom:url", "api/sales/customers");
+
             modelBuilder.Entity<Customer>()
                 .ToTable("Customers", "Sales");
 
@@ -39,7 +45,17 @@ namespace Axerrio.CQRS.API.Application.Query
 
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Name)
-                .HasColumnName("CustomerName");
+                .HasColumnName("CustomerName")
+                .HasAnnotation("custom:supportslike", true);
+
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.CreditLimit)
+                .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.AccountOpenedDate)
+                .HasColumnType("date");
+
 
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.CustomerCategory)

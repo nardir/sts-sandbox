@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Axerrio.CQRS.API.Application.Query
         public int Quantity { get; set; }
         public int StockItemID { get; set; }
 
+        [BsonIgnore]
         public SalesOrder SalesOrder { get; set; }
     }
 }

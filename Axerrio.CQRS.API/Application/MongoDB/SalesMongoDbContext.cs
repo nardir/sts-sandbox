@@ -29,11 +29,21 @@ namespace Axerrio.CQRS.API.Application.MongoDB
             }
         }
 
+        public IMongoDatabase Database => _database;
+
         public IMongoCollection<Customer> Customers
         {
             get
             {
                 return _database.GetCollection<Customer>("Customers");
+            }
+        }
+
+        public IMongoCollection<SalesOrder> SalesOrders
+        {
+            get
+            {
+                return _database.GetCollection<SalesOrder>("Orders");
             }
         }
     }

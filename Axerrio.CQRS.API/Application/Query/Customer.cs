@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Axerrio.CQRS.API.Application.Query
 {
+    //https://stackoverflow.com/questions/2656189/how-do-i-read-an-attribute-on-a-class-at-runtime
     public class Customer
     {
         //[BsonIgnoreIfDefault]

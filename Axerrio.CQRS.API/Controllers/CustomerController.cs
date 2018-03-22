@@ -33,6 +33,31 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("efmodel")]
+        public IActionResult GetEFModel()
+        {
+            var model = _context.Model;
+
+            var custType = model.FindEntityType("Axerrio.CQRS.API.Application.Query.Customer");
+            if (custType == null)
+                custType = model.GetEntityTypes().Where(et => et.Name == "").SingleOrDefault();
+
+            var props = custType.GetProperties().ToArray();
+            var navProps = custType.GetNavigations();
+            var annotations = custType.GetAnnotations();
+
+            var propNames = props.Select(p => p.Name);
+
+            var property = props.Where(p => p.Name == "Name").SingleOrDefault();
+            if (property != null)
+            {
+                var propAnn = property.GetAnnotations();
+            }
+        
+            return Ok(propNames);
+        }
+
+
         [HttpGet("orders4")]
         public IActionResult GetOrders4([FromQuery] int page, [FromQuery] int size)
         {
