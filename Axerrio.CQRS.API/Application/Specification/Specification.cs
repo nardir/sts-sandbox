@@ -43,8 +43,30 @@ namespace Axerrio.CQRS.API.Application.Specification
         #region ctor
 
         public Specification()
-            : this(null)
+            : this(default(Expression<Func<T, bool>>))
         {
+        }
+
+        public Specification(IDictionary<string, string> specification)
+            : this(default(Expression<Func<T, bool>>))
+        {
+            if (specification != null)
+            {
+                var orderbyRaw = specification["$orderby"];
+                var desc = new string[] { "DESC" };
+
+                var orderby = orderbyRaw.Split(',');
+
+                foreach(var o in orderby)
+                {
+                    bool asc = true;
+
+                    if (o.IndexOf("Desc", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        asc = false;
+                    }
+                }
+            }
         }
 
         public Specification(Expression<Func<T, bool>> predicate)

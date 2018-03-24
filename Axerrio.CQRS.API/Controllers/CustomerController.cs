@@ -33,6 +33,15 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("customersbyspec")]
+        public IActionResult GetCustomerBySpecification(Specification<Customer> specification)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return Ok();
+        }
+
         [HttpGet("efmodel")]
         public IActionResult GetEFModel()
         {

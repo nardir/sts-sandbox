@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Axerrio.CQRS.API.Application.MongoDB;
 using Axerrio.CQRS.API.Application.Query;
+using Axerrio.CQRS.API.Application.Specification;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing.Conventions;
@@ -75,7 +76,9 @@ namespace Axerrio.CQRS.API
             //    .AddOData(isCaseSensitive: false);
 
             //Microsoft.AspNetCore.OData
-            services.AddMvc();
+            services.AddMvc()
+                .AddMvcOptions(o => o.ModelBinderProviders.Insert(0, new SpecificationModelBinderProvider()));
+
             services.AddOData();
         }
 
