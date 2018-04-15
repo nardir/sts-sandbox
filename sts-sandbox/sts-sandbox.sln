@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4FA288D4-0038-4B47-A325-C00E6E4A57BB}"
 EndProject
@@ -105,7 +105,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.BB.DDD.IE.AzureServ
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ", "JJ", "{6817F97C-FA22-4F08-8F83-8BA685780B4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.JJ.Sandbox", "..\Axerrio.JJ.Sandbox\Axerrio.JJ.Sandbox.csproj", "{5F04330C-5F0E-4D48-B1E6-42BCF796321B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Axerrio.JJ.Sandbox", "..\Axerrio.JJ.Sandbox\Axerrio.JJ.Sandbox.csproj", "{5F04330C-5F0E-4D48-B1E6-42BCF796321B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD.Query", "..\Axerrio.BB.DDD.Query\Axerrio.BB.DDD.Query.csproj", "{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Axerrio.BB.DDD.Query.API", "Axerrio.BB.DDD.Query.API\Axerrio.BB.DDD.Query.API.csproj", "{B3BFEA28-3613-4639-9406-4262534465A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -273,6 +277,14 @@ Global
 		{5F04330C-5F0E-4D48-B1E6-42BCF796321B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F04330C-5F0E-4D48-B1E6-42BCF796321B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F04330C-5F0E-4D48-B1E6-42BCF796321B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3BFEA28-3613-4639-9406-4262534465A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3BFEA28-3613-4639-9406-4262534465A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3BFEA28-3613-4639-9406-4262534465A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3BFEA28-3613-4639-9406-4262534465A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -326,6 +338,8 @@ Global
 		{DA24C885-0F0E-4BBC-A54A-D5F6EB97881D} = {9EDE3298-51D5-4DF5-ABC1-33B7FB5E3595}
 		{6817F97C-FA22-4F08-8F83-8BA685780B4C} = {4FA288D4-0038-4B47-A325-C00E6E4A57BB}
 		{5F04330C-5F0E-4D48-B1E6-42BCF796321B} = {6817F97C-FA22-4F08-8F83-8BA685780B4C}
+		{2FD2E8F9-006E-4B66-8AEA-B109BDB2195E} = {39E15A1C-8CAF-4809-9FDA-B9FF59468D5D}
+		{B3BFEA28-3613-4639-9406-4262534465A8} = {39E15A1C-8CAF-4809-9FDA-B9FF59468D5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09CD75E5-3CEF-4BDE-8C23-92BF7EFE679B}

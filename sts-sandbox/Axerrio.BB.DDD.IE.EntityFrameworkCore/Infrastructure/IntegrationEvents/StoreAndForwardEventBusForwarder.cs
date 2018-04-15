@@ -16,7 +16,7 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
 {
     public partial class StoreAndForwardEventBusForwarder : IEventBusForwarder
     {
-       // private readonly IEventBusSubscriptionsService _eventBusSubscriptionsService;
+        private readonly IEventBusSubscriptionsService _eventBusSubscriptionsService;
         private readonly ILogger<StoreAndForwardEventBusForwarder> _logger;
         private readonly StoreAndForwardEventBusDatabaseOptions _databaseOptions;
         private readonly StoreAndForwardEventBusForwardOptions _forwardOptions;
@@ -65,6 +65,8 @@ namespace Axerrio.BB.DDD.EntityFrameworkCore.Infrastructure.IntegrationEvents
                         }
 
                         _logger.LogDebug($"Forwarding integration event for queue item {eventQueueItem.EventQueueItemId}");
+
+                        //if (_eventBusSubscriptionsService.HasSubscriptionsForEvent(""))
 
                         await _eventBusPublisher.PublishAsync(eventQueueItem.EventName, eventQueueItem.EventId, eventQueueItem.EventContent);
                         //await _eventBusSubscriptionsService.DispatchEventAsync(eventQueueItem.EventName, eventQueueItem.EventContent);

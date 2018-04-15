@@ -19,6 +19,8 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
+using Axerrio.CQRS.API.Application.Filters;
+using Newtonsoft.Json;
 
 namespace Axerrio.CQRS.API.Controllers
 {
@@ -33,9 +35,96 @@ namespace Axerrio.CQRS.API.Controllers
             _queryContext = queryContext;
         }
 
+        [HttpGet("testfilter3")]
+        public IActionResult TestFilter3()
+        {
+
+            IQueryable<Customer> query = _context.Customers;
+
+            bool isOrdered = (query is IOrderedQueryable<Customer>);
+
+            IOrderedQueryable<Customer> result = query.OrderBy(c => c.CustomerID);
+
+            isOrdered = (query is IOrderedQueryable<Customer>);
+
+            //query = query.OrderBy(c => c.Name);
+            result = result.ThenBy(c => c.Name);
+
+            //var customers = query.ToList();
+            var customers = result.ToList();
+
+            return Ok(customers);
+        }
+
+        [HttpGet("testfilter2")]
+        public IActionResult TestFilter2()
+        {
+            var filterSource = new Filter(typeof(Customer)) { Key = 100, Name = "Filter Test" };
+
+            var filterRow = filterSource.AddFilterRow();
+            filterSource.AddFilterCondition(filterRow, "CustomerID == 22");
+
+            var filterDef = new FilterDefinition(filterSource);
+
+            var filterTarget = filterDef.Filter;
+
+            var spec = new Specification<Customer>();
+
+            //spec.SetPredicate(filterTarget.Predicate);
+
+            //IQueryable<Customer> query = _context.Customers;
+
+            ////query = query.Where(filterTarget.Predicate).Cast<Customer>();
+            //query = query.Where(spec.Predicate);
+
+            //var customers = query.ToList();
+
+            //return Ok(customers);
+
+            return Ok();
+        }
+
+        [HttpGet("testfilter")]
+        public IActionResult TestFilter()
+        {
+            IFilter filterSource = new Filter<Customer> { Key = 100, Name = "Filter Test" };
+
+            filterSource.Where("CustomerID == 22");
+
+            string source = JsonConvert.SerializeObject(filterSource);
+
+            ////////////////
+
+            var customerTypeName = typeof(Customer).AssemblyQualifiedName;
+            var customerType = Type.GetType(customerTypeName);
+
+            var genericFilterType = typeof(Filter<>);
+            var closedFilterType = genericFilterType.MakeGenericType(customerType);
+
+            //IFilter filter = (IFilter) Activator.CreateInstance(closedFilterType);
+
+            //IFilter filterTarget = (IFilter) JsonConvert.DeserializeObject(source, closedFilterType);
+            Filter<Customer> filterTarget = (Filter<Customer>)JsonConvert.DeserializeObject(source, closedFilterType);
+
+            /////
+            var spec = new Specification<Customer>();
+
+            spec.SetPredicate(filterTarget.Predicate);
+
+            IQueryable<Customer> query = _context.Customers;
+
+            //query = query.Where(filterTarget.Predicate).Cast<Customer>();
+            query = query.Where(spec.Predicate);
+
+            var customers = query.ToList();
+
+            return Ok(customers);
+        }
+
         [HttpGet("customersbyspec")]
         public IActionResult GetCustomerBySpecification(Specification<Customer> specification)
         {
+            
             if (!ModelState.IsValid)
                 return BadRequest();
 
@@ -288,7 +377,7 @@ namespace Axerrio.CQRS.API.Controllers
             //Expression<Func<SalesOrder, string, bool>> likeLambda = (so, s) => EF.Functions.Like(so.Customer.Name, s);
             Expression<Func<string, string, bool>> likeLambda = (n, s) => EF.Functions.Like(n, s);
 
-
+           
             var p = new Dictionary<string, object>();
             p.Add("@like", likeLambda);
             //p.Add("@search", "%Taj%");
@@ -300,6 +389,8 @@ namespace Axerrio.CQRS.API.Controllers
             //Expression<Func<SalesOrder, bool>> lambda = (Expression<Func<SalesOrder, bool>>)DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(bool), "Microsoft.EntityFrameworkCore.EF.Functions.Like(o.Customer.Name, @0)", "Tail");
 
             //Expression<Func<SalesOrder, object>> orderby = (Expression<Func<SalesOrder, object>>) DynamicExpressionParser.ParseLambda(typeof(SalesOrder), typeof(object), "Customer.Name");
+
+            Expression<Func<DateTime, DateTime, int>> dateDiffDay = (sd, ed) => EF.Functions.DateDiffDay(sd, ed);
 
             //var query = _context.SalesOrders.Where("CustomerID == @0", 507);
             //var query = _context.SalesOrders.Where(lambda).Cast<SalesOrder>();

@@ -28,4 +28,26 @@ namespace Axerrio.CQRS.API.Application.Specification
             return Task.CompletedTask;
         }
     }
+
+    public class SpecificationModelBinder<T> : IModelBinder
+    {
+        public SpecificationModelBinder()
+        {
+        }
+        public Task BindModelAsync(ModelBindingContext bindingContext)
+        {
+            var modelType = bindingContext.ModelType;
+            var request = bindingContext.HttpContext.Request;
+
+            var spec = request.Query.ToDictionary(p => p.Key, p => p.Value.FirstOrDefault());
+
+            //var model = Class.Activate(modelType, GetOptions(request), primitiveTypes.ToArray(), isCaseSensitive);
+            //var model = new Specification<Customer>();
+            var model = Activator.CreateInstance(modelType, spec);
+
+            bindingContext.Result = ModelBindingResult.Success(model);
+
+            return Task.CompletedTask;
+        }
+    }
 }

@@ -16,6 +16,7 @@ namespace Axerrio.CQRS.API.Application.Specification
         Expression<Func<T, bool>> Predicate { get; set; }
         ISpecification<T> And(Expression<Func<T, bool>> predicate);
         ISpecification<T> Or(Expression<Func<T, bool>> predicate);
+        void SetPredicate(LambdaExpression predicate);
 
         bool HasSelector { get; }
         ISpecification<T> AddSelector<TResult>(Expression<Func<T, TResult>> selector);
@@ -101,6 +102,11 @@ namespace Axerrio.CQRS.API.Application.Specification
                 if (value != null)
                     _predicate.Start(value);
             }
+        }
+
+        public void SetPredicate(LambdaExpression predicate)
+        {
+            Predicate = (Expression<Func<T, bool>>) predicate;
         }
 
         public static implicit operator Expression<Func<T, bool>>(Specification<T> right)

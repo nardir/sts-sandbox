@@ -125,5 +125,17 @@ namespace Axerrio.CQRS.API.Controllers
 
             return Ok(salesOrders);
         }
+
+        [HttpGet("salesorders5/{id:int}")]
+        public async Task<IActionResult> GetSalesOrders5([ModelBinder(Name ="id")] int orderId)
+        {
+            var order = await _context.SalesOrders.Where(o => o.OrderID == orderId).SingleOrDefaultAsync();
+
+            await _context.Entry(order).Reference(o => o.Customer).LoadAsync();
+
+            await _context.Entry(order).Collection(o => o.SalesOrderLines).LoadAsync();
+
+            return Ok(order);
+        }
     }
 }

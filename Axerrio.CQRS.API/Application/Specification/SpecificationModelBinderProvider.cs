@@ -20,7 +20,14 @@ namespace Axerrio.CQRS.API.Application.Specification
 
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Specification<>))
             {
-                return new SpecificationModelBinder();
+                var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
+                var genericTypeArgs = typeInfo.GetGenericArguments();
+
+                var genericType = typeof(SpecificationModelBinder<>);
+                var closedType = genericType.MakeGenericType(genericTypeArgs[0]);
+                return (IModelBinder)Activator.CreateInstance(closedType);
+
+                //return new SpecificationModelBinder();
             }
 
             return null;

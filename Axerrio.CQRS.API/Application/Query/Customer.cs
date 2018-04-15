@@ -2,6 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,10 @@ namespace Axerrio.CQRS.API.Application.Query
         //[BsonRepresentation(BsonType.ObjectId)]
         [BsonId]
         public int CustomerID { get; set; }
+
+        [MaxLength(20)]
         public string Name { get; set; }
+        [Range(0, 1000)]
         public decimal? CreditLimit { get; set; }
         public DateTime AccountOpenedDate { get; set; }
         public string PhoneNumber { get; set; }
