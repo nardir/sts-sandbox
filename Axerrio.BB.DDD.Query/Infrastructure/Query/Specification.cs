@@ -119,6 +119,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public IReadOnlyList<(LambdaExpression KeySelector, bool Ascending)> Orderings => _orderings.AsReadOnly();
 
+
+
         public ISpecification<T> OrderBy(string keySelector, bool ascending = true)
         {
             //var keySelectorLambda = (Expression<Func<T, object>>) ParseLambda(typeof(object), keySelector);
@@ -134,6 +136,24 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         private ISpecification<T> OrderBy(LambdaExpression keySelector, bool ascending)
         {
             _orderings.Add((KeySelector: keySelector, Ascending: ascending));
+
+            return this;
+        }
+
+        #endregion
+
+        #region paging
+
+        public bool HasPaging => (PageSize != null && PageIndex != null);
+
+        public int? PageSize { get; private set; } = null;
+
+        public int? PageIndex { get; private set; } = null;
+
+        public ISpecification<T> Page(int pageSize, int pageIndex)
+        {
+            PageSize = EnsureArg.IsGt(pageSize, 0, nameof(pageSize));
+            PageIndex = EnsureArg.IsGte(pageIndex, 0, nameof(pageIndex));
 
             return this;
         }

@@ -7,16 +7,13 @@ namespace Axerrio.BB.DDD.Query.API.Parser
 {
     public class PrecedenceBasedRegexTokenizer : ITokenizer
     {
-        private List<TokenDefinition> _tokenDefinitions;
-
-        public PrecedenceBasedRegexTokenizer(List<TokenDefinition> tokenDefinitions)
+        public PrecedenceBasedRegexTokenizer()
         {
-            _tokenDefinitions = new List<TokenDefinition>(tokenDefinitions);
         }
 
-        public IEnumerable<DslToken> Tokenize(string text)
+        public IEnumerable<DslToken> Tokenize(string text, List<TokenDefinition> tokenDefinitions)
         {
-            var tokenMatches = FindTokenMatches(text);
+            var tokenMatches = FindTokenMatches(text, tokenDefinitions);
 
             var groupedByIndex = tokenMatches.GroupBy(x => x.StartIndex)
                 .OrderBy(x => x.Key)
@@ -37,11 +34,11 @@ namespace Axerrio.BB.DDD.Query.API.Parser
             yield return new DslToken(TokenType.SequenceTerminator);
         }
 
-        private List<TokenMatch> FindTokenMatches(string text)
+        private List<TokenMatch> FindTokenMatches(string text, List<TokenDefinition> tokenDefinitions)
         {
             var tokenMatches = new List<TokenMatch>();
 
-            foreach (var tokenDefinition in _tokenDefinitions)
+            foreach (var tokenDefinition in tokenDefinitions)
                 tokenMatches.AddRange(tokenDefinition.FindMatches(text).ToList());
 
             return tokenMatches;

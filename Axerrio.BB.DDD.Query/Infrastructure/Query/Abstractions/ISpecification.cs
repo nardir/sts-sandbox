@@ -28,5 +28,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
         ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector, bool ascending = true);
 
         #endregion
+
+        #region paging
+
+        bool HasPaging { get; }
+        int? PageSize { get; }
+        int? PageIndex { get; }
+        ISpecification<T> Page(int pageSize, int pageIndex);
+
+        #endregion
     }
 }

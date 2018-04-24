@@ -53,6 +53,9 @@ namespace Axerrio.CQRS.API.Controllers
             //var customers = query.ToList();
             var customers = result.ToList();
 
+            var p = new PagedResult<Customer>();
+
+
             return Ok(customers);
         }
 

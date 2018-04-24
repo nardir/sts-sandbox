@@ -38,7 +38,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return source.Where(specification.Predicate);
         }
 
-        public static IQueryable<TSource> ApplySpecificationOrder<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        public static IQueryable<TSource> ApplySpecificationOrdering<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
 
@@ -78,6 +78,17 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return result;
         }
 
+        public static IQueryable<TSource> ApplySpecificationPaging<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        {
+            EnsureArg.IsNotNull(specification, nameof(specification));
+
+            if (!specification.HasPaging) //Check ordering or default ordering of key in EF Core
+                return source;
+
+            return source.Skip(specification.PageIndex.Value * specification.PageSize.Value)
+                .Take(specification.PageSize.Value);
+        }
+
         //public static IQueryable<TSource> ApplySpecificationSkip<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         //{
         //    EnsureArg.IsNotNull(specification, nameof(specification));
@@ -102,7 +113,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
         {
             var query = source.ApplySpecificationPredicate(specification);
 
-            //query = query.ApplySpecificationOrder(specification);
+            query = query.ApplySpecificationOrdering(specification);
+
+            query = query.ApplySpecificationPaging(specification);
 
             //query = query.ApplySpecificationSkip(specification);
 
