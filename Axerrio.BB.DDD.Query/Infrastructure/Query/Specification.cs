@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using EnsureThat;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,40 @@ using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query
 {
-    public class Specification<T>: ISpecification<T>
+    public abstract class Specification
+    {
+        public class Ordering : IOrdering
+        {
+            public LambdaExpression KeySelectorLambda { get; set; }
+            public bool Ascending { get; set; }
+            public string KeySelector { get; set; }
+        }
+    }
+
+    //public class OrderedSpecification<TEntity>: Specification<TEntity>
+    //{
+    //    protected OrderedSpecification(Specification<TEntity> specification)
+    //    {
+    //        EnsureArg.IsNotNull(specification, nameof(specification));
+
+    //        Predicate = specification.Predicate;
+
+    //        PageIndex = specification.PageIndex;
+    //        PageSize = specification.PageSize;
+
+    //        _orderings = specification.Orderings.Select(o => (Ordering)o).ToList();
+    //    }
+
+    //    public static OrderedSpecification<TEntity> Create(Specification<TEntity> specification)
+    //    {
+    //        if (specification == null)
+    //            return null;
+
+    //        return new OrderedSpecification<TEntity>(specification);
+    //    }
+    //}
+
+    public class Specification<TEntity>: Specification, ISpecification<TEntity>, IOrderedSpecification<TEntity>
     {
         private static Dictionary<string, object> _lambdaValues = new Dictionary<string, object>();
 
@@ -33,7 +67,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
             Array.ForEach(values, v => extendedValues.Add($"@p{i++}", v));
 
-            return DynamicExpressionParser.ParseLambda(typeof(T), resultType, expression, extendedValues);
+            return DynamicExpressionParser.ParseLambda(typeof(TEntity), resultType, expression, extendedValues);
         }
 
         #region ctor
@@ -45,28 +79,36 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         #region Predicate
 
-        private ExpressionStarter<T> _predicate = PredicateBuilder.New<T>(true);
+        private ExpressionStarter<TEntity> _predicate = PredicateBuilder.New<TEntity>(true);
 
-        private static Expression<Func<T, bool>> ParsePredicate(string predicate, params object[] args)
+        private static Expression<Func<TEntity, bool>> ParsePredicate(string predicate, params object[] args)
         {
-            return (Expression<Func<T, bool>>)ParseLambda(typeof(bool), predicate, args);
+            return (Expression<Func<TEntity, bool>>)ParseLambda(typeof(bool), predicate, args);
         }
 
-        public Expression<Func<T, bool>> Predicate => _predicate;
+        public Expression<Func<TEntity, bool>> Predicate
+        {
+            get => _predicate;
+
+            protected set
+            {
+                _predicate = EnsureArg.IsNotNull(value, nameof(Predicate));
+            }
+        }
 
         public bool HasPredicate => _predicate.IsStarted;
 
-        public ISpecification<T> Where(Expression<Func<T, bool>> predicate)
+        public ISpecification<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {
             return And(predicate);
         }
 
-        public ISpecification<T> Where(string predicate, params object[] values)
+        public ISpecification<TEntity> Where(string predicate, params object[] values)
         {
             return Where(ParsePredicate(predicate, values));
         }
 
-        public ISpecification<T> And(Expression<Func<T, bool>> predicate)
+        public ISpecification<TEntity> And(Expression<Func<TEntity, bool>> predicate)
         {
             EnsureArg.IsNotNull(predicate);
 
@@ -75,12 +117,12 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
             return this;
         }
 
-        public ISpecification<T> And(string predicate, params object[] values)
+        public ISpecification<TEntity> And(string predicate, params object[] values)
         {
             return And(ParsePredicate(predicate, values));
         }
 
-        public ISpecification<T> Or(Expression<Func<T, bool>> predicate)
+        public ISpecification<TEntity> Or(Expression<Func<TEntity, bool>> predicate)
         {
             EnsureArg.IsNotNull(predicate, nameof(predicate));
 
@@ -89,55 +131,84 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
             return this;
         }
 
-        public ISpecification<T> Or(string predicate, params object[] values)
+        public ISpecification<TEntity> Or(string predicate, params object[] values)
         {
             return Or(ParsePredicate(predicate, values));
         }
 
-        public static implicit operator Expression<Func<T, bool>>(Specification<T> right)
+        public static implicit operator Expression<Func<TEntity, bool>>(Specification<TEntity> right)
         {
             return right.Predicate;
         }
 
-        public static implicit operator Func<T, bool>(Specification<T> right)
+        public static implicit operator Func<TEntity, bool>(Specification<TEntity> right)
         {
             return right.Predicate.Compile();
         }
 
-        public static implicit operator Specification<T>(Expression<Func<T, bool>> right)
+        public static implicit operator Specification<TEntity>(Expression<Func<TEntity, bool>> right)
         {
-            return (Specification<T>) new Specification<T>().Where(right);
+            return (Specification<TEntity>) new Specification<TEntity>().Where(right);
         }
 
         #endregion
 
         #region ordering
 
-        private readonly List<(LambdaExpression KeySelector, bool Ascending)> _orderings = new List<(LambdaExpression KeySelectorLambda, bool Ascending)>();
+        //public class Ordering
+        //{
+        //    public LambdaExpression KeySelectorLambda { get; set; }
+        //    public bool Ascending { get; set; }
+        //    public string KeySelector { get; set; }
+        //}
+
+        //private readonly List<(LambdaExpression KeySelectorLambda, bool Ascending, string KeySelector)> _orderings = new List<(LambdaExpression KeySelectorLambda, bool Ascending, string KeySelector)>();
+        //private readonly List<Ordering> _orderings = new List<Ordering>();
+        protected List<Ordering> _orderings = new List<Ordering>();
 
         public bool HasOrdering => _orderings.Any();
 
-        public IReadOnlyList<(LambdaExpression KeySelector, bool Ascending)> Orderings => _orderings.AsReadOnly();
+        //public IReadOnlyList<(LambdaExpression KeySelectorLambda, bool Ascending, string KeySelector)> Orderings => _orderings.AsReadOnly();
+        public IReadOnlyList<IOrdering> Orderings => _orderings.AsReadOnly();
 
-
-
-        public ISpecification<T> OrderBy(string keySelector, bool ascending = true)
+        public IOrderedSpecification<TEntity> OrderBy(string keySelector, bool ascending = true)
         {
-            //var keySelectorLambda = (Expression<Func<T, object>>) ParseLambda(typeof(object), keySelector);
+            EnsureArg.IsNotNullOrWhiteSpace(keySelector, nameof(keySelector));
             
-            return OrderBy(ParseLambda(null, keySelector), ascending);
+            return OrderBy(ParseLambda(null, keySelector), ascending, keySelector);
         }
 
-        public ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector, bool ascending = true)
+        public IOrderedSpecification<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true)
         {
-            return OrderBy((LambdaExpression)keySelector, ascending);
+            EnsureArg.IsNotNull(keySelector, nameof(keySelector));
+
+            var memberName = MemberNameExtractor.Extract(keySelector);
+
+            return OrderBy(keySelector, ascending, memberName);
         }
 
-        private ISpecification<T> OrderBy(LambdaExpression keySelector, bool ascending)
+        private IOrderedSpecification<TEntity> OrderBy(LambdaExpression keySelectorLambda, bool ascending, string keySelector)
         {
-            _orderings.Add((KeySelector: keySelector, Ascending: ascending));
+
+            //_orderings.Add((KeySelectorLambda: keySelectorLambda, Ascending: ascending, KeySelector: keySelector));
+            _orderings.Add(new Ordering
+                    {
+                        KeySelector = keySelector,
+                        Ascending = ascending,
+                        KeySelectorLambda = keySelectorLambda
+                    });
 
             return this;
+        }
+
+        public IOrderedSpecification<TEntity> ThenBy(string keySelector, bool ascending = true)
+        {
+            return OrderBy(keySelector, ascending);
+        }
+
+        public IOrderedSpecification<TEntity> ThenBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true)
+        {
+            return OrderBy(keySelector, ascending);
         }
 
         #endregion
@@ -146,11 +217,11 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public bool HasPaging => (PageSize != null && PageIndex != null);
 
-        public int? PageSize { get; private set; } = null;
+        public int? PageSize { get; protected set; } = null;
 
-        public int? PageIndex { get; private set; } = null;
+        public int? PageIndex { get; protected set; } = null;
 
-        public ISpecification<T> Page(int pageSize, int pageIndex)
+        public ISpecification<TEntity> Page(int pageSize, int pageIndex)
         {
             PageSize = EnsureArg.IsGt(pageSize, 0, nameof(pageSize));
             PageIndex = EnsureArg.IsGte(pageIndex, 0, nameof(pageIndex));

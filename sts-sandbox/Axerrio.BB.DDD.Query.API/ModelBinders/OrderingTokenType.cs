@@ -1,10 +1,11 @@
 ﻿using Axerrio.BB.DDD.Domain.Abstractions;
+using Axerrio.BB.DDD.Query.API.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Axerrio.BB.DDD.Query.API.Parser
+namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 {
     public class OrderingTokenType: TokenType //Enumeration<OrderingTokenType>, ITokenType
     {

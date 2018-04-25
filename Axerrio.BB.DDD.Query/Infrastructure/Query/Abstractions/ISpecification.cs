@@ -5,27 +5,34 @@ using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 {
-    public interface ISpecification<T>
+    public interface IOrderedSpecification<TEntity>: ISpecification<TEntity>
+    {
+        IOrderedSpecification<TEntity> ThenBy(string keySelector, bool ascending = true);
+        IOrderedSpecification<TEntity> ThenBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true);
+    }
+
+    public interface ISpecification<TEntity>
     {
         #region predicate
 
-        Expression<Func<T, bool>> Predicate { get; }
+        Expression<Func<TEntity, bool>> Predicate { get; }
         bool HasPredicate { get; }
-        ISpecification<T> Where(Expression<Func<T, bool>> predicate);
-        ISpecification<T> Where(string predicate, params object[] args);
-        ISpecification<T> And(Expression<Func<T, bool>> predicate);
-        ISpecification<T> And(string predicate, params object[] args);
-        ISpecification<T> Or(Expression<Func<T, bool>> predicate);
-        ISpecification<T> Or(string predicate, params object[] args);
+        ISpecification<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
+        ISpecification<TEntity> Where(string predicate, params object[] args);
+        ISpecification<TEntity> And(Expression<Func<TEntity, bool>> predicate);
+        ISpecification<TEntity> And(string predicate, params object[] args);
+        ISpecification<TEntity> Or(Expression<Func<TEntity, bool>> predicate);
+        ISpecification<TEntity> Or(string predicate, params object[] args);
 
         #endregion
 
         #region ordering
 
         bool HasOrdering { get; }
-        IReadOnlyList<(LambdaExpression KeySelector, bool Ascending)> Orderings { get; }
-        ISpecification<T> OrderBy(string keySelector, bool ascending = true);
-        ISpecification<T> OrderBy<TKey>(Expression<Func<T, TKey>> keySelector, bool ascending = true);
+        //IReadOnlyList<(LambdaExpression KeySelectorLambda, bool Ascending, string KeySelector)> Orderings { get; }
+        IReadOnlyList<IOrdering> Orderings { get; }
+        IOrderedSpecification<TEntity> OrderBy(string keySelector, bool ascending = true);
+        IOrderedSpecification<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true);
 
         #endregion
 
@@ -34,7 +41,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
         bool HasPaging { get; }
         int? PageSize { get; }
         int? PageIndex { get; }
-        ISpecification<T> Page(int pageSize, int pageIndex);
+        ISpecification<TEntity> Page(int pageSize, int pageIndex);
 
         #endregion
     }

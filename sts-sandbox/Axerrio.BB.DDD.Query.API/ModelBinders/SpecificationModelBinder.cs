@@ -1,4 +1,5 @@
-﻿using EnsureThat;
+﻿using Axerrio.BB.DDD.Query.API.Parser;
+using EnsureThat;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core.Exceptions;
 using System.Threading.Tasks;
+using static Axerrio.BB.DDD.Infrastructure.Query.ModelBinder.OrderingParser;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 {
@@ -34,9 +36,11 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             ApplyFilter(specification, bindingContext, options);
 
             //select
-            //orderby
 
-            //Apply paging
+            //orderby
+            ApplyOrdering(specification, bindingContext, options);
+
+            //paging
             ApplyPaging(specification, bindingContext, options);
 
 
@@ -68,6 +72,40 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
                     bindingContext.ModelState.TryAddModelError("filter", $"Invalid $filter expression {predicate} supplied");
                 }
+            }
+        }
+
+        private void ApplyOrdering(Specification<T> specification, ModelBindingContext bindingContext, Dictionary<string, string> options)
+        {
+            options.TryGetValue("$orderby", out string orderBy);
+
+            if (string.IsNullOrWhiteSpace(orderBy))
+                return;
+
+            var orderings = new Orderings();
+
+            try
+            {
+                OrderingParser.Parse(orderings, orderBy);
+            }
+            catch (DslParseException exception)
+            {
+                _logger.LogError(exception, exception.ToString());
+
+                bindingContext.ModelState.TryAddModelError("orderby", $"Invalid $orderby expression {orderBy} supplied");
+
+                return;
+            }
+
+            try
+            {
+                orderings.ForEach(o => specification.OrderBy(o.KeySelector, o.Ascending));
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, exception.ToString());
+
+                bindingContext.ModelState.TryAddModelError("orderby", $"Invalid $orderby expression {orderBy} supplied");
             }
         }
 

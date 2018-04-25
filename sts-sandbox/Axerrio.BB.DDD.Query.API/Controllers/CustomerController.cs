@@ -1,21 +1,20 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query;
 using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
-using Axerrio.BB.DDD.Infrastructure.Query.Extensions;
+using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
+using Axerrio.BB.DDD.Infrastructure.Query.ModelBinder;
 using Axerrio.BB.DDD.Query.API.Data;
 using Axerrio.BB.DDD.Query.API.Model;
-using Axerrio.BB.DDD.Query.API.Parser;
 using EnsureThat;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using static Axerrio.BB.DDD.Infrastructure.Query.ModelBinder.OrderingParser;
 
 namespace Axerrio.BB.DDD.Query.API.Controllers
 {
-    public class CustomerController: Controller
+    public class CustomerController : Controller
     {
         private readonly IQueryService _queryService;
 
@@ -59,30 +58,36 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
 
             var orderingText = "Customer.Name, AccountOpenedDate desc";
 
-            //var tokenDefinitions = new List<TokenDefinition>()
-            //{
-            //    new TokenDefinition(OrderingTokenType.Comma, ",", 1),
-            //    new TokenDefinition(OrderingTokenType.Direction, "asc|ascending|desc|descending", 1),
-            //    new TokenDefinition(OrderingTokenType.Property, @"[\p{L}\d\.]+", 2),
-            //};
-
-            //var tokenizer = new PrecedenceBasedRegexTokenizer(tokenDefinitions);
-
-            //var tokens = tokenizer.Tokenize(orderingText).ToList();
-
-            var ordering = new Ordering();
-
-            //var parser = new OrderingParser();
-
-            //parser.Parse(ordering, tokens);
-
-            //var parser = new OrderingParser();
-
-            //parser.Parse(ordering, orderingText);
+            var ordering = new Orderings();
 
             OrderingParser.Parse(ordering, orderingText);
 
+            return Ok();
+        }
 
+        [HttpGet("properties/{name}")]
+        public IActionResult GetPropertyName(string name)
+        {
+            try
+            {
+                var expression = DynamicExpressionParser.ParseLambda(typeof(Customer), null, name);
+
+                var memberName = MemberNameExtractor.Extract(expression);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            Expression<Func<Customer, object>> expression2 = (Customer c) => c.AccountOpenedDate;
+
+            var memberName2 = MemberNameExtractor.Extract(expression2);
+
+            ISpecification<Customer> specification = new Specification<Customer>();
+
+            specification.OrderBy(c => c.AccountOpenedDate, ascending: false)
+                .ThenBy("Name");
+            
             return Ok();
         }
     }

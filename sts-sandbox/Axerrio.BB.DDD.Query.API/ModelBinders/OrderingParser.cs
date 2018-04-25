@@ -1,17 +1,25 @@
-﻿using System;
+﻿using Axerrio.BB.DDD.Infrastructure.Query;
+using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Query.API.Parser;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Axerrio.BB.DDD.Infrastructure.Query.Specification;
 
-namespace Axerrio.BB.DDD.Query.API.Parser
+namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 {
-    public class Ordering: List<(string KeySelector, bool Ascending)>
-    {
+    //public class Orderings: List<(string KeySelector, bool Ascending)>
+    //{
 
-    }
+    //}
 
-    public class OrderingParser : DslParser<OrderingParser, Ordering, PrecedenceBasedRegexTokenizer>
+    public class OrderingParser : DslParser<OrderingParser, OrderingParser.Orderings, PrecedenceBasedRegexTokenizer>
     {
         public OrderingParser()
+        {
+        }
+
+        public class Orderings : List<IOrdering>
         {
         }
 
@@ -33,13 +41,16 @@ namespace Axerrio.BB.DDD.Query.API.Parser
         private void ParseOrdering()
         {
             //Setup Order
-            (string keySelector, bool ascending) orderBy;
+            //(string keySelector, bool ascending) orderBy;
+            Ordering orderBy = new Ordering();
 
             var propertyToken = ReadToken(OrderingTokenType.Property);
             DiscardToken(OrderingTokenType.Property);
 
-            orderBy.keySelector = propertyToken.Value;
-            orderBy.ascending = true; //default
+            //orderBy.keySelector = propertyToken.Value;
+            //orderBy.ascending = true; //default
+            orderBy.KeySelector = propertyToken.Value;
+            orderBy.Ascending = true; //default
 
             if (FirstTokenType == OrderingTokenType.Direction)
             {
@@ -47,7 +58,8 @@ namespace Axerrio.BB.DDD.Query.API.Parser
                 DiscardToken(OrderingTokenType.Direction);
 
                 if (directionToken.Value == "desc" || directionToken.Value == "descending")
-                    orderBy.ascending = false;
+                    orderBy.Ascending = false;
+                    //orderBy.ascending = false;
             }
 
             _model.Add(orderBy);

@@ -1,9 +1,11 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using EnsureThat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
@@ -46,6 +48,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
                 return source;
 
             IOrderedQueryable<TSource> result = null;
+            MethodInfo orderByMethod = null;
 
             foreach (var order in specification.Orderings)
             {
@@ -53,26 +56,27 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
                 {
                     if (order.Ascending)
                     {
-                        result = source.OrderBy((Expression<Func<TSource, object>>)order.KeySelector);
+                        orderByMethod = ExpressionHelperMethods.QueryableOrderByGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
+                        
                     }
                     else
                     {
-                        result = source.OrderByDescending((Expression<Func<TSource, object>>)order.KeySelector);
+                        orderByMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
                     }
                 }
                 else
                 {
                     if (order.Ascending)
                     {
-                        result = result.ThenBy((Expression<Func<TSource, object>>)order.KeySelector);
+                        orderByMethod = ExpressionHelperMethods.QueryableThenByGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
                     }
                     else
                     {
-                        result = result.ThenByDescending((Expression<Func<TSource, object>>)order.KeySelector);
+                        orderByMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
                     }
                 }
 
-                //result = order.Method.Invoke(null, new object[] { result ?? source, order.Lambda }) as IQueryable<TSource>;
+                result = orderByMethod.Invoke(null, new object[] { result ?? source, order.KeySelectorLambda }) as IOrderedQueryable<TSource>;
             }
 
             return result;
@@ -88,26 +92,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return source.Skip(specification.PageIndex.Value * specification.PageSize.Value)
                 .Take(specification.PageSize.Value);
         }
-
-        //public static IQueryable<TSource> ApplySpecificationSkip<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
-        //{
-        //    EnsureArg.IsNotNull(specification, nameof(specification));
-
-        //    if (!specification.HasSkip)
-        //        return source;
-
-        //    return source.Skip(specification.Skip.Value);
-        //}
-
-        //public static IQueryable<TSource> ApplySpecificationTake<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
-        //{
-        //    EnsureArg.IsNotNull(specification, nameof(specification));
-
-        //    if (!specification.HasTake)
-        //        return source;
-
-        //    return source.Take(specification.Take.Value);
-        //}
 
         public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {
