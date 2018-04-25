@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query
@@ -20,7 +21,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         {
             public LambdaExpression KeySelectorLambda { get; set; }
             public bool Ascending { get; set; }
-            public string KeySelector { get; set; }
+            public MemberInfo KeySelectorMember { get; set; }
         }
     }
 
@@ -191,9 +192,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
             _orderings.Add(new Ordering
                     {
-                        KeySelector = member.Name,
                         Ascending = ascending,
-                        KeySelectorLambda = keySelectorLambda
+                        KeySelectorLambda = keySelectorLambda,
+                        KeySelectorMember = member
                     });
 
             return this;

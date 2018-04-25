@@ -19,8 +19,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
         {
         }
 
-        public class Orderings : List<IOrdering>
+        public class Orderings : List<Ordering>
         {
+        }
+
+        public class Ordering
+        {
+            public string KeySelector { get; set; }
+            public bool Ascending { get; set; }
         }
 
         protected override void BuildTokenDefinitions()

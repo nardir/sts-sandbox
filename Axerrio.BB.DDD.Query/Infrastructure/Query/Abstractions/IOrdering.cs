@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 {
@@ -6,6 +7,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
     {
         LambdaExpression KeySelectorLambda { get; set; }
         bool Ascending { get; set; }
-        string KeySelector { get; set; }
+        MemberInfo KeySelectorMember { get; set; }
     }
 }
