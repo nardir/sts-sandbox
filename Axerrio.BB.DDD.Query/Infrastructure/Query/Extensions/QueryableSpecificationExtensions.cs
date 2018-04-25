@@ -40,7 +40,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return source.Where(specification.Predicate);
         }
 
-        public static IQueryable<TSource> ApplySpecificationOrdering<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        //public static IQueryable<TSource> ApplySpecificationOrdering<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        public static IQueryable<TSource> ApplySpecificationOrdering<TSource>(this IQueryable<TSource> source, ISpecification specification)
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
 
@@ -82,7 +83,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return result;
         }
 
-        public static IQueryable<TSource> ApplySpecificationPaging<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        //public static IQueryable<TSource> ApplySpecificationPaging<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        public static IQueryable<TSource> ApplySpecificationPaging<TSource>(this IQueryable<TSource> source, ISpecification specification)
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
 

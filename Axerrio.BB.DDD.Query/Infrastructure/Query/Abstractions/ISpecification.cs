@@ -11,7 +11,19 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
         IOrderedSpecification<TEntity> ThenBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true);
     }
 
-    public interface ISpecification<TEntity>
+    public interface ISpecification
+    {
+        Type EntityType { get; }
+
+        bool HasOrdering { get; }
+        IReadOnlyList<IOrdering> Orderings { get; }
+
+        bool HasPaging { get; }
+        int? PageSize { get; }
+        int? PageIndex { get; }
+    }
+
+    public interface ISpecification<TEntity>: ISpecification
     {
         #region predicate
 
@@ -28,9 +40,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 
         #region ordering
 
-        bool HasOrdering { get; }
-        //IReadOnlyList<(LambdaExpression KeySelectorLambda, bool Ascending, string KeySelector)> Orderings { get; }
-        IReadOnlyList<IOrdering> Orderings { get; }
         IOrderedSpecification<TEntity> OrderBy(string keySelector, bool ascending = true);
         IOrderedSpecification<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true);
 
@@ -38,9 +47,6 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 
         #region paging
 
-        bool HasPaging { get; }
-        int? PageSize { get; }
-        int? PageIndex { get; }
         ISpecification<TEntity> Page(int pageSize, int pageIndex);
 
         #endregion

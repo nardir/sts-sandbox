@@ -2,6 +2,7 @@
 using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
 using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using Axerrio.BB.DDD.Infrastructure.Query.ModelBinder;
+using Axerrio.BB.DDD.Infrastructure.Query.Sql;
 using Axerrio.BB.DDD.Query.API.Data;
 using Axerrio.BB.DDD.Query.API.Model;
 using EnsureThat;
@@ -30,6 +31,9 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var orderByBuilder = new OrderBySqlBuilder(specification);
+            var orderBy = orderByBuilder.Build();
 
             var customers = await _queryService.GetCustomersAsync(specification);
 
