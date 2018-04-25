@@ -175,25 +175,23 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         {
             EnsureArg.IsNotNullOrWhiteSpace(keySelector, nameof(keySelector));
             
-            return OrderBy(ParseLambda(null, keySelector), ascending, keySelector);
+            return OrderBy(ParseLambda(null, keySelector), ascending);
         }
 
         public IOrderedSpecification<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector, bool ascending = true)
         {
             EnsureArg.IsNotNull(keySelector, nameof(keySelector));
 
-            var memberName = MemberNameExtractor.Extract(keySelector);
-
-            return OrderBy(keySelector, ascending, memberName);
+            return OrderBy((LambdaExpression)keySelector, ascending);
         }
 
-        private IOrderedSpecification<TEntity> OrderBy(LambdaExpression keySelectorLambda, bool ascending, string keySelector)
+        private IOrderedSpecification<TEntity> OrderBy(LambdaExpression keySelectorLambda, bool ascending)
         {
+            var member = MemberExtractor.Extract(keySelectorLambda);
 
-            //_orderings.Add((KeySelectorLambda: keySelectorLambda, Ascending: ascending, KeySelector: keySelector));
             _orderings.Add(new Ordering
                     {
-                        KeySelector = keySelector,
+                        KeySelector = member.Name,
                         Ascending = ascending,
                         KeySelectorLambda = keySelectorLambda
                     });

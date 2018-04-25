@@ -1,31 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Helpers
 {
-    public class MemberNameExtractor : ExpressionVisitor
+    public class MemberExtractor : ExpressionVisitor
     {
-        private string _memberName = null;
+        private MemberInfo _member = null;
 
-        protected string MemberName => _memberName;
+        protected MemberInfo Member => _member;
 
-        public static string Extract(LambdaExpression expression)
+        public static MemberInfo Extract(LambdaExpression expression)
         {
             if (expression == null)
                 return null;
 
-            var extractor = new MemberNameExtractor();
+            var extractor = new MemberExtractor();
 
             extractor.Visit(expression);
 
-            return extractor.MemberName;
+            return extractor.Member;
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            _memberName = node.Member.Name;
+            _member = node.Member;
 
             return node;
         }

@@ -72,7 +72,7 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             {
                 var expression = DynamicExpressionParser.ParseLambda(typeof(Customer), null, name);
 
-                var memberName = MemberNameExtractor.Extract(expression);
+                var memberName = MemberExtractor.Extract(expression);
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
 
             Expression<Func<Customer, object>> expression2 = (Customer c) => c.AccountOpenedDate;
 
-            var memberName2 = MemberNameExtractor.Extract(expression2);
+            var memberName2 = MemberExtractor.Extract(expression2);
 
             ISpecification<Customer> specification = new Specification<Customer>();
 
