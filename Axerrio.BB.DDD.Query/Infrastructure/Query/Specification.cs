@@ -105,6 +105,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         }
 
         #endregion
+
+        #region selector
+
+        public LambdaExpression Selector { get; protected set; }
+
+        public bool HasSelector => Selector != null;
+
+        #endregion
     }
 
     //public class OrderedSpecification<TEntity>: Specification<TEntity>
@@ -253,6 +261,26 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         public new ISpecification<TEntity> Page(int pageSize, int pageIndex)
         {
             base.Page(pageSize, pageIndex);
+
+            return this;
+        }
+
+        #endregion
+
+        #region selector
+
+        public ISpecification<TEntity> Select(string keySelector)
+        {
+            EnsureArg.IsNotNullOrWhiteSpace(keySelector, nameof(keySelector));
+
+            Selector = ParseLambda(null, $"new ({keySelector})");
+
+            return this;
+        }
+
+        public ISpecification<TEntity> Select<TKey>(Expression<Func<TEntity, TKey>> keySelector)
+        {
+            Selector = EnsureArg.IsNotNull(keySelector, nameof(keySelector));
 
             return this;
         }

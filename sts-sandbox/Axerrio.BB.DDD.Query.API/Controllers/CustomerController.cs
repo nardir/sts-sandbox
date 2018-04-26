@@ -115,5 +115,21 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             
             return Ok();
         }
+
+        [HttpGet("projection")]
+        public IActionResult Projection([FromQuery(Name = "$filter")] string filter)
+        {
+            try
+            {
+                var p1 = DynamicExpressionParser.ParseLambda(typeof(Customer), null, $"new ({filter})");
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return Ok();
+        }
     }
 }
