@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.Query.Model;
 using Axerrio.BB.DDD.Query.API.Model;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace Axerrio.BB.DDD.Query.API.Data
     public interface IQueryService
     {
         Task<IEnumerable<dynamic>> GetCustomersAsync(ISpecification<Customer> specification);
+        Task<PagedEnumerable<Customer>> GetPagedCustomersAsync(ISpecification<Customer> specification);
     }
 }

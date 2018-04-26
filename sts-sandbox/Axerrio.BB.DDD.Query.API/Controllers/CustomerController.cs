@@ -32,12 +32,33 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var orderByBuilder = new OrderBySqlBuilder(specification);
+            var orderByBuilder = new OrderBySqlBuilder(specification)
+                .WithResolveColumn(mi =>
+                {
+                    var alias = "c";
+
+                    if (mi.ReflectedType == typeof(CustomerCategory))
+                        alias = "cat";
+
+                    return $"{alias}.{mi.Name}";
+                });
+
             var orderBy = orderByBuilder.Build();
 
             var customers = await _queryService.GetCustomersAsync(specification);
 
             return Ok(customers);
+        }
+
+        [HttpGet("api/pagedcustomers")]
+        public async Task<IActionResult> GetPagedCustomers(Specification<Customer> specification)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var pagedCustomers = await _queryService.GetPagedCustomersAsync(specification);
+
+            return Ok(pagedCustomers);
         }
 
         [HttpGet("api/customersbylike/{search}")]
