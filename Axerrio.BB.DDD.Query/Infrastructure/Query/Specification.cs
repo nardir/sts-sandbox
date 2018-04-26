@@ -59,14 +59,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         protected ISpecification OrderBy(LambdaExpression keySelectorLambda, bool ascending)
         {
-            var member = MemberExtractor.Extract(keySelectorLambda);
+            //var member = MemberExtractor.Extract(keySelectorLambda);
 
-            var ordering = new Ordering
-            {
-                Ascending = ascending,
-                KeySelectorLambda = keySelectorLambda,
-                KeySelectorMember = member
-            };
+            var ordering = new Ordering(keySelectorLambda, ascending);
 
             _orderings.Add(ordering);
 
@@ -75,9 +70,20 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public class Ordering : IOrdering
         {
-            public LambdaExpression KeySelectorLambda { get; set; }
-            public bool Ascending { get; set; }
-            public MemberInfo KeySelectorMember { get; set; }
+            private Lazy<MemberInfo> _member;
+
+            public Ordering(LambdaExpression keySelectorLambda, bool ascending)
+            {
+                KeySelectorLambda = EnsureArg.IsNotNull(keySelectorLambda, nameof(keySelectorLambda));
+
+                Ascending = ascending;
+
+                _member = new Lazy<MemberInfo>(() => MemberExtractor.Extract(KeySelectorLambda));
+            }
+
+            public LambdaExpression KeySelectorLambda { get; private set; }
+            public bool Ascending { get; private set; }
+            internal MemberInfo KeySelectorMember => _member.Value;
         }
 
         #endregion

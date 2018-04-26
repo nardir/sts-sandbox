@@ -2,8 +2,10 @@
 using EnsureThat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using static Axerrio.BB.DDD.Infrastructure.Query.Specification;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Sql
 {
@@ -51,7 +53,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Sql
             var sql = new StringBuilder();
             bool first = true;
 
-            foreach(var ordering in _specification.Orderings)
+            foreach(var ordering in _specification.Orderings.Cast<Ordering>())
             {
                 if (!first)
                 {

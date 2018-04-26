@@ -5,8 +5,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 {
     public interface IOrdering
     {
-        LambdaExpression KeySelectorLambda { get; set; }
-        bool Ascending { get; set; }
-        MemberInfo KeySelectorMember { get; set; }
+        LambdaExpression KeySelectorLambda { get; }
+        bool Ascending { get; }
+        //MemberInfo KeySelectorMember { get; }
     }
 }
