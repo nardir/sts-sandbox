@@ -12,23 +12,24 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
 {
     public static class QueryableSpecificationExtensions
     {
-        //public static IQueryable<TResult> ApplySpecificationSelector<TSource, TResult>(this IQueryable<TSource> source, ISpecification<TSource> specification)
-        //{
-        //    return source.ApplySpecificationSelector(specification).Cast<TResult>();
-        //}
-        //public static IQueryable ApplySpecificationSelector<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
-        //{
-        //    EnsureArg.IsNotNull(specification, nameof(specification));
+        public static IQueryable<TResult> ApplySpecificationSelector<TSource, TResult>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        {
+            return source.ApplySpecificationSelector(specification).Cast<TResult>();
+        }
 
-        //    if (!specification.HasSelector)
-        //        return source;
+        public static IQueryable ApplySpecificationSelector<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        {
+            EnsureArg.IsNotNull(specification, nameof(specification));
 
-        //    var selector = specification.Selector;
+            if (!specification.HasSelector)
+                return source;
 
-        //    var projection = selector.Method.Invoke(null, new object[] { source, selector.Lambda }) as IQueryable;
+            var selectorMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(typeof(TSource), specification.Selector.Body.Type);
+            
+            var projection = selectorMethod.Invoke(null, new object[] { source, specification.Selector }) as IQueryable;
 
-        //    return projection;
-        //}
+            return projection;
+        }
 
         public static IQueryable<TSource> ApplySpecificationPredicate<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {
@@ -103,18 +104,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
 
             query = query.ApplySpecificationPaging(specification);
 
-            //query = query.ApplySpecificationSkip(specification);
-
-            //query = query.ApplySpecificationTake(specification);
-
             return query;
         }
 
-        //public static IQueryable<TResult> ApplySpecification<TSource, TResult>(this IQueryable<TSource> source, ISpecification<TSource> specification)
-        //{
-        //    var query = source.ApplySpecification(specification);
+        public static IQueryable<TResult> ApplySpecification<TSource, TResult>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        {
+            var query = source.ApplySpecification(specification);
 
-        //    return query.ApplySpecificationSelector<TSource, TResult>(specification);
-        //}
+            return query.ApplySpecificationSelector<TSource, TResult>(specification);
+        }
     }
 }

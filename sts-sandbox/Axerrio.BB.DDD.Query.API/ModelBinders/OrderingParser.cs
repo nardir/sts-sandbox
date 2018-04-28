@@ -35,7 +35,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             {
                 new TokenDefinition(SpecificationTokenType.Comma, ",", 1),
                 new TokenDefinition(SpecificationTokenType.Direction, "asc|ascending|desc|descending", 1),
-                new TokenDefinition(SpecificationTokenType.Property, @"[\p{L}\d\.]+", 2),
+                //new TokenDefinition(SpecificationTokenType.Property, @"[\p{L}\d\.]+", 2), 
+                new TokenDefinition(SpecificationTokenType.Property, @"(?:[\w]+\.)*\w+", 2), //^(?:[\w]+\.)*\w+$
+                //https://stackoverflow.com/questions/33711381/regular-expression-to-check-valid-property-name-in-c-sharp?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
             };
         }
 

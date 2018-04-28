@@ -21,6 +21,11 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
         bool HasPaging { get; }
         int? PageSize { get; }
         int? PageIndex { get; }
+
+        LambdaExpression Selector { get; }
+
+        bool HasSelector { get; }
+
     }
 
     public interface ISpecification<TEntity>: ISpecification
@@ -48,6 +53,13 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
         #region paging
 
         ISpecification<TEntity> Page(int pageSize, int pageIndex);
+
+        #endregion
+
+        #region selector
+
+        ISpecification<TEntity> Select(string keySelector);
+        ISpecification<TEntity> Select<TKey>(Expression<Func<TEntity, TKey>> keySelector);
 
         #endregion
     }

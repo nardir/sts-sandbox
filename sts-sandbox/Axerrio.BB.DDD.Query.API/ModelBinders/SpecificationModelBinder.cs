@@ -109,6 +109,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             }
         }
 
+        private void ApplySelect(Specification<T> specification, ModelBindingContext bindingContext, Dictionary<string, string> options)
+        {
+            options.TryGetValue("$select", out string keySelector);
+
+            if (string.IsNullOrWhiteSpace(keySelector))
+                return;
+        }
+
         private void ApplyPaging(Specification<T> specification, ModelBindingContext bindingContext, Dictionary<string, string> options)
         {
             var containsPageSize = options.ContainsKey("$pagesize");
