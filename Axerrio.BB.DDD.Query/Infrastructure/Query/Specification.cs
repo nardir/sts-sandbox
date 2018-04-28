@@ -275,6 +275,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
             Selector = ParseLambda(null, $"new ({keySelector})");
 
+            var members = MembersExtractor.Extract(Selector);
+
             return this;
         }
 

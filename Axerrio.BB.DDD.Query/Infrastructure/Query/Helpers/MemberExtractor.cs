@@ -31,4 +31,35 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Helpers
             return node;
         }
     }
+
+    public class MembersExtractor : ExpressionVisitor
+    {
+        private List<MemberInfo> _members = null;
+
+        protected MembersExtractor()
+        {
+            _members = new List<MemberInfo>();
+        }
+
+        protected List<MemberInfo> Members => _members;
+
+        public static List<MemberInfo> Extract(LambdaExpression expression)
+        {
+            if (expression == null)
+                return null;
+
+            var extractor = new MembersExtractor();
+
+            extractor.Visit(expression);
+
+            return extractor.Members;
+        }
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            _members.Add(node.Member);
+
+            return node;
+        }
+    }
 }
