@@ -59,5 +59,30 @@ namespace Axerrio.BB.DDD.Query.API.Data
 
             return pagedCustomers;
         }
+
+        public async Task<PagedEnumerable<dynamic>> GetPagedCustomersAsync2(ISpecification<Customer> specification)
+        {
+            //Validate specification
+            if (!specification.HasPaging)
+                return null;
+
+            var baseQuery = _context.Customers
+                .Include(c => c.CustomerCategory)
+                .AsQueryable();
+
+            var countQuery = baseQuery;
+            if (specification.HasPredicate)
+                countQuery = countQuery.ApplySpecificationPredicate(specification);
+
+            var itemCount = await countQuery.LongCountAsync();
+
+            var query = baseQuery.ApplySpecification<Customer, dynamic>(specification);
+
+            var customers = await query.ToListAsync();
+
+            var pagedCustomers = PagedEnumerable.Create(customers, specification, itemCount);
+
+            return pagedCustomers;
+        }
     }
 }

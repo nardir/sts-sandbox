@@ -61,6 +61,18 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             return Ok(pagedCustomers);
         }
 
+        [HttpGet("api/pagedcustomers2")]
+        public async Task<IActionResult> GetPagedCustomers2(Specification<Customer> specification)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var pagedCustomers = await _queryService.GetPagedCustomersAsync2(specification);
+
+            return Ok(pagedCustomers);
+        }
+
+
         [HttpGet("api/customersbylike/{search}")]
         public async Task<IActionResult> GetCustomersByLike(string search)
         {

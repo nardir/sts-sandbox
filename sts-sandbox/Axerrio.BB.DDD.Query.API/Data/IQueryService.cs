@@ -12,5 +12,6 @@ namespace Axerrio.BB.DDD.Query.API.Data
     {
         Task<IEnumerable<dynamic>> GetCustomersAsync(ISpecification<Customer> specification);
         Task<PagedEnumerable<Customer>> GetPagedCustomersAsync(ISpecification<Customer> specification);
+        Task<PagedEnumerable<dynamic>> GetPagedCustomersAsync2(ISpecification<Customer> specification);
     }
 }

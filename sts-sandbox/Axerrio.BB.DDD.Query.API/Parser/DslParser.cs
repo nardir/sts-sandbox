@@ -87,6 +87,12 @@ namespace Axerrio.BB.DDD.Query.API.Parser
             if (_lookaheadFirst.TokenType != tokenType)
                 throw new DslParseException(string.Format("Expected {0} but found: {1}", tokenType.ToString().ToUpper(), _lookaheadFirst.Value));
 
+            //return _lookaheadFirst;
+            return ReadToken();
+        }
+
+        protected DslToken ReadToken()
+        {
             return _lookaheadFirst;
         }
 
@@ -106,6 +112,23 @@ namespace Axerrio.BB.DDD.Query.API.Parser
                 throw new DslParseException(string.Format("Expected {0} but found: {1}", tokenType.ToString().ToUpper(), _lookaheadFirst.Value));
 
             DiscardToken();
+        }
+
+        protected DslToken ReadAndDiscardToken(TokenType tokenType)
+        {
+            if (_lookaheadFirst.TokenType != tokenType)
+                throw new DslParseException(string.Format("Expected {0} but found: {1}", tokenType.ToString().ToUpper(), _lookaheadFirst.Value));
+
+            return ReadAndDiscardToken();
+        }
+
+        protected DslToken ReadAndDiscardToken()
+        {
+            var token = ReadToken();
+
+            DiscardToken();
+
+            return token;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Model
             return new PagedEnumerable<TEntity>(items, pageIndex, pageSize, itemCount);
         }
 
-        public static PagedEnumerable<TResult> Create<TResult, TEntity>(IEnumerable<TResult> items, ISpecification<TEntity> specification, long itemCount)
+        public static PagedEnumerable<TResult> Create<TEntity, TResult>(IEnumerable<TResult> items, ISpecification<TEntity> specification, long itemCount)
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
             EnsureArg.IsTrue(specification.HasPaging, nameof(specification.HasPaging));

@@ -1,4 +1,5 @@
-﻿using Axerrio.BB.DDD.Query.API.Parser;
+﻿using Axerrio.BB.DDD.Query.API.ModelBinders;
+using Axerrio.BB.DDD.Query.API.Parser;
 using EnsureThat;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
             var modelType = bindingContext.ModelType;
             var request = bindingContext.HttpContext.Request;
-            
+
             var options = request.Query.ToDictionary(p => p.Key.ToLowerInvariant(), p => p.Value.FirstOrDefault());
 
             //var model = Activator.CreateInstance(modelType);
@@ -36,6 +37,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             ApplyFilter(specification, bindingContext, options);
 
             //select
+            ApplySelect(specification, bindingContext, options);
 
             //orderby
             ApplyOrdering(specification, bindingContext, options);
@@ -115,6 +117,23 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
             if (string.IsNullOrWhiteSpace(keySelector))
                 return;
+
+            var selectors = new List<string>();
+
+            try
+            {
+                SelectorParser.Parse(selectors, keySelector);
+            }
+            catch (DslParseException exception)
+            {
+                _logger.LogError(exception, exception.ToString());
+
+                bindingContext.ModelState.TryAddModelError("select", $"Invalid $select expression {keySelector} supplied");
+
+                return;
+            }
+
+            specification.Select(keySelector);
         }
 
         private void ApplyPaging(Specification<T> specification, ModelBindingContext bindingContext, Dictionary<string, string> options)

@@ -48,22 +48,20 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
         private void ParseOrdering()
         {
-            //Setup Order
-            //(string keySelector, bool ascending) orderBy;
             Ordering orderBy = new Ordering();
 
-            var propertyToken = ReadToken(SpecificationTokenType.Property);
-            DiscardToken(SpecificationTokenType.Property);
+            //var propertyToken = ReadToken(SpecificationTokenType.Property);
+            //DiscardToken(SpecificationTokenType.Property);
+            var propertyToken = ReadAndDiscardToken(SpecificationTokenType.Property);
 
-            //orderBy.keySelector = propertyToken.Value;
-            //orderBy.ascending = true; //default
             orderBy.KeySelector = propertyToken.Value;
             orderBy.Ascending = true; //default
 
             if (FirstTokenType == SpecificationTokenType.Direction)
             {
-                var directionToken = ReadToken(SpecificationTokenType.Direction);
-                DiscardToken(SpecificationTokenType.Direction);
+                //var directionToken = ReadToken(SpecificationTokenType.Direction);
+                //DiscardToken(SpecificationTokenType.Direction);
+                var directionToken = ReadAndDiscardToken();
 
                 if (directionToken.Value == "desc" || directionToken.Value == "descending")
                     orderBy.Ascending = false;
@@ -78,12 +76,15 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             }
             else if (FirstTokenType == SpecificationTokenType.Comma)
             {
-                DiscardToken(SpecificationTokenType.Comma);
+                //DiscardToken(SpecificationTokenType.Comma);
+                DiscardToken();
 
                 ParseOrdering();
             }
             else
+            {
                 throw new DslParseException("syntax error");
+            }
         }
     }
 }
