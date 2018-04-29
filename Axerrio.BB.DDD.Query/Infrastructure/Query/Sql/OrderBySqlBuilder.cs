@@ -1,5 +1,4 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
-using EnsureThat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,51 +8,30 @@ using static Axerrio.BB.DDD.Infrastructure.Query.Specification;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Sql
 {
-    public class OrderBySqlBuilder
+
+    public class OrderBySqlBuilder: SqlBuilder
     {
-        private ISpecification _specification;
-
-        private Func<MemberInfo, string> _resolveColumn = m => $"[{m.Name}]" ;
-
-        public Func<MemberInfo, string> ResolveColumn
-        {
-            get => _resolveColumn;
-
-            private set => _resolveColumn = EnsureArg.IsNotNull(value, nameof(ResolveColumn));
-        }
-
         #region ctor
 
-        public OrderBySqlBuilder(ISpecification specification): this(specification, null)
+        public OrderBySqlBuilder(ISpecification specification) : base(specification)
         {
         }
 
-        public OrderBySqlBuilder(ISpecification specification, Func<MemberInfo, string> resolveColumn)
+        public OrderBySqlBuilder(ISpecification specification, Func<MemberInfo, string> resolveColumn) : base(specification, resolveColumn)
         {
-            _specification = EnsureArg.IsNotNull(specification, nameof(specification));
-
-            if (resolveColumn != null)
-                ResolveColumn = resolveColumn;
         }
 
         #endregion
 
-        public OrderBySqlBuilder WithResolveColumn(Func<MemberInfo, string> resolveColumn)
+        public override string Build()
         {
-            ResolveColumn = resolveColumn;
-
-            return this;
-        }
-
-        public string Build()
-        {
-            if (!_specification.HasOrdering)
+            if (!Specification.HasOrdering)
                 return null;
 
             var sql = new StringBuilder();
             bool first = true;
 
-            foreach(var ordering in _specification.Orderings.Cast<Ordering>())
+            foreach (var ordering in Specification.Orderings.Cast<Ordering>())
             {
                 if (!first)
                 {

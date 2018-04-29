@@ -6,31 +6,31 @@ using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Helpers
 {
-    public class MemberExtractor : ExpressionVisitor
-    {
-        private MemberInfo _member = null;
+    //public class MemberExtractor : ExpressionVisitor
+    //{
+    //    private MemberInfo _member = null;
 
-        protected MemberInfo Member => _member;
+    //    protected MemberInfo Member => _member;
 
-        public static MemberInfo Extract(LambdaExpression expression)
-        {
-            if (expression == null)
-                return null;
+    //    public static MemberInfo Extract(LambdaExpression expression)
+    //    {
+    //        if (expression == null)
+    //            return null;
 
-            var extractor = new MemberExtractor();
+    //        var extractor = new MemberExtractor();
 
-            extractor.Visit(expression);
+    //        extractor.Visit(expression);
 
-            return extractor.Member;
-        }
+    //        return extractor.Member;
+    //    }
 
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            _member = node.Member;
+    //    protected override Expression VisitMember(MemberExpression node)
+    //    {
+    //        _member = node.Member;
 
-            return node;
-        }
-    }
+    //        return node;
+    //    }
+    //}
 
     public class MembersExtractor : ExpressionVisitor
     {

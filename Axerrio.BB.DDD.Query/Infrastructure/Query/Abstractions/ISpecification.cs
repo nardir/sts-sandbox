@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Axerrio.BB.DDD.Infrastructure.Query.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
@@ -60,6 +61,13 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
 
         ISpecification<TEntity> Select(string keySelector);
         ISpecification<TEntity> Select<TKey>(Expression<Func<TEntity, TKey>> keySelector);
+
+        #endregion
+
+        #region validation
+
+        void Validate(SpecificationValidationSettings validationSettings);
+        bool TryValidate(SpecificationValidationSettings validationSettings);
 
         #endregion
     }

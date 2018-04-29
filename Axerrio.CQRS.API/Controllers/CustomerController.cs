@@ -436,7 +436,14 @@ namespace Axerrio.CQRS.API.Controllers
             var specification = new Specification<SalesOrder>();
             var specificationQuery = new ODataQueryable<SalesOrder>(specification);
 
+            var s2 = new ODataQuerySettings();
+            
+
             options.ToSpecification(specificationQuery);
+            var s = new ODataValidationSettings();
+            s.AllowedQueryOptions = AllowedQueryOptions.All;
+            
+            options.Validate(s); //ODataValidationException
 
             //var count = _context.SalesOrders.Where(specification.Predicate).Count();
 

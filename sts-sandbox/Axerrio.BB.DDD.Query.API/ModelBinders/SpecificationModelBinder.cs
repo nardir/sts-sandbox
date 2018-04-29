@@ -122,7 +122,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
             try
             {
-                SelectorParser.Parse(selectors, keySelector);
+                SelectorParser.Parse(selectors, keySelector); //NR: for now just to make sure the $select expression only contains properties
             }
             catch (DslParseException exception)
             {

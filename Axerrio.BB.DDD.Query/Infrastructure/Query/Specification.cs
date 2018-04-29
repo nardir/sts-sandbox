@@ -1,5 +1,6 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
 using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
+using Axerrio.BB.DDD.Infrastructure.Query.Validation;
 using EnsureThat;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
@@ -78,7 +79,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
                 Ascending = ascending;
 
-                _member = new Lazy<MemberInfo>(() => MemberExtractor.Extract(KeySelectorLambda));
+                _member = new Lazy<MemberInfo>(() => MembersExtractor.Extract(KeySelectorLambda).SingleOrDefault());
             }
 
             public LambdaExpression KeySelectorLambda { get; private set; }
@@ -285,6 +286,35 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
             Selector = EnsureArg.IsNotNull(keySelector, nameof(keySelector));
 
             return this;
+        }
+
+        #endregion
+
+        #region validation
+
+        public void Validate(SpecificationValidationSettings validationSettings)
+        {
+            //use fluentvalidation
+
+            throw new NotImplementedException();
+        }
+
+        public bool TryValidate(SpecificationValidationSettings validationSettings)
+        {
+            var valid = false;
+
+            try
+            {
+                Validate(validationSettings);
+
+                valid = true;
+            }
+            catch (Exception ex)
+            {
+                //return false;
+            }
+
+            return valid;
         }
 
         #endregion
