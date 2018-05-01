@@ -144,5 +144,20 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
 
             return Ok();
         }
+
+        [HttpGet("testdbcontext")]
+        public async Task<IActionResult> TestDbContext([FromServices] WorldWideImportersQueryContext context)
+        {
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return Ok();
+        }
     }
 }
