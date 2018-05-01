@@ -3,11 +3,40 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Axerrio.BB.DDD.Query.API.Data
 {
-    public class WorldWideImportersQueryContext: DbContext
+    public abstract class QueryDbContext: DbContext
+    {
+        public QueryDbContext(DbContextOptions options): base(options)
+        {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+
+        public override int SaveChanges()
+        {
+            throw new InvalidOperationException("Query/readonly DbContext");
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            return SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(SaveChanges());
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(SaveChanges());
+        }
+    }
+
+    public class WorldWideImportersQueryContext: QueryDbContext
     {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerCategory> CustomerCategories { get; set; }
@@ -15,7 +44,6 @@ namespace Axerrio.BB.DDD.Query.API.Data
         public WorldWideImportersQueryContext(DbContextOptions<WorldWideImportersQueryContext> options)
             : base(options)
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
