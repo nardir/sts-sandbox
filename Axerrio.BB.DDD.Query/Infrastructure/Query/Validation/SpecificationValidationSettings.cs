@@ -1,21 +1,9 @@
-﻿using System;
+﻿using FluentValidation;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Axerrio.BB.DDD.Infrastructure.Query.Validation
 {
-    [Flags]
-    public enum SpecificationOptions
-    {
-        None = 0,
-
-        Filter = 1,
-        Ordering = 2,
-        Paging = 4,
-        Projection = 8,
-
-        All = Filter | Ordering | Paging | Projection
-    }
 
     public class SpecificationValidationSettings
     {
@@ -27,7 +15,39 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Validation
 
         #endregion
 
-        public SpecificationOptions AllowedSpecificationOptions { get; set; } = SpecificationOptions.All;
-        public SpecificationOptions RequiredSpecificationOptions { get; set; } = SpecificationOptions.None;
+        private SpecificationOptions _allowedSpecificationOptions = SpecificationOptions.All;
+
+        public SpecificationOptions AllowedSpecificationOptions
+        {
+            get => _allowedSpecificationOptions;
+
+            set
+            {
+                _allowedSpecificationOptions = value;
+
+                Validate();
+            }
+        }
+
+        private SpecificationOptions _requiredSpecificationOptions = SpecificationOptions.None;
+
+        public SpecificationOptions RequiredSpecificationOptions
+        {
+            get => _requiredSpecificationOptions;
+
+            set
+            {
+                _requiredSpecificationOptions = value;
+
+                Validate();
+            }
+        }
+
+        private void Validate()
+        {
+            var validator = new SpecificationValidationSettingsValidator();
+
+            validator.ValidateAndThrow(this);
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
 using Axerrio.BB.DDD.Infrastructure.Query.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Query.Model;
+using Axerrio.BB.DDD.Infrastructure.Query.Validation;
 using Axerrio.BB.DDD.Query.API.Model;
 using EnsureThat;
 using Microsoft.EntityFrameworkCore;
@@ -37,8 +38,16 @@ namespace Axerrio.BB.DDD.Query.API.Data
         public async Task<PagedEnumerable<Customer>> GetPagedCustomersAsync(ISpecification<Customer> specification)
         {
             //Validate specification
-            if (!specification.HasPaging)
-                return null;
+            var settings = new SpecificationValidationSettings
+            {
+                RequiredSpecificationOptions = SpecificationOptions.Ordering | SpecificationOptions.Paging,
+                AllowedSpecificationOptions = SpecificationOptions.Filter | SpecificationOptions.Ordering | SpecificationOptions.Paging
+            };
+
+            specification.Validate(settings);
+
+            //if (!specification.HasPaging)
+            //    return null;
 
             var baseQuery = _context.Customers
                 .Include(c => c.CustomerCategory)

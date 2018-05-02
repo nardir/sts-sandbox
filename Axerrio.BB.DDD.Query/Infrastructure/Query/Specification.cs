@@ -300,7 +300,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
             //use fluentvalidation
             var validator = new SpecificationValidator<TEntity>(validationSettings);
 
-            var results = validator.Validate(this);
+            var results = validator.Validate(this); //TODO Refactor comment
 
             validator.ValidateAndThrow(this);
         }
