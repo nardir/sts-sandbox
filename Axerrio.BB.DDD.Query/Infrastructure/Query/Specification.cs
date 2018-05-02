@@ -2,6 +2,7 @@
 using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using Axerrio.BB.DDD.Infrastructure.Query.Validation;
 using EnsureThat;
+using FluentValidation;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -294,9 +295,14 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public void Validate(SpecificationValidationSettings validationSettings)
         {
-            //use fluentvalidation
+            EnsureArg.IsNotNull(validationSettings);
 
-            throw new NotImplementedException();
+            //use fluentvalidation
+            var validator = new SpecificationValidator<TEntity>(validationSettings);
+
+            var results = validator.Validate(this);
+
+            validator.ValidateAndThrow(this);
         }
 
         public bool TryValidate(SpecificationValidationSettings validationSettings)
