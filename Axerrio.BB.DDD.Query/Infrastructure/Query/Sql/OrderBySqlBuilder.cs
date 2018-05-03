@@ -1,4 +1,5 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,9 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Sql
                     sql.Append(", ");
                 }
 
-                var column = ResolveColumn(ordering.KeySelectorMember);
+                var keySelectorMember = MembersExtractor.Extract(ordering.KeySelectorLambda).SingleOrDefault();
+                var column = ResolveColumn(keySelectorMember);
+                //var column = ResolveColumn(ordering.KeySelectorMember);
 
                 if (string.IsNullOrWhiteSpace(column))
                     throw new ArgumentNullException();

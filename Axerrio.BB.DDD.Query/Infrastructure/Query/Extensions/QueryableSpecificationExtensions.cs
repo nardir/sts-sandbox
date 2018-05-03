@@ -35,10 +35,10 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
 
-            if (!specification.HasPredicate)
+            if (!specification.HasFilter)
                 return source;
 
-            return source.Where(specification.Predicate);
+            return source.Where(specification.Filter);
         }
 
         //public static IQueryable<TSource> ApplySpecificationOrdering<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
@@ -49,36 +49,44 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             if (!specification.HasOrdering)
                 return source;
 
-            IOrderedQueryable<TSource> result = null;
-            MethodInfo orderByMethod = null;
+            //typeof(IOrderedQueryable<Order>).IsAssignableFrom(query2.AsQueryable().Expression.Type);
+            var hasOrdering = QueryableOrderingDetector.HasOrdering(source.Expression);
 
-            foreach (var order in specification.Orderings)
+            if (hasOrdering)
+                throw new InvalidOperationException("Cannot apply ordering is quaryable is already ordered");
+
+            IOrderedQueryable<TSource> result = null;
+            MethodInfo orderingMethod = null;
+
+            foreach (var ordering in specification.Orderings)
             {
-                if (result == null && !(source is IOrderedQueryable<TSource>))
+                if (hasOrdering == false)
                 {
-                    if (order.Ascending)
+                    if (ordering.Ascending)
                     {
-                        orderByMethod = ExpressionHelperMethods.QueryableOrderByGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
+                        orderingMethod = ExpressionHelperMethods.QueryableOrderByGeneric.MakeGenericMethod(typeof(TSource), ordering.KeySelectorLambda.Body.Type);
                         
                     }
                     else
                     {
-                        orderByMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
+                        orderingMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(typeof(TSource), ordering.KeySelectorLambda.Body.Type);
                     }
+
+                    hasOrdering = true;
                 }
                 else
                 {
-                    if (order.Ascending)
+                    if (ordering.Ascending)
                     {
-                        orderByMethod = ExpressionHelperMethods.QueryableThenByGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
+                        orderingMethod = ExpressionHelperMethods.QueryableThenByGeneric.MakeGenericMethod(typeof(TSource), ordering.KeySelectorLambda.Body.Type);
                     }
                     else
                     {
-                        orderByMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(typeof(TSource), order.KeySelectorLambda.Body.Type);
+                        orderingMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(typeof(TSource), ordering.KeySelectorLambda.Body.Type);
                     }
                 }
 
-                result = orderByMethod.Invoke(null, new object[] { result ?? source, order.KeySelectorLambda }) as IOrderedQueryable<TSource>;
+                result = orderingMethod.Invoke(null, new object[] { result ?? source, ordering.KeySelectorLambda }) as IOrderedQueryable<TSource>;
             }
 
             return result;
@@ -95,6 +103,11 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return source.Skip(specification.PageIndex.Value * specification.PageSize.Value)
                 .Take(specification.PageSize.Value);
         }
+
+        //public static IQueryable<TSource> ApplySpecification<TSource>(this IOrderedQueryable<TSource> source, ISpecification<TSource> specification)
+        //{
+        //    return ApplySpecification((IQueryable<TSource>)source, specification);
+        //}
 
         public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {

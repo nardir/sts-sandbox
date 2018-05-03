@@ -51,6 +51,7 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             return Ok(customers);
         }
 
+        //http://localhost:5000/api/pagedcustomers?$orderby=AccountOpenedDate desc, CustomerCategory.CustomerCategoryID&$pagesize=5&$pageindex=0
         [HttpGet("api/pagedcustomers")]
         public async Task<IActionResult> GetPagedCustomers(Specification<Customer> specification)
         {
@@ -62,6 +63,8 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             return Ok(pagedCustomers);
         }
 
+
+        //http://localhost:5000/api/pagedcustomers2?$select=Name, CreditLimit, CustomerCategory.CustomerCategoryName&$orderby=AccountOpenedDate desc, Name&$pagesize=5&$pageindex=100
         [HttpGet("api/pagedcustomers2")]
         public async Task<IActionResult> GetPagedCustomers2(Specification<Customer> specification)
         {

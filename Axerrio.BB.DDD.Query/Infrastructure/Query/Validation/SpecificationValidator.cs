@@ -19,7 +19,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Validation
 
             #region Allowed
 
-            RuleFor(s => s).Must(s => !s.HasPredicate || _validationSettings.AllowedSpecificationOptions.HasFlag(SpecificationOptions.Filter))
+            RuleFor(s => s).Must(s => !s.HasFilter || _validationSettings.AllowedSpecificationOptions.HasFlag(SpecificationOptions.Filtering))
                 .WithMessage("Filtering is not allowed");
 
             RuleFor(s => s).Must(s => !s.HasOrdering || _validationSettings.AllowedSpecificationOptions.HasFlag(SpecificationOptions.Ordering))
@@ -35,7 +35,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Validation
 
             #region Required
 
-            RuleFor(s => s).Must(s => s.HasPredicate || !_validationSettings.RequiredSpecificationOptions.HasFlag(SpecificationOptions.Filter))
+            RuleFor(s => s).Must(s => s.HasFilter || !_validationSettings.RequiredSpecificationOptions.HasFlag(SpecificationOptions.Filtering))
                 .WithMessage("Filtering is required");
 
             RuleFor(s => s).Must(s => s.HasOrdering || !_validationSettings.RequiredSpecificationOptions.HasFlag(SpecificationOptions.Ordering))

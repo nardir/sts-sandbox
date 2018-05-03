@@ -120,6 +120,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
             var selectors = new List<string>();
 
+            //TODO: Moeten we deze check wel doen?
             try
             {
                 SelectorParser.Parse(selectors, keySelector); //NR: for now just to make sure the $select expression only contains properties
@@ -133,7 +134,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
                 return;
             }
 
-            specification.Select(keySelector);
+            //specification.Select(keySelector);
+            specification.Select($"new ({keySelector})");
         }
 
         private void ApplyPaging(Specification<T> specification, ModelBindingContext bindingContext, Dictionary<string, string> options)
@@ -168,6 +170,12 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
 
                     bindingContext.ModelState.TryAddModelError("Paging", $"Invalid paging (pagesize={rawPageSize}, pageindex={rawPageIndex}) supplied");
                 }
+            }
+            else
+            {
+                //_logger.LogError(exception, exception.ToString());
+
+                bindingContext.ModelState.TryAddModelError("Paging", $"Invalid paging (pagesize={rawPageSize}, pageindex={rawPageIndex}) supplied");
             }
         }
     }

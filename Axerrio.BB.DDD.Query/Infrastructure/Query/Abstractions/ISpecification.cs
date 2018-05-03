@@ -33,8 +33,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Abstractions
     {
         #region predicate
 
-        Expression<Func<TEntity, bool>> Predicate { get; }
-        bool HasPredicate { get; }
+        Expression<Func<TEntity, bool>> Filter { get; }
+        bool HasFilter { get; }
         ISpecification<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
         ISpecification<TEntity> Where(string predicate, params object[] args);
         ISpecification<TEntity> And(Expression<Func<TEntity, bool>> predicate);

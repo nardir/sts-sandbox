@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Axerrio.BB.DDD.Query.API.Data
+namespace Axerrio.BB.DDD.Infrastructure.Query.EntityFrameworkCore
 {
     public abstract class QueryDbContext: DbContext
     {

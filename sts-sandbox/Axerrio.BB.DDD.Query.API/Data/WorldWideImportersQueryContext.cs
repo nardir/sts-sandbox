@@ -1,7 +1,6 @@
-﻿using Axerrio.BB.DDD.Query.API.Model;
+﻿using Axerrio.BB.DDD.Infrastructure.Query.EntityFrameworkCore;
+using Axerrio.BB.DDD.Query.API.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Axerrio.BB.DDD.Query.API.Data
 {

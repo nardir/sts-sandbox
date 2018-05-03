@@ -47,6 +47,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Validation
         {
             var validator = new SpecificationValidationSettingsValidator();
 
+            //Refactor naar DomainValidationException, zoals bij validatie van een Command
             validator.ValidateAndThrow(this);
         }
     }

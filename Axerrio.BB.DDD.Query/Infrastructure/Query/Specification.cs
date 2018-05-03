@@ -72,7 +72,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public class Ordering : IOrdering
         {
-            private Lazy<MemberInfo> _member;
+            //private Lazy<MemberInfo> _member;
 
             public Ordering(LambdaExpression keySelectorLambda, bool ascending)
             {
@@ -80,12 +80,12 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
                 Ascending = ascending;
 
-                _member = new Lazy<MemberInfo>(() => MembersExtractor.Extract(KeySelectorLambda).SingleOrDefault());
+                //_member = new Lazy<MemberInfo>(() => MembersExtractor.Extract(KeySelectorLambda).SingleOrDefault());
             }
 
             public LambdaExpression KeySelectorLambda { get; private set; }
             public bool Ascending { get; private set; }
-            internal MemberInfo KeySelectorMember => _member.Value;
+            //internal MemberInfo KeySelectorMember => _member.Value;
         }
 
         #endregion
@@ -150,26 +150,26 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         #endregion
 
-        #region Predicate
+        #region filtering
 
-        private ExpressionStarter<TEntity> _predicate = PredicateBuilder.New<TEntity>(true);
+        private ExpressionStarter<TEntity> _filter = PredicateBuilder.New<TEntity>(true);
 
         private Expression<Func<TEntity, bool>> ParsePredicate(string predicate, params object[] args)
         {
             return (Expression<Func<TEntity, bool>>)ParseLambda(typeof(bool), predicate, args);
         }
 
-        public Expression<Func<TEntity, bool>> Predicate
+        public Expression<Func<TEntity, bool>> Filter
         {
-            get => _predicate;
+            get => _filter;
 
             protected set
             {
-                _predicate = EnsureArg.IsNotNull(value, nameof(Predicate));
+                _filter = EnsureArg.IsNotNull(value, nameof(Filter));
             }
         }
 
-        public bool HasPredicate => _predicate.IsStarted;
+        public bool HasFilter => _filter.IsStarted;
 
         public ISpecification<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {
@@ -185,7 +185,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         {
             EnsureArg.IsNotNull(predicate);
 
-            _predicate = _predicate.And(predicate);
+            _filter = _filter.And(predicate);
 
             return this;
         }
@@ -199,7 +199,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         {
             EnsureArg.IsNotNull(predicate, nameof(predicate));
 
-            _predicate = _predicate.Or(predicate);
+            _filter = _filter.Or(predicate);
 
             return this;
         }
@@ -211,12 +211,12 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
         public static implicit operator Expression<Func<TEntity, bool>>(Specification<TEntity> right)
         {
-            return right.Predicate;
+            return right.Filter;
         }
 
         public static implicit operator Func<TEntity, bool>(Specification<TEntity> right)
         {
-            return right.Predicate.Compile();
+            return right.Filter.Compile();
         }
 
         public static implicit operator Specification<TEntity>(Expression<Func<TEntity, bool>> right)
@@ -275,7 +275,8 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
         {
             EnsureArg.IsNotNullOrWhiteSpace(keySelector, nameof(keySelector));
 
-            Selector = ParseLambda(null, $"new ({keySelector})");
+            //Selector = ParseLambda(null, $"new ({keySelector})");
+            Selector = ParseLambda(null, keySelector);
 
             var members = MembersExtractor.Extract(Selector);
 
@@ -302,6 +303,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query
 
             var results = validator.Validate(this); //TODO Refactor comment
 
+            //Refactor naar DomainValidationException, zoals bij validatie van een Command
             validator.ValidateAndThrow(this);
         }
 

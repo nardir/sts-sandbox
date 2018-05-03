@@ -26,9 +26,10 @@ namespace Axerrio.BB.DDD.Query.API.Data
 
         public async Task<IEnumerable<dynamic>> GetCustomersAsync(ISpecification<Customer> specification)
         {
-            var query = _context.Customers
-                .Include(c => c.CustomerCategory)
-                .AsQueryable();
+            IQueryable<Customer> query = _context.Customers
+                .Include(c => c.CustomerCategory);
+
+                //.OrderBy(c => c.AccountOpenedDate);
 
             query = query.ApplySpecification(specification);
 
@@ -41,7 +42,7 @@ namespace Axerrio.BB.DDD.Query.API.Data
             var settings = new SpecificationValidationSettings
             {
                 RequiredSpecificationOptions = SpecificationOptions.Ordering | SpecificationOptions.Paging,
-                AllowedSpecificationOptions = SpecificationOptions.Filter | SpecificationOptions.Ordering | SpecificationOptions.Paging
+                AllowedSpecificationOptions = SpecificationOptions.Filtering | SpecificationOptions.Ordering | SpecificationOptions.Paging
             };
 
             specification.Validate(settings);
@@ -53,7 +54,7 @@ namespace Axerrio.BB.DDD.Query.API.Data
                 .Include(c => c.CustomerCategory)
                 .AsQueryable();
 
-            if (specification.HasPredicate)
+            if (specification.HasFilter)
                 baseQuery = baseQuery.ApplySpecificationPredicate(specification);
 
             var itemCount = await baseQuery.LongCountAsync();
@@ -80,7 +81,7 @@ namespace Axerrio.BB.DDD.Query.API.Data
                 .AsQueryable();
 
             var countQuery = baseQuery;
-            if (specification.HasPredicate)
+            if (specification.HasFilter)
                 countQuery = countQuery.ApplySpecificationPredicate(specification);
 
             var itemCount = await countQuery.LongCountAsync();
