@@ -1,5 +1,6 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query;
 using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
+using Axerrio.BB.DDD.Infrastructure.Query.EntityFrameworkCore;
 using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using Axerrio.BB.DDD.Infrastructure.Query.ModelBinder;
 using Axerrio.BB.DDD.Infrastructure.Query.Sql;
@@ -159,6 +160,19 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             {
 
             }
+
+            return Ok();
+        }
+
+        [HttpGet("compilation")]
+        public IActionResult TestQueryCompilation([FromServices] WorldWideImportersQueryContext context)
+        {
+            var query = context.Customers;
+                //.AsQueryable<Customer>();
+                //.Select(c => c);
+                //.Select(c => c.Name);
+
+            var command = context.GetRelationalCommand(query);
 
             return Ok();
         }
