@@ -17,6 +17,8 @@ namespace Axerrio.BB.DDD.Query.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Customer
+
             modelBuilder.Entity<Customer>()
                 .ToTable("Customers", "Sales");
 
@@ -44,11 +46,36 @@ namespace Axerrio.BB.DDD.Query.API.Data
                 .WithMany()
                 .HasForeignKey(c => c.CustomerCategoryID);
 
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.SalesOrders)
+                .WithOne()
+                .HasForeignKey(c => c.CustomerID);
+
+            #endregion
+
+            #region SalesOrder
+
+            modelBuilder.Entity<SalesOrder>()
+                .ToTable("Orders", "Sales");
+
+            modelBuilder.Entity<SalesOrder>()
+                .HasKey(so => so.OrderID);
+
+            modelBuilder.Entity<SalesOrder>()
+                .Property(so => so.OrderDate)
+                .IsRequired();
+
+            #endregion
+
+            #region CustomerCategory
+
             modelBuilder.Entity<CustomerCategory>()
                 .ToTable("CustomerCategories", "Sales");
 
             modelBuilder.Entity<CustomerCategory>()
                 .HasKey(cc => cc.CustomerCategoryID);
+
+            #endregion
         }
     }
 }

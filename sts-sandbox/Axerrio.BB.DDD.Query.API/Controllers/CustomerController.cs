@@ -1,6 +1,7 @@
 ﻿using Axerrio.BB.DDD.Infrastructure.Query;
 using Axerrio.BB.DDD.Infrastructure.Query.Abstractions;
 using Axerrio.BB.DDD.Infrastructure.Query.EntityFrameworkCore;
+using Axerrio.BB.DDD.Infrastructure.Query.Extensions;
 using Axerrio.BB.DDD.Infrastructure.Query.Helpers;
 using Axerrio.BB.DDD.Infrastructure.Query.ModelBinder;
 using Axerrio.BB.DDD.Infrastructure.Query.Sql;
@@ -167,14 +168,42 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
         [HttpGet("compilation")]
         public IActionResult TestQueryCompilation([FromServices] WorldWideImportersQueryContext context)
         {
-            var query = context.Customers;
-                //.AsQueryable<Customer>();
-                //.Select(c => c);
-                //.Select(c => c.Name);
+            //var query = context.Customers;
+            var query = context.Customers.AsQueryable();
+            //.AsQueryable<Customer>();
+            //.Select(c => c);
+            //.Select(c => c.Name);
+
+            query = query.Where(c => c.CreditLimit == 2600);
 
             var command = context.GetRelationalCommand(query);
 
             return Ok();
+        }
+
+        [HttpGet("querytest")]
+        public IActionResult QueryTest(Specification<Customer> specification, [FromServices] WorldWideImportersQueryContext context)
+        {
+            //http://localhost:5000/querytest?$select=Name,SalesOrders.Count() as Count&$filter=SalesOrders.Count()<100&$orderby=Name&$pagesize=10&$pageindex=0
+            var baseQuery = context.Customers.AsQueryable();
+
+            //if (specification.HasFilter)
+            //    baseQuery = baseQuery.ApplySpecificationFilter(specification);
+
+            ////baseQuery = baseQuery.Where(c => c.SalesOrders.DefaultIfEmpty().Count() < 100);
+
+            //var query = baseQuery
+            //    //.Select(c => new { c.Name, SalesOrderCount = c.SalesOrders.Count() })
+            //    .Select(c => new { c.Name, SalesOrderCount = c.SalesOrders.DefaultIfEmpty().Count() })
+            //    .Cast<dynamic>();
+
+            var query = baseQuery.ApplySpecification<Customer, dynamic>(specification);
+
+            var sql = context.GetRelationalCommand(query);
+
+            var customers = query.ToList();
+
+            return Ok(customers);
         }
     }
 }

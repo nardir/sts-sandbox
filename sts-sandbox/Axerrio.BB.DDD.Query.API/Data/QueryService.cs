@@ -55,7 +55,7 @@ namespace Axerrio.BB.DDD.Query.API.Data
                 .AsQueryable();
 
             if (specification.HasFilter)
-                baseQuery = baseQuery.ApplySpecificationPredicate(specification);
+                baseQuery = baseQuery.ApplySpecificationFilter(specification);
 
             var itemCount = await baseQuery.LongCountAsync();
 
@@ -82,7 +82,7 @@ namespace Axerrio.BB.DDD.Query.API.Data
 
             var countQuery = baseQuery;
             if (specification.HasFilter)
-                countQuery = countQuery.ApplySpecificationPredicate(specification);
+                countQuery = countQuery.ApplySpecificationFilter(specification);
 
             var itemCount = await countQuery.LongCountAsync();
 

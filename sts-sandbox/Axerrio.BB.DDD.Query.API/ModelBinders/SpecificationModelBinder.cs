@@ -121,18 +121,18 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.ModelBinder
             var selectors = new List<string>();
 
             //TODO: Moeten we deze check wel doen?
-            try
-            {
-                SelectorParser.Parse(selectors, keySelector); //NR: for now just to make sure the $select expression only contains properties
-            }
-            catch (DslParseException exception)
-            {
-                _logger.LogError(exception, exception.ToString());
+            //try
+            //{
+            //    SelectorParser.Parse(selectors, keySelector); //NR: for now just to make sure the $select expression only contains properties
+            //}
+            //catch (DslParseException exception)
+            //{
+            //    _logger.LogError(exception, exception.ToString());
 
-                bindingContext.ModelState.TryAddModelError("select", $"Invalid $select expression {keySelector} supplied");
+            //    bindingContext.ModelState.TryAddModelError("select", $"Invalid $select expression {keySelector} supplied");
 
-                return;
-            }
+            //    return;
+            //}
 
             //specification.Select(keySelector);
             specification.Select($"new ({keySelector})");

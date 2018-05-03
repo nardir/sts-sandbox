@@ -31,7 +31,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
             return projection;
         }
 
-        public static IQueryable<TSource> ApplySpecificationPredicate<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
+        public static IQueryable<TSource> ApplySpecificationFilter<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {
             EnsureArg.IsNotNull(specification, nameof(specification));
 
@@ -111,7 +111,7 @@ namespace Axerrio.BB.DDD.Infrastructure.Query.Extensions
 
         public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source, ISpecification<TSource> specification)
         {
-            var query = source.ApplySpecificationPredicate(specification);
+            var query = source.ApplySpecificationFilter(specification);
 
             query = query.ApplySpecificationOrdering(specification);
 
