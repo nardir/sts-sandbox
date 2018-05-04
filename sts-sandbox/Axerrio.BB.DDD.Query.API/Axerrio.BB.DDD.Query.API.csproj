@@ -11,9 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Axerrio.BB.DDD" Version="18.5.0.9" />
     <PackageReference Include="Ensure.That" Version="7.2.1" />
+    <PackageReference Include="Linq.PropertyTranslator.Core" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.8.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.2" />
+    <PackageReference Include="QueryInterceptor.EntityFrameworkCore" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

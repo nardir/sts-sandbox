@@ -51,6 +51,9 @@ namespace Axerrio.BB.DDD.Query.API.Data
                 .WithOne()
                 .HasForeignKey(c => c.CustomerID);
 
+            modelBuilder.Entity<Customer>()
+                .Ignore(c => c.SalesOrderCount);
+
             #endregion
 
             #region SalesOrder

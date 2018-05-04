@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Linq.PropertyTranslator.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,5 +22,14 @@ namespace Axerrio.BB.DDD.Query.API.Model
         public CustomerCategory CustomerCategory { get; set; }
 
         public ICollection<SalesOrder> SalesOrders { get; set; }
-    }
+
+        #region
+
+        private static readonly CompiledExpressionMap<Customer, int> salesOrderCountExpression =
+        DefaultTranslationOf<Customer>.Property(p => p.SalesOrderCount).Is(c => c.SalesOrders.Count());
+
+        public int SalesOrderCount => salesOrderCountExpression.Evaluate(this);
+
+        #endregion
+        }
 }

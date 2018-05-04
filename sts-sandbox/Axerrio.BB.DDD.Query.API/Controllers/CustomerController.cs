@@ -8,7 +8,9 @@ using Axerrio.BB.DDD.Infrastructure.Query.Sql;
 using Axerrio.BB.DDD.Query.API.Data;
 using Axerrio.BB.DDD.Query.API.Model;
 using EnsureThat;
+using Linq.PropertyTranslator.Core;
 using Microsoft.AspNetCore.Mvc;
+using QueryInterceptor.Core;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -200,6 +202,24 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
             var query = baseQuery.ApplySpecification<Customer, dynamic>(specification);
 
             var sql = context.GetRelationalCommand(query);
+
+            var customers = query.ToList();
+
+            return Ok(customers);
+        }
+
+        [HttpGet("querytest2")]
+        public IActionResult QueryTest2([FromServices] WorldWideImportersQueryContext context)
+        {
+            var baseQuery = context.Customers.AsQueryable().InterceptWith(new PropertyVisitor());
+
+            var query = baseQuery
+                //.Where(c => c.SalesOrderCount < 100)
+                .Where("SalesOrderCount < 100")
+                .Select(c => new { c.Name, c.SalesOrderCount })
+                .Cast<dynamic>();
+
+            //var sql = context.GetRelationalCommand(query);
 
             var customers = query.ToList();
 
