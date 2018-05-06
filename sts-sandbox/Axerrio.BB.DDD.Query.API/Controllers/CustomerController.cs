@@ -188,6 +188,7 @@ namespace Axerrio.BB.DDD.Query.API.Controllers
         {
             //http://localhost:5000/querytest?$select=Name,SalesOrders.Count() as Count&$filter=SalesOrders.Count()<100&$orderby=Name&$pagesize=10&$pageindex=0
             var baseQuery = context.Customers.AsQueryable();
+            //var baseQuery = context.Customers.AsQueryable().InterceptWith(new PropertyVisitor());
 
             //if (specification.HasFilter)
             //    baseQuery = baseQuery.ApplySpecificationFilter(specification);
